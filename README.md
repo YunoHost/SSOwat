@@ -3,6 +3,12 @@ SSOwat
 
 A simple SSO for nginx, written in Lua
 
+Requirements
+------------
+
+Nginx "Openresty" flavored : http://openresty.org/
+
+
 Example Nginx conf
 ------------------
 
