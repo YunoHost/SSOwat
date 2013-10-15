@@ -7,6 +7,7 @@ Requirements
 ------------
 
 Nginx "Openresty" flavored : http://openresty.org/
+or nginx-extras in Debian wheezy-backports
 
 
 Example Nginx conf
@@ -15,6 +16,7 @@ Example Nginx conf
 ```nginx
 
 lua_package_path "/usr/share/lua/5.1/nginx/?.lua;;"; # For Debian
+init_by_lua 'conf_path = "path/to/conf.json"';
 init_by_lua_file path/to/init.lua;
 access_by_lua_file path/to/access.lua;
 
