@@ -1,6 +1,8 @@
+--
 -- Load configuration
+--
 local conf_file = assert(io.open("cache.json", "r"), "Configuration file is missing")
-local conf = cjson.decode(conf_file:read("*all"))
+local conf = json.decode(conf_file:read("*all"))
 local portal_url = conf["portal_scheme"].."://"..
                    conf["main_domain"]..
                    ":"..conf["portal_port"]..
@@ -10,20 +12,26 @@ table.insert(conf["skipped_urls"], conf["main_domain"]..conf["portal_path"])
 -- Dummy intructions
 ngx.header["X-YNH-SSO"] = "You've just been SSOed"
 
--- Useful functions
+--
+--  Useful functions
+--
 function string.starts (String, Start)
    return string.sub(String, 1, string.len(Start)) == Start
 end
 
-function set_cookie (user)
+function string.ends (String, End)
+   return End=='' or string.sub(String, -string.len(End)) == End
+end
+
+function set_auth_cookie (user)
     local maxAge = 60 * 60 * 24 * 7 -- 1 week
     local expire = ngx.req.start_time() + maxAge
     local hash = ngx.md5(auth_key..
                "|" ..ngx.var.remote_addr..
                "|"..user..
                "|"..expire)
-    local cookie_str = "; Domain=."..conf["main_domain"]..
-                       "; Path="..conf["portal_path"]..
+    local cookie_str = "; Domain=."..ngx.var.host..
+                       "; Path=/"..
                        "; Max-Age="..maxAge
     ngx.header["Set-Cookie"] = {
         "YnhAuthUser="..user..cookie_str,
@@ -32,20 +40,47 @@ function set_cookie (user)
     }
 end
 
-function delete_cookie ()
-    expired_time = gx.req.start_time() - 3600 -- expired yesterday
+function set_token_cookie ()
+    local token = tostring(math.random(111111, 999999))
+    tokens[token] = token
     ngx.header["Set-Cookie"] = {
-        "YnhAuthUser=;"..expired_time,
-        "YnhAuthHash=;"..expired_time,
-        "YnhAuthExpire=;"..expired_time
+        "YnhAuthToken="..token..
+        "; Path="..conf["portal_path"]..
+        "; Max-Age=3600"
     }
 end
 
+function set_redirect_cookie (redirect_url)
+    ngx.header["Set-Cookie"] = {
+        "YnhAuthRedirect="..redirect_url..
+        "; Path="..conf["portal_path"]..
+        "; Max-Age=3600"
+    }
+end
+
+function delete_cookie ()
+    expired_time = ngx.req.start_time() - 3600 -- expired yesterday
+    ngx.header["Set-Cookie"] = {
+        "YnhAuthUser=;"    ..expired_time,
+        "YnhAuthHash=;"    ..expired_time,
+        "YnhAuthExpire=;"  ..expired_time
+    }
+end
+
+function delete_onetime_cookie ()
+    expired_time = ngx.req.start_time() - 3600 -- expired yesterday
+    ngx.header["Set-Cookie"] = {
+        "YnhAuthToken=;"   ..expired_time,
+        "YnhAuthRedirect=;"..expired_time
+    }
+end
+
+
 function check_cookie ()
     -- Check if cookie is set
-    if not ( ngx.var.cookie_YnhAuthExpire and
-             ngx.var.cookie_YnhAuthUser and
-             ngx.var.cookie_YnhAuthHash)
+    if not ngx.var.cookie_YnhAuthExpire
+    or not ngx.var.cookie_YnhAuthUser
+    or not ngx.var.cookie_YnhAuthHash
     then
         return false
     end
@@ -59,8 +94,8 @@ function check_cookie ()
     local hash = ngx.md5(auth_key..
                "|"..ngx.var.remote_addr..
                "|"..ngx.var.cookie_YnhAuthUser..
-               "|"..YnhAuthExpire)
-    if (hash ~= ngx.var.cookie_YnhAuthHash) then
+               "|"..ngx.var.cookie_YnhAuthExpire)
+    if hash ~= ngx.var.cookie_YnhAuthHash then
         return false
     end
 
@@ -70,8 +105,8 @@ end
 function authenticate (user, password)
     return lualdap.open_simple (
         "localhost",
-        "uid=".. args.user ..",ou=users,dc=yunohost,dc=org",
-        args.password
+        "uid=".. user ..",ou=users,dc=yunohost,dc=org",
+        password
     )
 end
 
@@ -91,13 +126,6 @@ end
 
 function display_login_form ()
     local args = ngx.req.get_uri_args()
-    token = tostring(math.random(111111, 999999))
-    tokens[token] = token
-
-    -- Store the redirect URL
-    if args.r then
-        redirects[token] = ngx.unescape_uri(ngx.decode_base64(args.r))
-    end
 
     if args.action and args.action == 'logout' then
         -- Logout
@@ -105,7 +133,7 @@ function display_login_form ()
         return ngx.redirect(portal_url)
     else
         -- Display normal form
-        ngx.req.set_uri_args(token)
+        set_token_cookie()
         return
     end
 end
@@ -115,56 +143,70 @@ function do_login ()
     local args = ngx.req.get_post_args()
 
     -- CSRF check
-    if args.token and tokens[args.token] then
-        local token = tokens[args.token]
-        tokens[args.token] = nil
+    local token = ngx.var.cookie_YnhAuthToken
+
+    if token and tokens[token] then
+        tokens[token] = nil
 
         if authenticate(args.user, args.password) then
-            set_cookie(args.user)
+            set_auth_cookie(args.user)
+            --ngx.status = ngx.HTTP_CREATED
+            --ngx.exit(ngx.HTTP_OK)
 
             -- Redirect to precedent page
-            if redirects[token] then
-                local redirect_url = redirects[token]
-                redirects[token] = nil
-                return ngx.redirect(redirect_url)
+            local redirect_url = ngx.var.cookie_YnhAuthRedirect
+            if redirect_url then
+	        return ngx.redirect(ngx.unescape_uri(redirect_url))
             end
         end
         return ngx.redirect(portal_url)
     end
 end
 
--- Portal route
+function pass ()
+    if not ngx.header["Content-Type"] then
+        ngx.header["Content-Type"] = "text/html"
+    end
+    delete_onetime_cookie()
+    return
+end
+
+--
+-- Routing
+--
+
+-- Portal
 if ngx.var.host == conf["main_domain"]
    and string.starts(ngx.var.uri, conf["portal_path"])
 then
-    if ngx.req.get_method() == "GET" then
+    if ngx.var.request_method == "GET" then
         return display_login_form()
-    elseif ngx.req.get_method() == "POST" then
+    elseif ngx.var.request_method == "POST" then
         return do_login()
     end
 end
 
 -- Skipped urls
 for _, url in ipairs(conf["skipped_urls"]) do
-    if ngx.var.host..ngx.var.uri == url then
-        return
+    if string.starts(ngx.var.host..ngx.var.uri, url) then
+        return pass
     end
 end
 
 -- Unprotected urls
 for _, url in ipairs(conf["unprotected_urls"]) do
-    if ngx.var.host..ngx.var.uri == url then
+    if string.starts(ngx.var.host..ngx.var.uri, url) then
         if check_cookie() then
             set_headers(ngx.var.cookie_YnhAuthUser)
         end
-        return
+        return pass
     end
 end
 
 -- Cookie validation
 if check_cookie() then
     set_headers(ngx.var.cookie_YnhAuthUser)
-    return
+    return pass
 end
 
 -- Connect with HTTP Auth if credentials are brought
@@ -174,10 +216,16 @@ if auth_header then
     _, _, user, password = string.find(ngx.decode_base64(b64_cred), "^(.+):(.+)$")
     if authenticate(user, password) then
         set_headers(user)
-        return
+        return pass
     end
 end
 
--- Else redirect to portal
-local back_url = ngx.encode_base64(ngx.escape_uri(ngx.var.scheme .. "://" .. ngx.var.http_host .. ngx.var.uri))
-return ngx.redirect(portal_url.."?r="..back_url)
+if not ngx.var.cookie_YnhAuthRedirect and not string.ends(ngx.var.uri, "favicon.ico") then
+    -- Else redirect to portal
+    local back_url = ngx.escape_uri(ngx.var.scheme .. "://" .. ngx.var.http_host .. ngx.var.uri)
+    set_redirect_cookie(back_url)
+    return ngx.redirect(portal_url)
+else
+    ngx.status = ngx.HTTP_UNAUTHORIZED
+    return ngx.exit(ngx.HTTP_OK)
+end

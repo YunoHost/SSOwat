@@ -1,5 +1,5 @@
 -- Load libraries
-cjson = require "cjson"
+json = require "json"
 lualdap = require "lualdap"
 math = require "math"
 
@@ -7,7 +7,5 @@ math = require "math"
 math.randomseed(os.time())
 auth_key = math.random(1111111, 9999999)
 
--- Shared tables
+-- Shared table
 tokens = {}
-redirects = {}
-flashs = {}
