@@ -6,7 +6,8 @@ A simple SSO for nginx, written in Lua
 Example Nginx conf
 ------------------
 
-'''
+```nginx
+
 lua_package_path "/usr/share/lua/5.1/nginx/?.lua;;"; # For Debian
 init_by_lua_file path/to/init.lua;
 access_by_lua_file path/to/access.lua;
@@ -37,4 +38,4 @@ server {
 
 }
 
-'''
+```
