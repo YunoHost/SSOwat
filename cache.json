@@ -1,0 +1,11 @@
+{
+   "main_domain": "mydomain.com",
+   "portal_path": "/ssowat/",
+   "portal_port": "443",
+   "portal_scheme": "https",
+   "skipped_urls": [
+       "mydomain.com/megusta",
+       "myotherdomain.com/somuchwin"
+    ],
+   "unprotected_urls": ["mydomain.com/yunoprotect"]
+}
