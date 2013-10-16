@@ -3,6 +3,10 @@
    "portal_path": "/ssowat/",
    "portal_port": "443",
    "portal_scheme": "https",
+   "domains": [
+        "mydomain.com",
+        "myotherdomain.com"
+    ],
    "skipped_urls": [
        "mydomain.com/megusta",
        "myotherdomain.com/somuchwin"

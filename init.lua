@@ -9,3 +9,8 @@ auth_key = math.random(1111111, 9999999)
 
 -- Shared table
 tokens = {}
+cache = {}
+connections = {}
+
+-- Path of the configuration
+conf_path = 'conf.json'
