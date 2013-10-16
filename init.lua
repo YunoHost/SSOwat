@@ -10,7 +10,8 @@ srvkey = math.random(1111111, 9999999)
 -- Shared table
 tokens = {}
 cache = {}
-connections = {}
+login = {}
+logout = {}
 
 -- Path of the configuration
 conf_path = '/etc/ssowat/conf.json'

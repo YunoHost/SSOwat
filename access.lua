@@ -154,18 +154,25 @@ function display_login_form ()
     ngx.req.set_header("Cache-Control", "no-cache")
 
     if args.action and args.action == 'logout' then
-        -- Logout
-        delete_cookie()
-        return redirect(portal_url)
-    else
-        -- Set redirect
-        if args.r then set_redirect_cookie(ngx.decode_base64(args.r)) end
-        -- Set token
-        set_token_cookie()
-        ngx.header["Cache-Control"] = "no-cache"
-        ngx.header["Set-Cookie"] = cookies
-        return
+        if check_cookie() then
+            local user = ngx.var.cookie_SSOwAuthUser
+            logout[user] = {}
+            logout[user]["redirect_url"] = portal_url
+            logout[user]["domains"] = {}
+            for _, value in ipairs(conf["domains"]) do
+                table.insert(logout[user]["domains"], value)
+            end
+            return redirect(ngx.var.scheme.."://"..ngx.var.http_host.."/?ssologout="..user)
+        end
     end
+
+    -- Set redirect
+    if args.r then set_redirect_cookie(ngx.decode_base64(args.r)) end
+    -- Set token
+    set_token_cookie()
+    ngx.header["Cache-Control"] = "no-cache"
+    ngx.header["Set-Cookie"] = cookies
+    return
 end
 
 function do_login ()
@@ -186,18 +193,58 @@ function do_login ()
                 redirect_url = ngx.decode_base64(uri_args.r)
             end
             if not redirect_url then redirect_url = portal_url end
-            connections[args.user] = {}
-            connections[args.user]["redirect_url"] = redirect_url
-            connections[args.user]["domains"] = {}
+            login[args.user] = {}
+            login[args.user]["redirect_url"] = redirect_url
+            login[args.user]["domains"] = {}
             for _, value in ipairs(conf["domains"]) do
-                table.insert(connections[args.user]["domains"], value)
+                table.insert(login[args.user]["domains"], value)
             end
 
             -- Connect to the first domain (self)
-            return redirect(ngx.var.scheme.."://"..ngx.var.http_host.."/?ssoconnect="..args.user)
+            return redirect(ngx.var.scheme.."://"..ngx.var.http_host.."/?ssologin="..args.user)
         end
     end
     return redirect(portal_url)
+end
+
+function login_walkthrough (user)
+    -- Set Authentication cookies
+    set_auth_cookie(user, ngx.var.host)
+    -- Remove domain from login table
+    domain_key = is_in_table(login[user]["domains"], ngx.var.host)
+    table.remove(login[user]["domains"], domain_key)
+
+    if table.getn(login[user]["domains"]) == 0 then
+        -- All the redirections has been made
+        local redirect_url = login[user]["redirect_url"]
+        login[user] = nil
+        return redirect(ngx.unescape_uri(redirect_url))
+    else
+        -- Redirect to the next domain
+        for _, domain in ipairs(login[user]["domains"]) do
+            return redirect(ngx.var.scheme.."://"..domain.."/?ssologin="..user)
+        end
+    end
+end
+
+function logout_walkthrough (user)
+    -- Expire Authentication cookies
+    delete_cookie()
+    -- Remove domain from logout table
+    domain_key = is_in_table(logout[user]["domains"], ngx.var.host)
+    table.remove(logout[user]["domains"], domain_key)
+
+    if table.getn(logout[user]["domains"]) == 0 then
+        -- All the redirections has been made
+        local redirect_url = logout[user]["redirect_url"]
+        logout[user] = nil
+        return redirect(ngx.unescape_uri(redirect_url))
+    else
+        -- Redirect to the next domain
+        for _, domain in ipairs(logout[user]["domains"]) do
+            return redirect(ngx.var.scheme.."://"..domain.."/?ssologout="..user)
+        end
+    end
 end
 
 function redirect (url)
@@ -215,30 +262,18 @@ end
 -- Routing
 --
 
--- Connection
+-- Logging in/out
 if ngx.var.request_method == "GET" then
     local args = ngx.req.get_uri_args()
 
-    -- /?ssoconnect=user
-    local user = args.ssoconnect
-    if user and connections[user] then
-        -- Set Authentication cookie
-        set_auth_cookie(user, ngx.var.host)
-        -- Remove domain from connection table
-        domain_key = is_in_table(connections[user]["domains"], ngx.var.host)
-        table.remove(connections[user]["domains"], domain_key)
+    local user = args.ssologin
+    if user and login[user] then
+        return login_walkthrough(user)
+    end
 
-        if table.getn(connections[user]["domains"]) == 0 then
-            -- All the redirections has been made
-            local redirect_url = connections[user]["redirect_url"]
-            connections[user] = nil
-            return redirect(ngx.unescape_uri(redirect_url))
-        else
-            -- Redirect to the next domain
-            for _, domain in ipairs(connections[user]["domains"]) do
-                return redirect(ngx.var.scheme.."://"..domain.."/?ssoconnect="..user)
-            end
-        end
+    user = args.ssologout
+    if user and logout[user] then
+        return logout_walkthrough(user)
     end
 end
 
@@ -279,7 +314,7 @@ else
 end
 
 
--- Connect with HTTP Auth if credentials are brought
+-- Login with HTTP Auth if credentials are brought
 local auth_header = ngx.req.get_headers()["Authorization"]
 if auth_header then
     _, _, b64_cred = string.find(auth_header, "^Basic%s+(.+)$")
