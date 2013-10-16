@@ -18,14 +18,19 @@ Requirements
 Installation
 ------------
 
+* Fetch the repository
 ```bash
 git clone https://github.com/Kloadut/SSOwat /etc/ssowat
+```
+* Edit SSOwat configuration
+```
 nano /etc/ssowat/conf.json
 ```
 
 Nginx conf
 ----------
 
+* Add SSOwat's Nginx configuration
 ```bash
 nano /etc/nginx/conf.d/ssowat.conf
 ```
@@ -38,7 +43,7 @@ access_by_lua_file /etc/ssowat/access.lua;
 server {
     listen 80; # Do not forget HTTPS for production
 
-    location /sso {
+    location /ssowat {
        alias /etc/ssowat/portal;
        default_type text/html;
        index index.html;
