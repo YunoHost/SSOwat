@@ -11,7 +11,7 @@ local portal_url = conf["portal_scheme"].."://"..
 table.insert(conf["skipped_urls"], conf["main_domain"]..conf["portal_path"])
 
 -- Dummy intructions
-ngx.header["X-YNH-SSO"] = "You've just been SSOed"
+ngx.header["X-SSO-WAT"] = "You've just been SSOed"
 
 --
 --  Useful functions
