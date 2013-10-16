@@ -11,5 +11,11 @@
        "mydomain.com/megusta",
        "myotherdomain.com/somuchwin"
     ],
-   "unprotected_urls": ["mydomain.com/yunoprotect"]
+   "unprotected_urls": ["mydomain.com/yunoprotect"],
+   "additional_headers": {
+       "Auth-User": "uid",
+       "Remote-User": "uid",
+       "Email": "mail",
+       "Name": "cn"
+   }
 }

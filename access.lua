@@ -137,13 +137,16 @@ function set_headers (user)
         end
     end
 
-    ngx.req.set_header("Auth-User", user)
-    ngx.req.set_header("Remote-User", user)
-    ngx.req.set_header("Name", cache[user]["cn"])
-    ngx.req.set_header("Email", cache[user]["mail"])
+    -- Set HTTP Auth header
     ngx.req.set_header("Authorization", "Basic "..ngx.encode_base64(
       cache[user]["uid"]..":"..cache[user]["password"]
     ))
+
+    -- Set Additional headers
+    for k, v in pairs(conf["additional_headers"]) do
+        ngx.req.set_header(k, cache[user][v])
+    end
+
 end
 
 function display_login_form ()
