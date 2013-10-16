@@ -131,12 +131,16 @@ function set_headers (user)
             base = "uid=".. user ..",ou=users,dc=yunohost,dc=org",
             scope = "base",
             sizelimit = 1,
-            attrs = {"uid", "givenName", "sn", "homeDirectory", "mail"}
+            attrs = {"uid", "givenName", "sn", "cn", "homeDirectory", "mail"}
         } do
             for k,v in pairs(attribs) do cache[user][k] = v end
         end
     end
 
+    ngx.header["Auth-User"] = user
+    ngx.header["Remote-User"] = user
+    ngx.header["Name"] = cache[user]["cn"]
+    ngx.header["Email"] = cache[user]["mail"]
     ngx.header["Authorization"] = "Basic "..ngx.encode_base64(
         cache[user]["uid"]..":"..cache[user]["password"]
     )
