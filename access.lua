@@ -137,13 +137,13 @@ function set_headers (user)
         end
     end
 
-    ngx.header["Auth-User"] = user
-    ngx.header["Remote-User"] = user
-    ngx.header["Name"] = cache[user]["cn"]
-    ngx.header["Email"] = cache[user]["mail"]
-    ngx.header["Authorization"] = "Basic "..ngx.encode_base64(
-        cache[user]["uid"]..":"..cache[user]["password"]
-    )
+    ngx.req.set_header("Auth-User", user)
+    ngx.req.set_header("Remote-User", user)
+    ngx.req.set_header("Name", cache[user]["cn"])
+    ngx.req.set_header("Email", cache[user]["mail"])
+    ngx.req.set_header("Authorization", "Basic "..ngx.encode_base64(
+      cache[user]["uid"]..":"..cache[user]["password"]
+    ))
 end
 
 function display_login_form ()
@@ -164,7 +164,7 @@ function display_login_form ()
     and tokens[ngx.var.cookie_SSOwAuthToken]
     then
         -- Display normal form
-        return pass
+        return
     else
         -- Set token
         set_token_cookie()
@@ -202,12 +202,12 @@ end
 
 function redirect (url)
     ngx.header["Set-Cookie"] = cookies
-    return ngx.redirect(url, ngx.HTTP_MOVED_PERMANENTLY)
+    return ngx.redirect(url)
 end
 
 function pass ()
     delete_onetime_cookie()
-    ngx.header["Set-Cookie"] = cookies
+    ngx.req.set_header("Set-Cookie", cookies)
     return
 end
 
