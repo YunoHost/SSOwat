@@ -1,13 +1,17 @@
 SSOwat
 ======
 
-A simple SSO for nginx, written in Lua
+A simple LDAP SSO for nginx, written in Lua
 
 Requirements
 ------------
 
-Nginx "Openresty" flavored : http://openresty.org/
-or nginx-extras in Debian wheezy-backports
+- Nginx-extras from Debian wheezy-backports
+- lua-json 
+- lua-ldap
+OR
+- Nginx "Openresty" flavored : http://openresty.org/
+- lua-ldap
 
 
 Example Nginx conf
