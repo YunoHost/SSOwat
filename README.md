@@ -9,7 +9,9 @@ Requirements
 - Nginx-extras from Debian wheezy-backports
 - lua-json 
 - lua-ldap
+
 OR
+
 - Nginx "Openresty" flavored : http://openresty.org/
 - lua-ldap
 
