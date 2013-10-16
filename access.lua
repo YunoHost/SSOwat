@@ -37,7 +37,7 @@ end
 function set_auth_cookie (user, domain)
     local maxAge = 60 * 60 * 24 * 7 -- 1 week
     local expire = ngx.req.start_time() + maxAge
-    local hash = ngx.md5(auth_key..
+    local hash = ngx.md5(srvkey..
                "|" ..ngx.var.remote_addr..
                "|"..user..
                "|"..expire)
@@ -99,7 +99,7 @@ function check_cookie ()
         -- Check expire time
         if (ngx.req.start_time() <= tonumber(ngx.var.cookie_SSOwAuthExpire)) then
             -- Check hash
-            local hash = ngx.md5(auth_key..
+            local hash = ngx.md5(srvkey..
                     "|"..ngx.var.remote_addr..
                     "|"..ngx.var.cookie_SSOwAuthUser..
                     "|"..ngx.var.cookie_SSOwAuthExpire)
