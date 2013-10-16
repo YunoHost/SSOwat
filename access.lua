@@ -6,7 +6,6 @@ local conf_file = assert(io.open(conf_path, "r"), "Configuration file is missing
 local conf = json.decode(conf_file:read("*all"))
 local portal_url = conf["portal_scheme"].."://"..
                    conf["portal_domain"]..
-                   ":"..conf["portal_port"]..
                    conf["portal_path"]
 table.insert(conf["skipped_urls"], conf["portal_domain"]..conf["portal_path"])
 
@@ -49,17 +48,6 @@ function set_auth_cookie (user, domain)
     cook("SSOwAuthExpire="..expire..cookie_str)
 end
 
-function set_token_cookie ()
-    local token = tostring(math.random(111111, 999999))
-    tokens[token] = token
-    cook(
-        "SSOwAuthToken="..token..
-        "; Domain=."..conf["portal_domain"]..
-        "; Path="..conf["portal_path"]..
-        "; Max-Age=3600"
-    )
-end
-
 function set_redirect_cookie (redirect_url)
     cook(
         "SSOwAuthRedirect="..redirect_url..
@@ -84,7 +72,6 @@ function delete_onetime_cookie ()
     expired_time = "Thu, Jan 01 1970 00:00:00 UTC;"
     local cookie_str = "; Path="..conf["portal_path"]..
                        "; Max-Age="..expired_time
-    cook("SSOwAuthToken=;"    ..cookie_str)
     cook("SSOwAuthRedirect=;" ..cookie_str)
 end
 
@@ -167,11 +154,11 @@ function display_login_form ()
     end
 
     -- Set redirect
-    if args.r then set_redirect_cookie(ngx.decode_base64(args.r)) end
-    -- Set token
-    set_token_cookie()
+    if args.r then
+        set_redirect_cookie(ngx.decode_base64(args.r))
+        ngx.header["Set-Cookie"] = cookies
+    end
     ngx.header["Cache-Control"] = "no-cache"
-    ngx.header["Set-Cookie"] = cookies
     return
 end
 
@@ -180,11 +167,7 @@ function do_login ()
     local args = ngx.req.get_post_args()
     local uri_args = ngx.req.get_uri_args()
 
-    -- CSRF check
-    local token = ngx.var.cookie_SSOwAuthToken
-
-    if token and tokens[token] then
-        tokens[token] = nil
+    if string.starts(ngx.var.http_referer, portal_url) then
         ngx.status = ngx.HTTP_CREATED
 
         if authenticate(args.user, args.password) then

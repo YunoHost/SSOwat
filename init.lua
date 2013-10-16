@@ -8,7 +8,6 @@ math.randomseed(os.time())
 srvkey = math.random(1111111, 9999999)
 
 -- Shared table
-tokens = {}
 cache = {}
 login = {}
 logout = {}
