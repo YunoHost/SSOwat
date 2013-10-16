@@ -7,49 +7,44 @@ Requirements
 ------------
 
 - Nginx-extras from Debian wheezy-backports
-- lua-json 
+- lua-json
 - lua-ldap
 
-OR
+**OR**
 
 - Nginx "Openresty" flavored : http://openresty.org/
 - lua-ldap
 
+Installation
+------------
 
-Example Nginx conf
-------------------
+```bash
+git clone https://github.com/Kloadut/SSOwat /etc/ssowat
+nano /etc/ssowat/conf.json
+```
+
+Nginx conf
+----------
+
+```bash
+nano /etc/nginx/conf.d/ssowat.conf
+```
 
 ```nginx
 
-init_by_lua_file path/to/init.lua;
-access_by_lua_file path/to/access.lua;
+init_by_lua_file   /etc/ssowat/init.lua;
+access_by_lua_file /etc/ssowat/access.lua;
 
-# SSO domain
 server {
-    listen 80;
-    server_name  mydomain.com;
-    root /var/www/mydomain.com;
+    listen 80; # Do not forget HTTPS for production
 
-    location /ssowat {
-       alias /var/www/ssowat;
+    location /sso {
+       alias /etc/ssowat/portal;
        default_type text/html;
+       index index.html;
     }
-
-    location /whatever {
-
-        ...
-
-    }
-}
-
-# Other domain
-server {
-    listen 80;
-    server_name myotherdomain.com;
-    root /var/www/myotherdomain.com;
-
-    ...
-
 }
 
 ```
+
+**That's it !**
