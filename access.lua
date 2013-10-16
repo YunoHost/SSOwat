@@ -44,16 +44,17 @@ function set_auth_cookie (user, domain)
     local cookie_str = "; Domain=."..domain..
                        "; Path=/"..
                        "; Max-Age="..maxAge
-    cook("YnhAuthUser="..user..cookie_str)
-    cook("YnhAuthHash="..hash..cookie_str)
-    cook("YnhAuthExpire="..expire..cookie_str)
+    cook("SSOwAuthUser="..user..cookie_str)
+    cook("SSOwAuthHash="..hash..cookie_str)
+    cook("SSOwAuthExpire="..expire..cookie_str)
 end
 
 function set_token_cookie ()
     local token = tostring(math.random(111111, 999999))
     tokens[token] = token
     cook(
-        "YnhAuthToken="..token..
+        "SSOwAuthToken="..token..
+        "; Domain=."..conf["portal_domain"]..
         "; Path="..conf["portal_path"]..
         "; Max-Age=3600"
     )
@@ -61,52 +62,52 @@ end
 
 function set_redirect_cookie (redirect_url)
     cook(
-        "YnhAuthRedirect="..redirect_url..
-        "; Domain=."..conf["portal_domain"]..
+        "SSOwAuthRedirect="..redirect_url..
         "; Path="..conf["portal_path"]..
         "; Max-Age=3600"
     )
 end
 
 function delete_cookie ()
-    expired_time = ngx.req.start_time() - 3600 -- expired yesterday
-    cook("YnhAuthUser=;"    ..expired_time)
-    cook("YnhAuthHash=;"    ..expired_time)
-    cook("YnhAuthExpire=;"  ..expired_time)
+    expired_time = "Thu, Jan 01 1970 00:00:00 UTC;"
+    for _, domain in ipairs(conf["domains"]) do
+        local cookie_str = "; Domain=."..domain..
+                           "; Path=/"..
+                           "; Max-Age="..expired_time
+        cook("SSOwAuthUser=;"    ..cookie_str)
+        cook("SSOwAuthHash=;"    ..cookie_str)
+        cook("SSOwAuthExpire=;"  ..cookie_str)
+    end
 end
 
 function delete_onetime_cookie ()
-    expired_time = ngx.req.start_time() - 3600 -- expired yesterday
-    cook("YnhAuthToken=;"   ..expired_time)
-    cook("YnhAuthRedirect=;"..expired_time)
+    expired_time = "Thu, Jan 01 1970 00:00:00 UTC;"
+    local cookie_str = "; Path="..conf["portal_path"]..
+                       "; Max-Age="..expired_time
+    cook("SSOwAuthToken=;"    ..cookie_str)
+    cook("SSOwAuthRedirect=;" ..cookie_str)
 end
 
 
 function check_cookie ()
 
     -- Check if cookie is set
-    if not ngx.var.cookie_YnhAuthExpire
-    or not ngx.var.cookie_YnhAuthUser
-    or not ngx.var.cookie_YnhAuthHash
+    if  ngx.var.cookie_SSOwAuthExpire and ngx.var.cookie_SSOwAuthExpire ~= ""
+    and ngx.var.cookie_SSOwAuthHash   and ngx.var.cookie_SSOwAuthHash   ~= ""
+    and ngx.var.cookie_SSOwAuthUser   and ngx.var.cookie_SSOwAuthUser   ~= ""
     then
-        return false
+        -- Check expire time
+        if (ngx.req.start_time() <= tonumber(ngx.var.cookie_SSOwAuthExpire)) then
+            -- Check hash
+            local hash = ngx.md5(auth_key..
+                    "|"..ngx.var.remote_addr..
+                    "|"..ngx.var.cookie_SSOwAuthUser..
+                    "|"..ngx.var.cookie_SSOwAuthExpire)
+            return hash == ngx.var.cookie_SSOwAuthHash
+        end
     end
 
-    -- Check expire time
-    if (ngx.req.start_time() >= tonumber(ngx.var.cookie_YnhAuthExpire)) then
-        return false
-    end
-
-    -- Check hash
-    local hash = ngx.md5(auth_key..
-               "|"..ngx.var.remote_addr..
-               "|"..ngx.var.cookie_YnhAuthUser..
-               "|"..ngx.var.cookie_YnhAuthExpire)
-    if hash ~= ngx.var.cookie_YnhAuthHash then
-        return false
-    end
-
-    return true
+    return false
 end
 
 function authenticate (user, password)
@@ -155,7 +156,9 @@ function display_login_form ()
         -- Logout
         delete_cookie()
         return redirect(portal_url)
-    elseif ngx.var.cookie_YnhAuthToken then
+    elseif ngx.var.cookie_SSOwAuthToken
+    and tokens[ngx.var.cookie_SSOwAuthToken]
+    then
         -- Display normal form
         return pass
     else
@@ -170,14 +173,14 @@ function do_login ()
     local args = ngx.req.get_post_args()
 
     -- CSRF check
-    local token = ngx.var.cookie_YnhAuthToken
+    local token = ngx.var.cookie_SSOwAuthToken
 
     if token and tokens[token] then
         tokens[token] = nil
         ngx.status = ngx.HTTP_CREATED
 
         if authenticate(args.user, args.password) then
-            local redirect_url = ngx.var.cookie_YnhAuthRedirect
+            local redirect_url = ngx.var.cookie_SSOwAuthRedirect
             if not redirect_url then redirect_url = portal_url end
             connections[args.user] = {}
             connections[args.user]["redirect_url"] = redirect_url
@@ -200,6 +203,7 @@ end
 
 function pass ()
     delete_onetime_cookie()
+    ngx.header["Set-Cookie"] = cookies
     return
 end
 
@@ -256,7 +260,7 @@ end
 for _, url in ipairs(conf["unprotected_urls"]) do
     if string.starts(ngx.var.host..ngx.var.uri, url) then
         if check_cookie() then
-            set_headers(ngx.var.cookie_YnhAuthUser)
+            set_headers(ngx.var.cookie_SSOwAuthUser)
         end
         return pass
     end
@@ -264,8 +268,10 @@ end
 
 -- Cookie validation
 if check_cookie() then
-    set_headers(ngx.var.cookie_YnhAuthUser)
+    set_headers(ngx.var.cookie_SSOwAuthUser)
     return pass
+else
+    delete_cookie()
 end
 
 
