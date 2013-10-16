@@ -148,11 +148,13 @@ end
 
 function display_login_form ()
     local args = ngx.req.get_uri_args()
+    ngx.req.set_header("Cache-Control", "no-cache")
 
     -- Redirected from another domain
     if args.r then
         local redirect_url = ngx.decode_base64(args.r)
         set_redirect_cookie(redirect_url)
+        ngx.header["Cache-Control"] = "no-cache"
         return redirect(portal_url)
     end
 
