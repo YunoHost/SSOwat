@@ -16,7 +16,7 @@ Example Nginx conf
 ```nginx
 
 lua_package_path "/usr/share/lua/5.1/nginx/?.lua;;"; # For Debian
-init_by_lua 'conf_path = "path/to/conf.json"';
+
 init_by_lua_file path/to/init.lua;
 access_by_lua_file path/to/access.lua;
 
@@ -24,23 +24,25 @@ access_by_lua_file path/to/access.lua;
 server {
     listen 80;
     server_name  mydomain.com;
+    root /var/www/mydomain.com;
 
-    location = /ssowat/ {
-       root /var/www/portal;
-       index  login.html;
-       add_header Content-Type text/html;
+    location /ssowat {
+       alias /var/www/ssowat;
+       default_type text/html;
     }
 
-    location = /whatever/ {
+    location /whatever {
 
         ...
 
+    }
 }
 
 # Other domain
 server {
     listen 80;
     server_name myotherdomain.com;
+    root /var/www/myotherdomain.com;
 
     ...
 
