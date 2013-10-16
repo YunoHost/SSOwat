@@ -19,10 +19,13 @@ Installation
 ------------
 
 * Fetch the repository
+
 ```bash
 git clone https://github.com/Kloadut/SSOwat /etc/ssowat
 ```
+
 * Edit SSOwat configuration
+
 ```
 nano /etc/ssowat/conf.json
 ```
@@ -31,6 +34,7 @@ Nginx conf
 ----------
 
 * Add SSOwat's Nginx configuration
+
 ```bash
 nano /etc/nginx/conf.d/ssowat.conf
 ```
