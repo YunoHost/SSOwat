@@ -153,33 +153,25 @@ function display_login_form ()
     local args = ngx.req.get_uri_args()
     ngx.req.set_header("Cache-Control", "no-cache")
 
-    -- Redirected from another domain
-    if args.r then
-        local redirect_url = ngx.decode_base64(args.r)
-        set_redirect_cookie(redirect_url)
-        ngx.header["Cache-Control"] = "no-cache"
-        return redirect(portal_url)
-    end
-
     if args.action and args.action == 'logout' then
         -- Logout
         delete_cookie()
         return redirect(portal_url)
-    elseif ngx.var.cookie_SSOwAuthToken
-    and tokens[ngx.var.cookie_SSOwAuthToken]
-    then
-        -- Display normal form
-        return
     else
+        -- Set redirect
+        if args.r then set_redirect_cookie(ngx.decode_base64(args.r)) end
         -- Set token
         set_token_cookie()
-        return redirect(portal_url)
+        ngx.header["Cache-Control"] = "no-cache"
+        ngx.header["Set-Cookie"] = cookies
+        return
     end
 end
 
 function do_login ()
     ngx.req.read_body()
     local args = ngx.req.get_post_args()
+    local uri_args = ngx.req.get_uri_args()
 
     -- CSRF check
     local token = ngx.var.cookie_SSOwAuthToken
@@ -190,6 +182,9 @@ function do_login ()
 
         if authenticate(args.user, args.password) then
             local redirect_url = ngx.var.cookie_SSOwAuthRedirect
+            if uri_args.r then
+                redirect_url = ngx.decode_base64(uri_args.r)
+            end
             if not redirect_url then redirect_url = portal_url end
             connections[args.user] = {}
             connections[args.user]["redirect_url"] = redirect_url
@@ -297,10 +292,5 @@ end
 
 -- Else redirect to portal
 local back_url = ngx.escape_uri(ngx.var.scheme .. "://" .. ngx.var.http_host .. ngx.var.uri)
-if set_redirect_cookie(back_url) then
-    -- From same domain
-    return redirect(portal_url)
-else
-    -- From another domain
-    return redirect(portal_url.."?r="..ngx.encode_base64(back_url))
-end
+-- From another domain
+return redirect(portal_url.."?r="..ngx.encode_base64(back_url))
