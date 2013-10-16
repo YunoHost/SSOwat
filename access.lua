@@ -5,10 +5,10 @@ cookies = {}
 local conf_file = assert(io.open(conf_path, "r"), "Configuration file is missing")
 local conf = json.decode(conf_file:read("*all"))
 local portal_url = conf["portal_scheme"].."://"..
-                   conf["main_domain"]..
+                   conf["portal_domain"]..
                    ":"..conf["portal_port"]..
                    conf["portal_path"]
-table.insert(conf["skipped_urls"], conf["main_domain"]..conf["portal_path"])
+table.insert(conf["skipped_urls"], conf["portal_domain"]..conf["portal_path"])
 
 -- Dummy intructions
 ngx.header["X-SSO-WAT"] = "You've just been SSOed"
@@ -62,7 +62,7 @@ end
 function set_redirect_cookie (redirect_url)
     cook(
         "YnhAuthRedirect="..redirect_url..
-        "; Domain=."..conf["main_domain"]..
+        "; Domain=."..conf["portal_domain"]..
         "; Path="..conf["portal_path"]..
         "; Max-Age=3600"
     )
@@ -235,7 +235,7 @@ if ngx.var.request_method == "GET" then
 end
 
 -- Portal
-if ngx.var.host == conf["main_domain"]
+if ngx.var.host == conf["portal_domain"]
    and string.starts(ngx.var.uri, conf["portal_path"])
 then
     if ngx.var.request_method == "GET" then

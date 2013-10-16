@@ -1,5 +1,5 @@
 {
-   "main_domain": "mydomain.com",
+   "portal_domain": "mydomain.com",
    "portal_path": "/ssowat/",
    "portal_port": "443",
    "portal_scheme": "https",
