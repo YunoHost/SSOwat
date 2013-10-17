@@ -201,7 +201,7 @@ function login_walkthrough (user)
         -- All the redirections has been made
         local redirect_url = login[user]["redirect_url"]
         login[user] = nil
-        return redirect(ngx.unescape_uri(redirect_url))
+        return redirect(redirect_url)
     else
         -- Redirect to the next domain
         for _, domain in ipairs(login[user]["domains"]) do
@@ -221,7 +221,7 @@ function logout_walkthrough (user)
         -- All the redirections has been made
         local redirect_url = logout[user]["redirect_url"]
         logout[user] = nil
-        return redirect(ngx.unescape_uri(redirect_url))
+        return redirect(redirect_url)
     else
         -- Redirect to the next domain
         for _, domain in ipairs(logout[user]["domains"]) do
@@ -309,6 +309,6 @@ if auth_header then
 end
 
 -- Else redirect to portal
-local back_url = ngx.escape_uri(ngx.var.scheme .. "://" .. ngx.var.http_host .. ngx.var.uri)
+local back_url = ngx.var.scheme .. "://" .. ngx.var.http_host .. ngx.var.uri
 -- From another domain
 return redirect(portal_url.."?r="..ngx.encode_base64(back_url))
