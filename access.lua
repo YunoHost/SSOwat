@@ -142,9 +142,13 @@ function display_login_form ()
 
     if args.action and args.action == 'logout' then
         if check_cookie() then
+            local redirect_url = portal_url
+            if args.r then
+                redirect_url = ngx.decode_base64(args.r)
+            end
             local user = ngx.var.cookie_SSOwAuthUser
             logout[user] = {}
-            logout[user]["redirect_url"] = portal_url
+            logout[user]["redirect_url"] = redirect_url
             logout[user]["domains"] = {}
             for _, value in ipairs(conf["domains"]) do
                 table.insert(logout[user]["domains"], value)
