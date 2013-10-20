@@ -1,8 +1,7 @@
 {
+   "portal_scheme": "https",
    "portal_domain": "mydomain.com",
    "portal_path": "/ssowat/",
-   "portal_port": "443",
-   "portal_scheme": "https",
    "domains": [
         "mydomain.com",
         "myotherdomain.com"

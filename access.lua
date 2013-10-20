@@ -13,8 +13,129 @@ table.insert(conf["skipped_urls"], conf["portal_domain"]..conf["portal_path"])
 ngx.header["X-SSO-WAT"] = "You've just been SSOed"
 
 --
+-- Routing
+--
+
+-- Logging in/out
+--   i.e. http://mydomain.org/?ssologin=myuser
+
+if ngx.var.request_method == "GET" then
+    local args = ngx.req.get_uri_args()
+
+    -- In login loop
+    local user = args.ssologin
+    if user and login[user] then
+        return login_walkthrough(user)
+    end
+
+    -- In logout loop
+    user = args.ssologout
+    if user and logout[user] then
+        return logout_walkthrough(user)
+    end
+end
+
+
+-- Portal
+--   i.e. http://mydomain.org/ssowat/*
+
+if ngx.var.host == conf["portal_domain"]
+   and string.starts(ngx.var.uri, conf["portal_path"])
+then
+
+    if ngx.var.request_method == "GET" then
+
+        uri_args = ngx.req.get_uri_args()
+        if uri_args.action and uri_args.action == 'logout' then
+            -- Logout
+            return do_logout()
+
+        elseif check_cookie() or ngx.var.uri == conf["portal_path"] then
+            -- Serve normal portal
+            return serve(ngx.var.uri)
+
+        else
+            -- Redirect to portal
+            return redirect(portal_url)
+        end
+
+    elseif ngx.var.request_method == "POST" then
+
+        if string.starts(ngx.var.http_referer, portal_url) then
+            -- CSRF protection
+            return do_login()
+        else
+            -- Redirect to portal
+            return redirect(portal_url)
+    end
+end
+
+
+-- Skipped urls
+--  i.e. http://mydomain.org/no_protection/
+
+for _, url in ipairs(conf["skipped_urls"]) do
+    if string.starts(ngx.var.host..ngx.var.uri, url) then
+        return pass()
+    end
+end
+
+
+-- Unprotected urls
+--  i.e. http://mydomain.org/no_protection+headers/
+
+for _, url in ipairs(conf["unprotected_urls"]) do
+    if string.starts(ngx.var.host..ngx.var.uri, url) then
+        if check_cookie() then
+            set_headers(ngx.var.cookie_SSOwAuthUser)
+        end
+        return pass()
+    end
+end
+
+
+-- Cookie validation
+--
+
+if check_cookie() then
+    set_headers(ngx.var.cookie_SSOwAuthUser)
+    return pass
+else
+    delete_cookie()
+end
+
+
+-- Login with HTTP Auth if credentials are brought
+--
+
+local auth_header = ngx.req.get_headers()["Authorization"]
+if auth_header then
+    _, _, b64_cred = string.find(auth_header, "^Basic%s+(.+)$")
+    _, _, user, password = string.find(ngx.decode_base64(b64_cred), "^(.+):(.+)$")
+    if authenticate(user, password) then
+        set_headers(user)
+        return pass()
+    end
+end
+
+-- Else redirect to portal
+--
+
+local back_url = ngx.var.scheme .. "://" .. ngx.var.http_host .. ngx.var.uri
+return redirect(portal_url.."?r="..ngx.encode_base64(back_url))
+
+
+--
 --  Useful functions
 --
+function read_file(file)
+    local f = io.open(file, "rb")
+    if not f then return false
+    local content = f:read("*all")
+    f:close()
+    return content
+end
+
 function is_in_table (t, v)
     for key, value in ipairs(t) do
         if value == v then return key end
@@ -136,34 +257,57 @@ function set_headers (user)
 
 end
 
-function display_login_form ()
-    local args = ngx.req.get_uri_args()
-    ngx.req.set_header("Cache-Control", "no-cache")
+-- Yo dawg
+function serve(uri)
+    rel_path = string.gsub(uri, conf["portal_path"], "/")
 
-    if args.action and args.action == 'logout' then
-        if check_cookie() then
-            local redirect_url = portal_url
-            if args.r then
-                redirect_url = ngx.decode_base64(args.r)
-            end
-            local user = ngx.var.cookie_SSOwAuthUser
-            logout[user] = {}
-            logout[user]["redirect_url"] = redirect_url
-            logout[user]["domains"] = {}
-            for _, value in ipairs(conf["domains"]) do
-                table.insert(logout[user]["domains"], value)
-            end
-            return redirect(ngx.var.scheme.."://"..ngx.var.http_host.."/?ssologout="..user)
-        end
+    -- Load login.html as index
+    if rel_path == "/" then
+        rel_path = "/login.html"
     end
 
-    -- Set redirect
-    if args.r then
-        set_redirect_cookie(ngx.decode_base64(args.r))
-        ngx.header["Set-Cookie"] = cookies
+    content = read_file(script_path.."portal/"..rel_path)
+    if not content then
+        ngx.exit(ngx.HTTP_NOT_FOUND)
     end
+
+    -- Extract file extension
+    _, file, ext = string.match(uri, "(.-)([^\\/]-%.?([^%.\\/]*))$")
+
+    -- Associate to MIME type
+    mime_types = {
+        html = "text/html",
+        js   = "text/javascript",
+        css  = "text/css",
+        gif  = "image/gif",
+        jpg  = "image/jpeg",
+        png  = "image/png",
+        svg  = "image/svg+xml",
+        ico  = "image/vnd.microsoft.icon",
+    }
+
+    -- Set Content-Type
+    if mime_types[ext] then
+        ngx.header["Content-Type"] = mime_types[ext]
+    else
+        ngx.header["Content-Type"] = "text/plain"
+    end
+
+    -- Render as mustache
+    if ext == "html" then
+        data = get_data_for(file)
+        content = string.gsub(hige.render(content, data), "</html>(%d+)", "</html>")
+    end
+
     ngx.header["Cache-Control"] = "no-cache"
-    return
+    ngx.say(content)
+    ngx.exit(ngx.HTTP_OK)
+end
+
+function get_data_for(view)
+    if view == "login.html" then
+        return { flash = "Meh" }
+    end
 end
 
 function do_login ()
@@ -171,27 +315,45 @@ function do_login ()
     local args = ngx.req.get_post_args()
     local uri_args = ngx.req.get_uri_args()
 
-    if string.starts(ngx.var.http_referer, portal_url) then
+    if authenticate(args.user, args.password) then
         ngx.status = ngx.HTTP_CREATED
-
-        if authenticate(args.user, args.password) then
-            local redirect_url = ngx.var.cookie_SSOwAuthRedirect
-            if uri_args.r then
-                redirect_url = ngx.decode_base64(uri_args.r)
-            end
-            if not redirect_url then redirect_url = portal_url end
-            login[args.user] = {}
-            login[args.user]["redirect_url"] = redirect_url
-            login[args.user]["domains"] = {}
-            for _, value in ipairs(conf["domains"]) do
-                table.insert(login[args.user]["domains"], value)
-            end
-
-            -- Connect to the first domain (self)
-            return redirect(ngx.var.scheme.."://"..ngx.var.http_host.."/?ssologin="..args.user)
+        local redirect_url = ngx.var.cookie_SSOwAuthRedirect
+        if uri_args.r then
+            redirect_url = ngx.decode_base64(uri_args.r)
         end
+        if not redirect_url then redirect_url = portal_url end
+        login[args.user] = {}
+        login[args.user]["redirect_url"] = redirect_url
+        login[args.user]["domains"] = {}
+        for _, value in ipairs(conf["domains"]) do
+            table.insert(login[args.user]["domains"], value)
+        end
+
+        -- Connect to the first domain (self)
+        return redirect(ngx.var.scheme.."://"..ngx.var.http_host.."/?ssologin="..args.user)
+    else
+        ngx.status = ngx.HTTP_UNAUTHORIZED
+        return redirect(portal_url)
     end
-    return redirect(portal_url)
+end
+
+function do_logout()
+    local args = ngx.req.get_uri_args()
+    ngx.req.set_header("Cache-Control", "no-cache")
+      if check_cookie() then
+          local redirect_url = portal_url
+          if args.r then
+              redirect_url = ngx.decode_base64(args.r)
+          end
+          local user = ngx.var.cookie_SSOwAuthUser
+          logout[user] = {}
+          logout[user]["redirect_url"] = redirect_url
+          logout[user]["domains"] = {}
+          for _, value in ipairs(conf["domains"]) do
+              table.insert(logout[user]["domains"], value)
+          end
+          return redirect(ngx.var.scheme.."://"..ngx.var.http_host.."/?ssologout="..user)
+      end
 end
 
 function login_walkthrough (user)
@@ -245,74 +407,3 @@ function pass ()
     return
 end
 
---
--- Routing
---
-
--- Logging in/out
-if ngx.var.request_method == "GET" then
-    local args = ngx.req.get_uri_args()
-
-    local user = args.ssologin
-    if user and login[user] then
-        return login_walkthrough(user)
-    end
-
-    user = args.ssologout
-    if user and logout[user] then
-        return logout_walkthrough(user)
-    end
-end
-
--- Portal
-if ngx.var.host == conf["portal_domain"]
-   and string.starts(ngx.var.uri, conf["portal_path"])
-then
-    if ngx.var.request_method == "GET" then
-        return display_login_form()
-    elseif ngx.var.request_method == "POST" then
-        return do_login()
-    end
-end
-
--- Skipped urls
-for _, url in ipairs(conf["skipped_urls"]) do
-    if string.starts(ngx.var.host..ngx.var.uri, url) then
-        return pass
-    end
-end
-
--- Unprotected urls
-for _, url in ipairs(conf["unprotected_urls"]) do
-    if string.starts(ngx.var.host..ngx.var.uri, url) then
-        if check_cookie() then
-            set_headers(ngx.var.cookie_SSOwAuthUser)
-        end
-        return pass
-    end
-end
-
--- Cookie validation
-if check_cookie() then
-    set_headers(ngx.var.cookie_SSOwAuthUser)
-    return pass
-else
-    delete_cookie()
-end
-
-
--- Login with HTTP Auth if credentials are brought
-local auth_header = ngx.req.get_headers()["Authorization"]
-if auth_header then
-    _, _, b64_cred = string.find(auth_header, "^Basic%s+(.+)$")
-    _, _, user, password = string.find(ngx.decode_base64(b64_cred), "^(.+):(.+)$")
-    if authenticate(user, password) then
-        set_headers(user)
-        return pass
-    end
-end
-
--- Else redirect to portal
-local back_url = ngx.var.scheme .. "://" .. ngx.var.http_host .. ngx.var.uri
--- From another domain
-return redirect(portal_url.."?r="..ngx.encode_base64(back_url))
