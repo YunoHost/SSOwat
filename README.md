@@ -33,7 +33,7 @@ nano /etc/ssowat/conf.json
 Nginx conf
 ----------
 
-* Add SSOwat's Nginx configuration
+* Add SSOwat's Nginx configuration (http{} scope)
 
 ```bash
 nano /etc/nginx/conf.d/ssowat.conf
@@ -43,16 +43,6 @@ nano /etc/nginx/conf.d/ssowat.conf
 
 init_by_lua_file   /etc/ssowat/init.lua;
 access_by_lua_file /etc/ssowat/access.lua;
-
-server {
-    listen 80; # Do not forget HTTPS for production
-
-    location /ssowat {
-       alias /etc/ssowat/portal;
-       default_type text/html;
-       index index.html;
-    }
-}
 
 ```
 
