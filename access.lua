@@ -154,9 +154,9 @@ function serve(uri)
         rel_path = "/login.html"
     end
 
-    content = read_file(script_path.."portal/"..rel_path)
+    content = read_file(script_path.."portal"..rel_path)
     if not content then
-        ngx.exit(ngx.HTTP_NOT_FOUND)
+        return ngx.exit(ngx.HTTP_NOT_FOUND)
     end
 
     -- Extract file extension
@@ -189,12 +189,12 @@ function serve(uri)
 
     ngx.header["Cache-Control"] = "no-cache"
     ngx.say(content)
-    ngx.exit(ngx.HTTP_OK)
+    return ngx.exit(ngx.HTTP_OK)
 end
 
 function get_data_for(view)
     if view == "login.html" then
-        return { flash = "Meh" }
+        return { title = "YunoHost Login" }
     end
 end
 
@@ -334,7 +334,10 @@ then
             -- Logout
             return do_logout()
 
-        elseif check_cookie() or ngx.var.uri == conf["portal_path"] then
+        elseif check_cookie()
+            or ngx.var.uri == conf["portal_path"]
+            or string.starts(ngx.var.uri, conf["portal_path"].."assets")
+        then
             -- Serve normal portal
             return serve(ngx.var.uri)
 
