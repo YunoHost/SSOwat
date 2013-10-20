@@ -21,3 +21,5 @@ logout = {}
 
 -- Path of the configuration
 conf_path = '/etc/ssowat/conf.json'
+
+ngx.log(ngx.INFO, "SSOwat ready")
