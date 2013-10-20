@@ -154,6 +154,12 @@ function serve(uri)
         rel_path = "/login.html"
     end
 
+    -- Access to directory root: forbidden
+    if string.ends(rel_path, "/") then
+        return ngx.exit(403)
+    end
+
+    -- Try to get file content
     content = read_file(script_path.."portal"..rel_path)
     if not content then
         return ngx.exit(ngx.HTTP_NOT_FOUND)
