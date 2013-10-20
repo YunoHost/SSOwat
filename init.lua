@@ -16,6 +16,7 @@ srvkey = math.random(1111111, 9999999)
 
 -- Shared table
 cache = {}
+flashs = {}
 login = {}
 logout = {}
 

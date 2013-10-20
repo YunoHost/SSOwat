@@ -42,6 +42,15 @@ function cook (cookie_str)
     table.insert(cookies, cookie_str)
 end
 
+function flash (wat, message)
+    if wat == "fail"
+    or wat == "win"
+    or wat == "info"
+    then
+        flashs[wat] = message
+    end
+end
+
 function set_auth_cookie (user, domain)
     local maxAge = 60 * 60 * 24 * 7 -- 1 week
     local expire = ngx.req.start_time() + maxAge
@@ -61,7 +70,7 @@ function set_redirect_cookie (redirect_url)
     cook(
         "SSOwAuthRedirect="..redirect_url..
         "; Path="..conf["portal_path"]..
-        "; Max-Age=3600"
+        "; Max-Age=3600;"
     )
 end
 
@@ -77,13 +86,12 @@ function delete_cookie ()
     end
 end
 
-function delete_onetime_cookie ()
+function delete_redirect_cookie ()
     expired_time = "Thu, Jan 01 1970 00:00:00 UTC;"
     local cookie_str = "; Path="..conf["portal_path"]..
                        "; Max-Age="..expired_time
     cook("SSOwAuthRedirect=;" ..cookie_str)
 end
-
 
 function check_cookie ()
 
@@ -160,7 +168,7 @@ function serve(uri)
     end
 
     -- Try to get file content
-    content = read_file(script_path.."portal"..rel_path)
+    local content = read_file(script_path.."portal"..rel_path)
     if not content then
         return ngx.exit(ngx.HTTP_NOT_FOUND)
     end
@@ -189,19 +197,33 @@ function serve(uri)
 
     -- Render as mustache
     if ext == "html" then
-        data = get_data_for(file)
-        content = string.gsub(hige.render(content, data), "</html>(%d+)", "</html>")
+        local data = get_data_for(file)
+        local rendered = hige.render(read_file(script_path.."portal/header.ms"), data)
+        rendered = rendered..hige.render(content, data)
+        content = rendered..hige.render(read_file(script_path.."portal/footer.ms"), data)
     end
 
+    -- Reset flash messages
+    flashs["fail"] = nil
+    flashs["win"] = nil
+    flashs["info"] = nil
+
+    -- Ain't nobody got time for cache
     ngx.header["Cache-Control"] = "no-cache"
     ngx.say(content)
     return ngx.exit(ngx.HTTP_OK)
 end
 
 function get_data_for(view)
+    local data = {}
+    data['flash_fail'] = {flashs["fail"]}
+    data['flash_win']  = {flashs["win"] }
+    data['flash_info'] = {flashs["info"]}
+
     if view == "login.html" then
-        return { title = "YunoHost Login" }
+        data["title"] = "YunoHost Login"
     end
+    return data
 end
 
 function do_login ()
@@ -227,27 +249,30 @@ function do_login ()
         return redirect(ngx.var.scheme.."://"..ngx.var.http_host.."/?ssologin="..args.user)
     else
         ngx.status = ngx.HTTP_UNAUTHORIZED
+        flash("fail", "Wrong username/password combination")
         return redirect(portal_url)
     end
 end
 
 function do_logout()
     local args = ngx.req.get_uri_args()
-    ngx.req.set_header("Cache-Control", "no-cache")
-      if check_cookie() then
-          local redirect_url = portal_url
-          if args.r then
-              redirect_url = ngx.decode_base64(args.r)
-          end
-          local user = ngx.var.cookie_SSOwAuthUser
-          logout[user] = {}
-          logout[user]["redirect_url"] = redirect_url
-          logout[user]["domains"] = {}
-          for _, value in ipairs(conf["domains"]) do
-              table.insert(logout[user]["domains"], value)
-          end
-          return redirect(ngx.var.scheme.."://"..ngx.var.http_host.."/?ssologout="..user)
-      end
+    if check_cookie() then
+        local redirect_url = portal_url
+        if args.r then
+            redirect_url = ngx.decode_base64(args.r)
+        end
+        local user = ngx.var.cookie_SSOwAuthUser
+        logout[user] = {}
+        logout[user]["redirect_url"] = redirect_url
+        logout[user]["domains"] = {}
+        for _, value in ipairs(conf["domains"]) do
+            table.insert(logout[user]["domains"], value)
+        end
+        return redirect(ngx.var.scheme.."://"..ngx.var.http_host.."/?ssologout="..user)
+    else
+        flash("info", "You are already logged out")
+        return redirect(portal_url)
+    end
 end
 
 function login_walkthrough (user)
@@ -261,6 +286,7 @@ function login_walkthrough (user)
         -- All the redirections has been made
         local redirect_url = login[user]["redirect_url"]
         login[user] = nil
+        flash("win", "Successfully logged in")
         return redirect(redirect_url)
     else
         -- Redirect to the next domain
@@ -281,6 +307,7 @@ function logout_walkthrough (user)
         -- All the redirections has been made
         local redirect_url = logout[user]["redirect_url"]
         logout[user] = nil
+        flash("win", "Successfully logged out")
         return redirect(redirect_url)
     else
         -- Redirect to the next domain
@@ -296,7 +323,7 @@ function redirect (url)
 end
 
 function pass ()
-    delete_onetime_cookie()
+    delete_redirect_cookie()
     ngx.req.set_header("Set-Cookie", cookies)
     return
 end
@@ -340,15 +367,18 @@ then
             -- Logout
             return do_logout()
 
-        elseif check_cookie()
-            or ngx.var.uri == conf["portal_path"]
-            or string.starts(ngx.var.uri, conf["portal_path"].."assets")
+        elseif check_cookie()                                             -- Authenticated
+            or ngx.var.uri == conf["portal_path"]                         -- OR Want to serve portal login
+            or (string.starts(ngx.var.uri, conf["portal_path"].."assets")
+               and ngx.var.http_referer
+               and string.starts(ngx.var.http_referer, portal_url))       -- OR Want to serve assets for portal login
         then
             -- Serve normal portal
             return serve(ngx.var.uri)
 
         else
             -- Redirect to portal
+            flash("info", "Please log in to access to this content")
             return redirect(portal_url)
         end
 
@@ -359,6 +389,7 @@ then
             return do_login()
         else
             -- Redirect to portal
+            flash("fail", "Please log in from the portal")
             return redirect(portal_url)
         end
     end
@@ -393,7 +424,7 @@ end
 
 if check_cookie() then
     set_headers(ngx.var.cookie_SSOwAuthUser)
-    return pass
+    return pass()
 else
     delete_cookie()
 end
@@ -415,6 +446,7 @@ end
 -- Else redirect to portal
 --
 
+flash("info", "Please log in to access to this content")
 local back_url = ngx.var.scheme .. "://" .. ngx.var.http_host .. ngx.var.uri
 return redirect(portal_url.."?r="..ngx.encode_base64(back_url))
 
