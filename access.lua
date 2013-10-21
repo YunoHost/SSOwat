@@ -93,7 +93,7 @@ function delete_redirect_cookie ()
     cook("SSOwAuthRedirect=;" ..cookie_str)
 end
 
-function check_cookie ()
+function is_logged_in ()
 
     -- Check if cookie is set
     if  ngx.var.cookie_SSOwAuthExpire and ngx.var.cookie_SSOwAuthExpire ~= ""
@@ -129,15 +129,18 @@ function authenticate (user, password)
 end
 
 function set_headers (user)
-    if not cache[user]["uid"] then
+    user = user or ngx.var.cookie_SSOwAuthUser
+    if not cache[user]["mail"] then
         ldap = lualdap.open_simple("localhost")
         for dn, attribs in ldap:search {
             base = "uid=".. user ..",ou=users,dc=yunohost,dc=org",
             scope = "base",
             sizelimit = 1,
-            attrs = {"uid", "givenName", "sn", "cn", "homeDirectory", "mail"}
+            attrs = {"uid", "givenname", "sn", "cn", "homedirectory", "mail", "maildrop"}
         } do
-            for k,v in pairs(attribs) do cache[user][k] = v end
+            for k,v in pairs(attribs) do
+                cache[user][k] = v
+            end
         end
     end
 
@@ -159,7 +162,11 @@ function serve(uri)
 
     -- Load login.html as index
     if rel_path == "/" then
-        rel_path = "/login.html"
+        if is_logged_in() then
+            rel_path = "/info.html"
+        else
+            rel_path = "/login.html"
+        end
     end
 
     -- Access to directory root: forbidden
@@ -215,6 +222,7 @@ function serve(uri)
 end
 
 function get_data_for(view)
+    local user = ngx.var.cookie_SSOwAuthUser
     local data = {}
     data['flash_fail'] = {flashs["fail"]}
     data['flash_win']  = {flashs["win"] }
@@ -222,8 +230,67 @@ function get_data_for(view)
 
     if view == "login.html" then
         data["title"] = "YunoHost Login"
+    elseif view == "info.html" then
+        set_headers()
+        data["title"] = cache[user]["uid"].." <small>"..cache[user]["cn"].."</small>"
+        data["connected"] = true
+        data["uid"] = cache[user]["uid"]
+        data["cn"] = cache[user]["cn"]
+        data["mailalias"] = {}
+        data["maildrop"] = {}
+        if type(cache[user]["mail"]) == "table" then
+            data["mail"] = cache[user]["mail"][1]
+            for k, mail in ipairs(cache[user]["mail"]) do
+                if k ~= 1 then table.insert(data["mailalias"], mail) end
+            end
+        else
+            data["mail"] = cache[user]["mail"]
+        end
+        if type(cache[user]["maildrop"]) == "table" then
+            for k, mail in ipairs(cache[user]["maildrop"]) do
+                if k ~= 1 then table.insert(data["maildrop"], mail) end
+            end
+        end
+    elseif view == "password.html" then
+        data["title"] = "Change password"
+        data["connected"] = true
     end
     return data
+end
+
+function do_edit ()
+    ngx.req.read_body()
+    local args = ngx.req.get_post_args()
+
+    if is_logged_in() and args
+    then
+        ngx.status = ngx.HTTP_CREATED
+        if string.ends(ngx.var.uri, "password.html") then
+            if args.actualpassword
+            and args.actualpassword == cache[ngx.var.cookie_SSOwAuthUser]["password"]
+            then
+                if args.newpassword == args.confirm then
+                    local dn = "uid="..ngx.var.cookie_SSOwAuthUser..",ou=users,dc=yunohost,dc=org"
+                    local ldap = lualdap.open_simple("localhost", dn, args.actualpassword)
+                    local password = "{SHA}"..ngx.encode_base64(ngx.sha1_bin(args.newpassword))
+                    if ldap:modify(dn, {'=', userPassword = password }) then
+                        flash("win", "Password successfully changed")
+                        cache[ngx.var.cookie_SSOwAuthUser]["password"] = args.newpassword
+                        return redirect(portal_url.."info.html")
+                    else
+                        flash("fail", "An error occured on password changing")
+                     end
+                else
+                    flash("fail", "New passwords don't match")
+                end
+             else
+                flash("fail", "Actual password is wrong")
+             end
+             return redirect(portal_url.."password.html")
+         elseif string.ends(ngx.var.uri, "edit.html") then
+             return redirect(portal_url.."edit.html")
+         end
+    end
 end
 
 function do_login ()
@@ -256,7 +323,7 @@ end
 
 function do_logout()
     local args = ngx.req.get_uri_args()
-    if check_cookie() then
+    if is_logged_in() then
         local redirect_url = portal_url
         if args.r then
             redirect_url = ngx.decode_base64(args.r)
@@ -270,7 +337,7 @@ function do_logout()
         end
         return redirect(ngx.var.scheme.."://"..ngx.var.http_host.."/?ssologout="..user)
     else
-        flash("info", "You are already logged out")
+        flash("info", "Logged out")
         return redirect(portal_url)
     end
 end
@@ -286,7 +353,9 @@ function login_walkthrough (user)
         -- All the redirections has been made
         local redirect_url = login[user]["redirect_url"]
         login[user] = nil
-        flash("win", "Successfully logged in")
+        if redirect_url == portal_url then
+            flash("win", "Logged in")
+        end
         return redirect(redirect_url)
     else
         -- Redirect to the next domain
@@ -307,7 +376,9 @@ function logout_walkthrough (user)
         -- All the redirections has been made
         local redirect_url = logout[user]["redirect_url"]
         logout[user] = nil
-        flash("win", "Successfully logged out")
+        if redirect_url == portal_url then
+            flash("info", "Logged out")
+        end
         return redirect(redirect_url)
     else
         -- Redirect to the next domain
@@ -367,7 +438,7 @@ then
             -- Logout
             return do_logout()
 
-        elseif check_cookie()                                             -- Authenticated
+        elseif is_logged_in()                                             -- Authenticated
             or ngx.var.uri == conf["portal_path"]                         -- OR Want to serve portal login
             or (string.starts(ngx.var.uri, conf["portal_path"].."assets")
                and ngx.var.http_referer
@@ -384,9 +455,15 @@ then
 
     elseif ngx.var.request_method == "POST" then
 
+        -- CSRF protection
         if string.starts(ngx.var.http_referer, portal_url) then
-            -- CSRF protection
-            return do_login()
+            if string.ends(ngx.var.uri, conf["portal_path"].."password.html")
+            or string.ends(ngx.var.uri, conf["portal_path"].."edit.html")
+            then
+               return do_edit()
+            else
+               return do_login()
+            end
         else
             -- Redirect to portal
             flash("fail", "Please log in from the portal")
@@ -411,8 +488,8 @@ end
 
 for _, url in ipairs(conf["unprotected_urls"]) do
     if string.starts(ngx.var.host..ngx.var.uri, url) then
-        if check_cookie() then
-            set_headers(ngx.var.cookie_SSOwAuthUser)
+        if is_logged_in() then
+            set_headers()
         end
         return pass()
     end
@@ -422,8 +499,8 @@ end
 -- Cookie validation
 --
 
-if check_cookie() then
-    set_headers(ngx.var.cookie_SSOwAuthUser)
+if is_logged_in() then
+    set_headers()
     return pass()
 else
     delete_cookie()
