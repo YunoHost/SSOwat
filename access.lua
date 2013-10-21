@@ -130,6 +130,11 @@ end
 
 function set_headers (user)
     user = user or ngx.var.cookie_SSOwAuthUser
+    if not cache[user] then
+        flash("info", "Please log in to access to this content")
+        local back_url = ngx.var.scheme .. "://" .. ngx.var.http_host .. ngx.var.uri
+        return redirect(portal_url.."?r="..ngx.encode_base64(back_url))
+    end
     if not cache[user]["mail"] then
         ldap = lualdap.open_simple("localhost")
         for dn, attribs in ldap:search {
@@ -339,7 +344,7 @@ function do_edit ()
          -- Edit user informations
          elseif string.ends(ngx.var.uri, "edit.html") then
              if args.givenName and args.sn and args.mail then
-                 
+
                  local mailalias = {}
                  if args["mailalias[]"] and type(args["mailalias[]"]) == "table" then
                      mailalias = args["mailalias[]"]
@@ -384,7 +389,7 @@ function do_edit ()
                      end
                  end
                  table.insert(maildrop, 1, user)
-                     
+
                  local dn = "uid="..user..",ou=users,dc=yunohost,dc=org"
                  local ldap = lualdap.open_simple("localhost", dn, cache[user]["password"])
                  local cn = args.givenName.." "..args.sn
