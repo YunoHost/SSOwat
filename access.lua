@@ -156,6 +156,37 @@ function set_headers (user)
 
 end
 
+function get_mails(user)
+    local mails = { mail = "", mailalias = {}, maildrop = {} }
+    if type(cache[user]["mail"]) == "table" then
+        mails["mail"] = cache[user]["mail"][1]
+        for k, mail in ipairs(cache[user]["mail"]) do
+            if k ~= 1 then table.insert(mails["mailalias"], mail) end
+        end
+    else
+        mails["mail"] = cache[user]["mail"]
+    end
+    if type(cache[user]["maildrop"]) == "table" then
+        for k, mail in ipairs(cache[user]["maildrop"]) do
+            if k ~= 1 then table.insert(mails["maildrop"], mail) end
+        end
+    end
+    return mails
+end
+
+function get_domains()
+    local domains = {}
+    ldap = lualdap.open_simple("localhost")
+    for dn, attribs in ldap:search {
+        base = "ou=domains,dc=yunohost,dc=org",
+        scope = "onelevel",
+        attrs = {"virtualdomain"}
+    } do
+        table.insert(domains, attribs["virtualdomain"])
+    end
+    return domains
+end
+
 -- Yo dawg
 function serve(uri)
     rel_path = string.gsub(uri, conf["portal_path"], "/")
@@ -187,6 +218,7 @@ function serve(uri)
     mime_types = {
         html = "text/html",
         js   = "text/javascript",
+        map  = "text/javascript",
         css  = "text/css",
         gif  = "image/gif",
         jpg  = "image/jpeg",
@@ -224,37 +256,50 @@ end
 function get_data_for(view)
     local user = ngx.var.cookie_SSOwAuthUser
     local data = {}
-    data['flash_fail'] = {flashs["fail"]}
-    data['flash_win']  = {flashs["win"] }
-    data['flash_info'] = {flashs["info"]}
 
     if view == "login.html" then
         data["title"] = "YunoHost Login"
+
     elseif view == "info.html" then
-        set_headers()
-        data["title"] = cache[user]["uid"].." <small>"..cache[user]["cn"].."</small>"
-        data["connected"] = true
-        data["uid"] = cache[user]["uid"]
-        data["cn"] = cache[user]["cn"]
-        data["mailalias"] = {}
-        data["maildrop"] = {}
-        if type(cache[user]["mail"]) == "table" then
-            data["mail"] = cache[user]["mail"][1]
-            for k, mail in ipairs(cache[user]["mail"]) do
-                if k ~= 1 then table.insert(data["mailalias"], mail) end
-            end
-        else
-            data["mail"] = cache[user]["mail"]
-        end
-        if type(cache[user]["maildrop"]) == "table" then
-            for k, mail in ipairs(cache[user]["maildrop"]) do
-                if k ~= 1 then table.insert(data["maildrop"], mail) end
-            end
-        end
+        set_headers(user)
+
+        local mails = get_mails(user)
+        data = {
+            title     = cache[user]["uid"].." <small>"..cache[user]["cn"].."</small>",
+            connected = true,
+            uid       = cache[user]["uid"],
+            cn        = cache[user]["cn"],
+            mail      = mails["mail"],
+            mailalias = mails["mailalias"],
+            maildrop  = mails["maildrop"]
+        }
+
     elseif view == "password.html" then
-        data["title"] = "Change password"
-        data["connected"] = true
+
+        data = {
+            title     = "Change password",
+            connected = true
+        }
+
+    elseif view == "edit.html" then
+        set_headers(user)
+
+        local mails = get_mails(user)
+        data = {
+            title     = "Edit "..user,
+            connected = true,
+            uid       = cache[user]["uid"],
+            sn        = cache[user]["sn"],
+            givenName = cache[user]["givenName"],
+            mail      = mails["mail"],
+            mailalias = mails["mailalias"],
+            maildrop  = mails["maildrop"]
+        }
     end
+
+    data['flash_fail'] = {flashs["fail"]}
+    data['flash_win']  = {flashs["win"] }
+    data['flash_info'] = {flashs["info"]}
     return data
 end
 
@@ -265,21 +310,24 @@ function do_edit ()
     if is_logged_in() and args
     then
         ngx.status = ngx.HTTP_CREATED
+        local user = ngx.var.cookie_SSOwAuthUser
+
+        -- Change password
         if string.ends(ngx.var.uri, "password.html") then
-            if args.actualpassword
-            and args.actualpassword == cache[ngx.var.cookie_SSOwAuthUser]["password"]
+            if args.currentpassword
+            and args.currentpassword == cache[user]["password"]
             then
                 if args.newpassword == args.confirm then
-                    local dn = "uid="..ngx.var.cookie_SSOwAuthUser..",ou=users,dc=yunohost,dc=org"
-                    local ldap = lualdap.open_simple("localhost", dn, args.actualpassword)
+                    local dn = "uid="..user..",ou=users,dc=yunohost,dc=org"
+                    local ldap = lualdap.open_simple("localhost", dn, args.currentpassword)
                     local password = "{SHA}"..ngx.encode_base64(ngx.sha1_bin(args.newpassword))
                     if ldap:modify(dn, {'=', userPassword = password }) then
                         flash("win", "Password successfully changed")
-                        cache[ngx.var.cookie_SSOwAuthUser]["password"] = args.newpassword
+                        cache[user]["password"] = args.newpassword
                         return redirect(portal_url.."info.html")
                     else
                         flash("fail", "An error occured on password changing")
-                     end
+                    end
                 else
                     flash("fail", "New passwords don't match")
                 end
@@ -287,7 +335,76 @@ function do_edit ()
                 flash("fail", "Actual password is wrong")
              end
              return redirect(portal_url.."password.html")
+
+         -- Edit user informations
          elseif string.ends(ngx.var.uri, "edit.html") then
+             if args.givenName and args.sn and args.mail then
+                 
+                 local mailalias = {}
+                 if args["mailalias[]"] and type(args["mailalias[]"]) == "table" then
+                     mailalias = args["mailalias[]"]
+                 end
+
+                 local maildrop = {}
+                 if args["maildrop[]"] and type(args["maildrop[]"]) == "table" then
+                     maildrop = args["maildrop[]"]
+                 end
+
+                 local mail_pattern = "[A-Za-z0-9%.%%%+%-]+@[A-Za-z0-9%.%%%+%-]+%.%w%w%w?%w?"
+
+                 table.insert(mailalias, 1, args.mail)
+                 for k, mail in ipairs(mailalias) do
+                     if mail == "" then
+                         table.remove(mailalias, k)
+                     elseif not mail:match(mail_pattern) then
+                         flash("fail", "Invalid mail address: "..mail)
+                         return redirect(portal_url.."edit.html")
+                     else
+                         local domains = get_domains()
+                         local domain_valid = false
+                         for _, domain in ipairs(domains) do
+                             if string.ends(mail, "@"..domain) then
+                                 domain_valid = true
+                                 break
+                             end
+                         end
+                         if not domain_valid then
+                             flash("fail", "Invalid domain for mail "..mail)
+                             return redirect(portal_url.."edit.html")
+                         end
+                     end
+                 end
+
+                 for k, mail in ipairs(maildrop) do
+                     if mail == "" then
+                         table.remove(maildrop, k)
+                     elseif not mail:match(mail_pattern) then
+                         flash("fail", "Invalid mail forward address: "..mail)
+                         return redirect(portal_url.."edit.html")
+                     end
+                 end
+                 table.insert(maildrop, 1, user)
+                     
+                 local dn = "uid="..user..",ou=users,dc=yunohost,dc=org"
+                 local ldap = lualdap.open_simple("localhost", dn, cache[user]["password"])
+                 local cn = args.givenName.." "..args.sn
+                 if ldap:modify(dn, {'=', cn    = cn,
+                                          gecos = cn,
+                                          givenName = args.givenName,
+                                          sn = args.sn,
+                                          mail = mailalias,
+                                          maildrop = maildrop })
+                 then
+                     cache[user]["mail"] = nil
+                     set_headers(user) -- Ugly trick to reload cache
+                     flash("win", "Informations updated")
+                     return redirect(portal_url.."info.html")
+                 else
+                     flash("fail", "An error occured on user saving")
+                 end
+             else
+                 flash("fail", "Missing required fields")
+             end
              return redirect(portal_url.."edit.html")
          end
     end
@@ -428,10 +545,14 @@ end
 --   i.e. http://mydomain.org/ssowat/*
 
 if ngx.var.host == conf["portal_domain"]
-   and string.starts(ngx.var.uri, conf["portal_path"])
+   and string.starts(ngx.var.uri, string.sub(conf["portal_path"], 1, -2))
 then
-
     if ngx.var.request_method == "GET" then
+
+        -- http://mydomain.org/ssowat
+        if ngx.var.uri.."/" == conf["portal_path"] then
+            return redirect(portal_url)
+        end
 
         uri_args = ngx.req.get_uri_args()
         if uri_args.action and uri_args.action == 'logout' then

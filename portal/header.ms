@@ -1,8 +1,9 @@
 <html>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" >
 <head>
-        <title>YunoHost</title>
-        <link rel="stylesheet" href="assets/css/bootstrap.min.css" type="text/css"/>
+    <title>YunoHost Portal</title>
+    <link rel="stylesheet" href="assets/css/bootstrap.min.css" type="text/css"/>
+    <script src="assets/js/jquery-1.10.2.min.js"></script>
 </head>
 <body>
 <!-- Padding bootstrap style -->
@@ -10,7 +11,7 @@
 <div class="col-xs-1 visible-xs"></div>
 <div class="col-sm-10 col-sm-offset-1 col-xs-10 col-xs-offest-1">
 <div class="row">
-<div class="col-sm-6 col-sm-offset-3 col-xs-12">
+<div class="col-sm-8 col-sm-offset-2 col-xs-12" style="max-width: 750px;">
 
 <h2>{{{title}}}</h2>
 {{#connected}}
