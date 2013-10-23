@@ -1,6 +1,8 @@
 <html>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" >
 <head>
+    <meta name="format-detection" content="telephone=no" />
+    <meta name="viewport" content="user-scalable=no, width=device-width, height=device-height" />
     <title>YunoHost Portal</title>
     <link rel="stylesheet" href="assets/css/bootstrap.min.css" type="text/css"/>
     <script src="assets/js/jquery-1.10.2.min.js"></script>

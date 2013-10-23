@@ -1,0 +1,41 @@
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+iframe {
+    position: absolute;
+    top: 0; bottom: 0; left: 0; width: 100%; height: 100%;
+    border: none;
+    box-sizing: border-box; -moz-box-sizing: border-box; -webkit-box-sizing: border-box;
+}
+#ynhtopbar {                                                                                                                                                                         
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 110px;
+    background-color: black;
+    color: black;            
+    z-index: 1000;
+    font-family: "helvetica";
+}     
+#ynhtoggle {
+    cursor: pointer;
+    position: absolute;
+    background-color: black;
+    text-align: center;
+    padding-top: 10px;
+    top: 100px;
+    left: 50px;
+    width: 80px;
+    height: 18px;
+    z-index: 900;
+    color: white;
+    font-weight: bold;
+    font-size: 13px;
+    border-radius: 3px;
+}
+#ynhtoggle:hover {
+    text-decoration: none;
+}
