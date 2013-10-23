@@ -130,7 +130,10 @@ end
 
 function set_headers (user)
     user = user or ngx.var.cookie_SSOwAuthUser
-    if not cache[user] or not cache[user]["mail"] then
+    if not cache[user] then
+        cache[user] = {} 
+    end
+    if not cache[user]["mail"] then
         ldap = lualdap.open_simple("localhost")
         for dn, attribs in ldap:search {
             base = "uid=".. user ..",ou=users,dc=yunohost,dc=org",

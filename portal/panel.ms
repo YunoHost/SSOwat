@@ -20,6 +20,8 @@ var ynh = {};
 ynh.jquery = jQuery.noConflict();
 (function( $ ) {
 
+    preventFire = false;
+    preventRefire = false;
     function datScroll(to) {
         preventRefire = true;
         $("body,html").animate({scrollTop:to}, '100', 'swing', function() {
@@ -30,15 +32,15 @@ ynh.jquery = jQuery.noConflict();
                     $("#ynhtoggle").removeClass("ynhopen");
                 }
                 preventRefire = false;
-            }, 300);
+            }, 200);
         });
     }
 
-    preventRefire = false;
     function checkScroll (direction) {
         if(preventRefire) return;
 
         if((direction == "top") && ($("body").scrollTop() == 107 || $("html").scrollTop() == 107) && $("#ynhtoggle.ynhopen").length == 0) {
+            if(preventFire) return;
             datScroll(0);
         } else if((direction == "bottom") && $("#ynhtoggle.ynhopen").length > 0) {
             datScroll(h);
@@ -46,42 +48,39 @@ ynh.jquery = jQuery.noConflict();
     }
 
     $( document ).ready(function($) {
-        scroll = $("body").scrollTop();
         h = 107;
-        $('body').children().filter(function() {
-            return $(this).css("position") === 'absolute' ||  $(this).css("position") === 'fixed';
-        }).css({top: function(index, value) {
-                return parseFloat(value) + h + 3;
-        }});
-        if ($(window).height() > $("html").height()) {
-            alert('moualé');
-            $("html").css('min-height', $(window).height() + h );
-        }
-        $("body").append('<div id="ynhtopbar"><div id="ynhtoggle" class="ynhopen">YunoHost</div></div>');
-        $("body").css({marginTop: function(index, value) {
-            return parseFloat(value) + h + 3;
-        }});
-        if (scroll == 0) {
-            $("body,html").animate({scrollTop:h}, '100', 'swing', function() {
-                setTimeout(function() { 
-                    $("#ynhtoggle").removeClass("ynhopen");
-                }, 300);
-                //window.scrollTo(0, h);
-            });
-        }
-        $("#ynhtoggle").on("click", function() {
-            if ($("body").scrollTop() == 0 && $("html").scrollTop() == 0) {
-                datScroll(h);
-            } else {
-                datScroll(0);
-            }                                                                                                                                                                                    
-        });
 
         $("#glu").load(function() {
+
+            setTimeout(function() {
+                $('body').children().filter(function() {
+                    return $(this).css("position") === 'absolute' ||  $(this).css("position") === 'fixed';
+                }).css({top: function(index, value) {
+                        return parseFloat(value) + h + 3;
+                }});
+                $("body").append('<div id="ynhtopbar"><div id="ynhtoggle" class="ynhopen">YunoHost</div></div>');
+                $("body").css({marginTop: function(index, value) {
+                    return parseFloat(value) + h + 3;
+                }});
+                if ($("body").scrollTop() == 0) {
+                        $("body,html").scrollTop(h);
+                        $("#ynhtoggle").removeClass("ynhopen");
+                }
+                $("#ynhtoggle").on("click", function() {
+                        preventFire = false;
+                        checkScroll("bottom");
+                        checkScroll("top");
+                });
+            }, 10);
+
             $( $(this)[0].contentWindow ).bind("DOMMouseScroll mousewheel scroll", function(event) {
-                if (event.currentTarget.scrollY > 0) {
+                if ((event.type == "DOMMouseScroll" && event.originalEvent.detail > 0)
+                ||  (event.type == "mousewheel" && event.originalEvent.wheelDeltaY < 0)
+                ||   event.currentTarget.scrollY > 0 ) {
                     checkScroll("bottom");
+                    preventFire = true;
                 } else {
+                    setTimeout(function() { preventFire = false; }, 200);
                     checkScroll("top");
                 }
             });
