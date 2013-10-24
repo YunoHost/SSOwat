@@ -52,12 +52,14 @@ ynh.jquery = jQuery.noConflict();
         $("#glu").load(function() {
 
             setTimeout(function() {
-                $('body').children().filter(function() {
-                    return $(this).css("position") === 'absolute' ||  $(this).css("position") === 'fixed';
-                }).css({top: function(index, value) {
+                if ($("#ynhtopbar").length == 0) {
+                    $('body').children().filter(function() {
+                        return $(this).css("position") === 'absolute' ||  $(this).css("position") === 'fixed';
+                    }).css({top: function(index, value) {
                         return parseFloat(value) + h + 3;
-                }});
-                $("body").append('<div id="ynhtopbar"><div id="ynhtoggle" class="ynhopen">YunoHost</div></div>');
+                    }});
+                    $("body").append('<div id="ynhtopbar"><div id="ynhtoggle" class="ynhopen">YunoHost</div></div>');
+                }
                 $("body").css({marginTop: function(index, value) {
                     return parseFloat(value) + h + 3;
                 }});
@@ -85,7 +87,7 @@ ynh.jquery = jQuery.noConflict();
                     checkScroll("bottom");
                     preventFire = true;
                 } else {
-                    setTimeout(function() { preventFire = false; }, 200);
+                    setTimeout(function() { preventFire = false; }, 500);
                     checkScroll("top");
                 }
             });
