@@ -13,7 +13,6 @@
 <script src="assets/js/jquery-1.10.2.min.js"></script>
 </head>
 <body class="gradient" style="overflow: hidden">
-<!--<body class="gradient" style="">-->
 <iframe name="glu" id="glu" width="100%" src="/" style=""></iframe>
 <script>
 var ynh = {};
@@ -42,7 +41,7 @@ ynh.jquery = jQuery.noConflict();
         if((direction == "top") && ($("body").scrollTop() == 107 || $("html").scrollTop() == 107) && $("#ynhtoggle.ynhopen").length == 0) {
             if(preventFire) return;
             datScroll(0);
-        } else if((direction == "bottom") && $("#ynhtoggle.ynhopen").length > 0) {
+        } else if((direction == "bottom") && $("#ynhtoggle.ynhopen").length > 0 ) {
             datScroll(h);
         }
     }
@@ -72,6 +71,12 @@ ynh.jquery = jQuery.noConflict();
                         checkScroll("top");
                 });
             }, 10);
+
+            $(window).resize(function() {
+                if ($("#ynhtoggle.ynhopen").length == 0) {
+                    $("body,html").scrollTop(h);
+                }
+            });
 
             $( $(this)[0].contentWindow ).bind("DOMMouseScroll mousewheel scroll", function(event) {
                 if ((event.type == "DOMMouseScroll" && event.originalEvent.detail > 0)
