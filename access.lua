@@ -1,6 +1,8 @@
 --
 -- Load configuration
 --
+cache = ngx.shared.cache
+oneweek = 60 * 60 * 24 * 7
 cookies = {}
 local conf_file = assert(io.open(conf_path, "r"), "Configuration file is missing")
 local conf = json.decode(conf_file:read("*all"))
@@ -52,7 +54,7 @@ function flash (wat, message)
 end
 
 function set_auth_cookie (user, domain)
-    local maxAge = 60 * 60 * 24 * 7 -- 1 week
+    local maxAge = oneweek
     local expire = ngx.req.start_time() + maxAge
     local hash = ngx.md5(srvkey..
                "|" ..ngx.var.remote_addr..
@@ -121,8 +123,9 @@ function authenticate (user, password)
         password
     )
 
-    if connected and not cache[user] then
-        cache[user] = { password=password }
+    cache:flush_expired()
+    if connected then
+        cache:add(user.."-password", password, oneweek)
     end
 
     return connected
@@ -130,10 +133,12 @@ end
 
 function set_headers (user)
     user = user or ngx.var.cookie_SSOwAuthUser
-    if not cache[user] then
-        cache[user] = {} 
+    if not cache:get(user.."-password") then
+        flash("info", "Please log in to access to this content")
+        local back_url = ngx.var.scheme .. "://" .. ngx.var.http_host .. ngx.var.uri
+        return redirect(portal_url.."?r="..ngx.encode_base64(back_url))
     end
-    if not cache[user]["mail"] then
+    if not cache:get(user.."-uid") then
         ldap = lualdap.open_simple("localhost")
         for dn, attribs in ldap:search {
             base = "uid=".. user ..",ou=users,dc=yunohost,dc=org",
@@ -142,51 +147,48 @@ function set_headers (user)
             attrs = {"uid", "givenname", "sn", "cn", "homedirectory", "mail", "maildrop"}
         } do
             for k,v in pairs(attribs) do
-                cache[user][k] = v
+                if type(v) == "table" then
+                    for k2,v2 in ipairs(v) do
+                        if k2 == 1 then cache:set(user.."-"..k, v2, oneweek) end
+                        cache:set(user.."-"..k.."|"..k2, v2, oneweek)
+                    end
+                else
+                    cache:set(user.."-"..k, v, oneweek)
+                end
             end
         end
     end
 
     -- Set HTTP Auth header
     ngx.req.set_header("Authorization", "Basic "..ngx.encode_base64(
-      cache[user]["uid"]..":"..cache[user]["password"]
+      user..":"..cache:get(user.."-password")
     ))
 
     -- Set Additional headers
     for k, v in pairs(conf["additional_headers"]) do
-        ngx.req.set_header(k, cache[user][v])
+        ngx.req.set_header(k, cache:get(user.."-"..v))
     end
 
 end
 
 function get_mails(user)
     local mails = { mail = "", mailalias = {}, maildrop = {} }
-    if type(cache[user]["mail"]) == "table" then
-        mails["mail"] = cache[user]["mail"][1]
-        for k, mail in ipairs(cache[user]["mail"]) do
-            if k ~= 1 then table.insert(mails["mailalias"], mail) end
+    if cache:get(user.."-mail|2") then
+        for _, v in ipairs({2, 3, 4, 5, 6, 7, 8, 9, 10}) do
+            table.insert(mails["mailalias"], cache:get(user.."-mail|"..v))
         end
-    else
-        mails["mail"] = cache[user]["mail"]
     end
-    if type(cache[user]["maildrop"]) == "table" then
-        for k, mail in ipairs(cache[user]["maildrop"]) do
-            if k ~= 1 then table.insert(mails["maildrop"], mail) end
+    mails["mail"] = cache:get(user.."-mail")
+    if cache:get(user.."-maildrop|2") then
+        for _, v in ipairs({2, 3, 4, 5, 6, 7, 8, 9, 10}) do
+            table.insert(mails["maildrop"], cache:get(user.."-maildrop|"..v))
         end
     end
     return mails
 end
 
 function get_domains()
-    local domains = {}
-    ldap = lualdap.open_simple("localhost")
-    for dn, attribs in ldap:search {
-        base = "ou=domains,dc=yunohost,dc=org",
-        scope = "onelevel",
-        attrs = {"virtualdomain"}
-    } do
-        table.insert(domains, attribs["virtualdomain"])
-    end
+    local domains = conf["domains"]
     return domains
 end
 
@@ -271,10 +273,10 @@ function get_data_for(view)
 
         local mails = get_mails(user)
         data = {
-            title     = cache[user]["uid"].." <small>"..cache[user]["cn"].."</small>",
+            title     = user.." <small>"..cache:get(user.."-cn").."</small>",
             connected = true,
-            uid       = cache[user]["uid"],
-            cn        = cache[user]["cn"],
+            uid       = user,
+            cn        = cache:get(user.."-cn"),
             mail      = mails["mail"],
             mailalias = mails["mailalias"],
             maildrop  = mails["maildrop"]
@@ -294,9 +296,9 @@ function get_data_for(view)
         data = {
             title     = "Edit "..user,
             connected = true,
-            uid       = cache[user]["uid"],
-            sn        = cache[user]["sn"],
-            givenName = cache[user]["givenName"],
+            uid       = user,
+            sn        = cache:get(user.."-sn"),
+            givenName = cache:get(user.."-givenName"),
             mail      = mails["mail"],
             mailalias = mails["mailalias"],
             maildrop  = mails["maildrop"]
@@ -321,7 +323,7 @@ function do_edit ()
         -- Change password
         if string.ends(ngx.var.uri, "password.html") then
             if args.currentpassword
-            and args.currentpassword == cache[user]["password"]
+            and args.currentpassword == cache:get(user.."-password")
             then
                 if args.newpassword == args.confirm then
                     local dn = "uid="..user..",ou=users,dc=yunohost,dc=org"
@@ -329,7 +331,7 @@ function do_edit ()
                     local password = "{SHA}"..ngx.encode_base64(ngx.sha1_bin(args.newpassword))
                     if ldap:modify(dn, {'=', userPassword = password }) then
                         flash("win", "Password successfully changed")
-                        cache[user]["password"] = args.newpassword
+                        cache:set(user.."-password", args.newpassword, oneweek)
                         return redirect(portal_url.."info.html")
                     else
                         flash("fail", "An error occured on password changing")
@@ -392,7 +394,7 @@ function do_edit ()
                  table.insert(maildrop, 1, user)
                      
                  local dn = "uid="..user..",ou=users,dc=yunohost,dc=org"
-                 local ldap = lualdap.open_simple("localhost", dn, cache[user]["password"])
+                 local ldap = lualdap.open_simple("localhost", dn, cache:get(user.."-password"))
                  local cn = args.givenName.." "..args.sn
                  if ldap:modify(dn, {'=', cn    = cn,
                                           gecos = cn,
@@ -401,7 +403,7 @@ function do_edit ()
                                           mail = mailalias,
                                           maildrop = maildrop })
                  then
-                     cache[user]["mail"] = nil
+                     cache:delete(user.."-uid")
                      set_headers(user) -- Ugly trick to reload cache
                      flash("win", "Informations updated")
                      return redirect(portal_url.."info.html")
