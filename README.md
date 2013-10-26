@@ -41,6 +41,7 @@ nano /etc/nginx/conf.d/ssowat.conf
 
 ```nginx
 
+lua_shared_dict cache 10m;
 init_by_lua_file   /etc/ssowat/init.lua;
 access_by_lua_file /etc/ssowat/access.lua;
 
