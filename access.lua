@@ -116,6 +116,15 @@ function is_logged_in ()
     return false
 end
 
+function has_access (user, url)
+    user = user or ngx.var.cookie_SSOwAuthUser
+    url = url or ngx.var.host..ngx.var.uri
+    for u, _ in pairs(conf["users"][user]) do
+        if string.starts(url, u) then return true end
+    end
+    return false
+end
+
 function authenticate (user, password)
     connected = lualdap.open_simple (
         "localhost",
@@ -185,11 +194,6 @@ function get_mails(user)
         end
     end
     return mails
-end
-
-function get_domains()
-    local domains = conf["domains"]
-    return domains
 end
 
 -- Yo dawg
@@ -280,8 +284,13 @@ function get_data_for(view)
             cn        = cache:get(user.."-cn"),
             mail      = mails["mail"],
             mailalias = mails["mailalias"],
-            maildrop  = mails["maildrop"]
+            maildrop  = mails["maildrop"],
+            app = {}
         }
+
+        for url, name in pairs(conf["users"][user]) do
+            table.insert(data["app"], { url = url, name = name })
+        end
 
     elseif view == "password.html" then
 
@@ -375,7 +384,7 @@ function do_edit ()
                          flash("fail", "Invalid mail address: "..mail)
                          return redirect(portal_url.."edit.html")
                      else
-                         local domains = get_domains()
+                         local domains = conf["domains"]
                          local domain_valid = false
                          for _, domain in ipairs(domains) do
                              if string.ends(mail, "@"..domain) then
@@ -637,6 +646,10 @@ end
 --
 
 if is_logged_in() then
+    if not has_access() then
+        ngx.status = 403
+        ngx.exit(403)
+    end
     set_headers()
     return pass()
 else

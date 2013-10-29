@@ -1,6 +1,27 @@
 <div class="row">
     <div class="col-md-4 text-center">
-      <img src="assets/img/avatar.png">
+        <h3>My apps</h3>
+        <div class="visible-sm visible-xs" style="height: 20px"></div>
+    </div>
+    <div class="col-md-8">
+        <div class="row">
+        {{#app}}
+        <div class="col-sm-3 text-center" style="float: left; width: 130px; height: 130px">
+            <a style="font-size: 44px; padding: 15%;" class="btn btn-lg btn-primary btn-block" href="https://{{url}}" title="{{name}}">
+                <div style="font-family: 'monospace'; width:28px; margin-left: 21px; overflow: hidden">{{name}}</div>
+            </a>
+            <a href="https://{{url}}"><h6>{{name}}</h6></a>
+        </div>
+        {{/app}}
+        </div>
+    </div>
+</div>
+<hr>
+<div class="row">
+    <div class="col-md-4 text-center">
+        <h3>Profile</h3>
+        <div class="visible-sm visible-xs" style="height: 20px"></div>
+        <img src="assets/img/avatar.png">
     </div>
     <div class="visible-sm" style="height: 20px"></div>
     <div class="col-md-8">
@@ -34,10 +55,10 @@
 <hr>
 <div class="row">
     <div class="col-sm-6 text-center">
-        <a href="password.html" class="btn btn-lg btn-primary">Change password</a>
+        <a href="password.html" class="btn btn-lg btn-danger">Change password</a>
     </div>
     <div class="visible-xs" style="height: 20px"></div>
     <div class="col-sm-6 text-center">
-        <a href="edit.html" class="btn btn-lg btn-info">Edit</a>
+        <a href="edit.html" class="btn btn-lg btn-warning">Edit</a>
     </div>
 </div>
