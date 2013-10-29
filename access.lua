@@ -119,6 +119,9 @@ end
 function has_access (user, url)
     user = user or ngx.var.cookie_SSOwAuthUser
     url = url or ngx.var.host..ngx.var.uri
+    if not conf["users"] then
+        return true
+    end
     for u, _ in pairs(conf["users"][user]) do
         if string.starts(url, string.sub(u, 1, -2)) then return true end
     end
