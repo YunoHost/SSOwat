@@ -163,7 +163,7 @@ function set_headers (user)
     ngx.req.set_header("Authorization", "Basic "..ngx.encode_base64(
       user..":"..cache:get(user.."-password")
     ))
-
+ 
     -- Set Additional headers
     for k, v in pairs(conf["additional_headers"]) do
         ngx.req.set_header(k, cache:get(user.."-"..v))
@@ -247,7 +247,8 @@ function serve(uri)
         rendered = rendered..hige.render(content, data)
         content = rendered..hige.render(read_file(script_path.."portal/footer.ms"), data)
     elseif ext == "ms" then
-        content = hige.render(content, {})
+        local data = get_data_for(file)
+        content = hige.render(content, data)
     end
 
     -- Reset flash messages
@@ -303,6 +304,12 @@ function get_data_for(view)
             mailalias = mails["mailalias"],
             maildrop  = mails["maildrop"]
         }
+
+    elseif view == "panel.ms" then
+        data = { app = {} }
+        for url, name in pairs(conf["users"][user]) do
+            table.insert(data["app"], { url = url, name = name })
+        end
     end
 
     data['flash_fail'] = {flashs["fail"]}

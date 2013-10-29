@@ -13,7 +13,7 @@
 <script src="assets/js/jquery-1.10.2.min.js"></script>
 </head>
 <body class="gradient" style="overflow: hidden">
-<iframe name="glu" id="glu" width="100%" src="/" style=""></iframe>
+<iframe name="glu" id="glu" width="100%" src="https://megusta7.com/webmaaail/" style=""></iframe>
 <script>
 var ynh = {};
 ynh.jquery = jQuery.noConflict();
@@ -46,12 +46,21 @@ ynh.jquery = jQuery.noConflict();
         }
     }
 
+    function changeTitle() {
+        if (top.glu.document.title)
+            top.document.title = top.glu.document.title;
+        else
+            top.document.title = 'Yunohost Apps';
+    }
+    var tid = setInterval(changeTitle, 10000);
+
     $( document ).ready(function($) {
         h = 107;
 
         $("#glu").load(function() {
 
             setTimeout(function() {
+                changeTitle();
                 if ($("#ynhtopbar").length == 0) {
                     $('body').children().filter(function() {
                         return $(this).css("position") === 'absolute' ||  $(this).css("position") === 'fixed';
@@ -59,6 +68,9 @@ ynh.jquery = jQuery.noConflict();
                         return parseFloat(value) + h + 3;
                     }});
                     $("body").append('<div id="ynhtopbar"><div id="ynhtoggle" class="ynhopen">YunoHost</div></div>');
+                    {{#app}}
+                    $("#ynhtopbar").append('<div class="ynhapp" data-href="https://{{url}}"><div class="ynhappsquare">R</div><div class="ynhappcaption">{{name}}</div></div>');
+                    {{/app}}
                 }
                 $("body").css({marginTop: function(index, value) {
                     return parseFloat(value) + h + 3;
@@ -71,6 +83,13 @@ ynh.jquery = jQuery.noConflict();
                         preventFire = false;
                         checkScroll("bottom");
                         checkScroll("top");
+                });
+  
+                $(".ynhapp").on("click", function(event) {
+                    event.preventDefault();
+                    parent.glu.location.href = $(this).attr('data-href');
+                    $('.ynhapp.active').removeClass('active');
+                    $(this).addClass('active');
                 });
             }, 10);
 
