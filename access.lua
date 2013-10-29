@@ -120,7 +120,7 @@ function has_access (user, url)
     user = user or ngx.var.cookie_SSOwAuthUser
     url = url or ngx.var.host..ngx.var.uri
     for u, _ in pairs(conf["users"][user]) do
-        if string.starts(url, u) then return true end
+        if string.starts(url, string.sub(u, 1, -2)) then return true end
     end
     return false
 end
