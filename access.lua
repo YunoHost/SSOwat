@@ -199,7 +199,7 @@ function serve(uri)
     -- Load login.html as index
     if rel_path == "/" then
         if is_logged_in() then
-            rel_path = "/panel.ms"
+            rel_path = "/info.html"
         else
             rel_path = "/login.html"
         end

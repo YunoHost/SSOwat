@@ -13,7 +13,7 @@
 <script src="assets/js/jquery-1.10.2.min.js"></script>
 </head>
 <body class="gradient" style="overflow: hidden">
-<iframe name="glu" id="glu" width="100%" src="https://megusta7.com/webmaaail/" style=""></iframe>
+<iframe name="glu" id="glu" width="100%" src="/" style=""></iframe>
 <script>
 var ynh = {};
 ynh.jquery = jQuery.noConflict();
