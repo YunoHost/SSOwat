@@ -238,6 +238,7 @@ function serve(uri)
         png  = "image/png",
         svg  = "image/svg+xml",
         ico  = "image/vnd.microsoft.icon",
+        woff = "application/x-font-woff"
     }
 
     -- Set Content-Type
