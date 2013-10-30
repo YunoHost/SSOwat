@@ -12,7 +12,7 @@ hige = require "hige"
 
 -- Set random key
 math.randomseed(os.time())
-srvkey = math.random(1111111, 9999999)
+ngx.shared.cache:add("srvkey", math.random(1111111, 9999999))
 
 -- Shared table
 flashs = {}
@@ -20,6 +20,6 @@ login = {}
 logout = {}
 
 -- Path of the configuration
-conf_path = '/etc/ssowat/conf.json'
+conf_path = "/etc/ssowat/conf.json"
 
 ngx.log(ngx.INFO, "SSOwat ready")
