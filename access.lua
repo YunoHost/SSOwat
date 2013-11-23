@@ -652,8 +652,7 @@ end
 
 if is_logged_in() then
     if not has_access() then
-        ngx.status = 403
-        ngx.exit(403)
+        return redirect(portal_url)
     end
     set_headers()
     return pass()
