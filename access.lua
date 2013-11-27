@@ -592,8 +592,8 @@ then
         elseif is_logged_in()                                             -- Authenticated
             or ngx.var.uri == conf["portal_path"]                         -- OR Want to serve portal login
             or (string.starts(ngx.var.uri, conf["portal_path"].."assets")
-               and ngx.var.http_referer
-               and string.starts(ngx.var.http_referer, portal_url))       -- OR Want to serve assets for portal login
+               and (not ngx.var.http_referer
+                    or string.starts(ngx.var.http_referer, portal_url)))  -- OR Want to serve assets for portal login
         then
             -- Serve normal portal
             return serve(ngx.var.uri)
