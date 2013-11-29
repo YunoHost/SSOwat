@@ -2,7 +2,6 @@
 -- Load configuration
 --
 cache = ngx.shared.cache
-srvkey = cache:get("srvkey")
 oneweek = 60 * 60 * 24 * 7
 cookies = {}
 local conf_file = assert(io.open(conf_path, "r"), "Configuration file is missing")
