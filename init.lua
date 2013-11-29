@@ -10,19 +10,6 @@ lualdap = require "lualdap"
 math = require "math"
 hige = require "hige"
 
--- Set random key
-local file = io.open("/tmp/ngx_srvkey","r")
-if file ~= nil then
-    srvkey = file:read("*all")
-    file:close()
-else
-    local file = io.open("/tmp/ngx_srvkey","w")
-    math.randomseed(os.time())
-    srvkey = tostring(math.random(1111111, 9999999))
-    file:write(srvkey)
-    file:close()
-end
-
 -- Shared table
 flashs = {}
 login = {}
