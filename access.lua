@@ -181,7 +181,7 @@ function set_headers (user)
     ngx.req.set_header("Authorization", "Basic "..ngx.encode_base64(
       user..":"..cache:get(user.."-password")
     ))
- 
+
     -- Set Additional headers
     for k, v in pairs(conf["additional_headers"]) do
         ngx.req.set_header(k, cache:get(user.."-"..v))
@@ -373,7 +373,7 @@ function do_edit ()
          -- Edit user informations
          elseif string.ends(ngx.var.uri, "edit.html") then
              if args.givenName and args.sn and args.mail then
-                 
+
                  local mailalias = {}
                  if args["mailalias[]"] and type(args["mailalias[]"]) == "table" then
                      mailalias = args["mailalias[]"]
@@ -418,7 +418,7 @@ function do_edit ()
                      end
                  end
                  table.insert(maildrop, 1, user)
-                     
+
                  local dn = "uid="..user..",ou=users,dc=yunohost,dc=org"
                  local ldap = lualdap.open_simple("localhost", dn, cache:get(user.."-password"))
                  local cn = args.givenName.." "..args.sn
