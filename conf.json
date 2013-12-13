@@ -20,11 +20,11 @@
    "users": {
        "myuser": {
           "mydomain.com/myapp": "My App",
-          "mydomain.com/myapp2: "My second App"
+          "mydomain.com/myapp2": "My second App"
        },
        "myuser2": {
           "myotherdomain.com/myapp": "My other domain App",
-          "mydomain.com/myapp2: "My second App"
+          "mydomain.com/myapp2": "My second App"
        }
    }
 }
