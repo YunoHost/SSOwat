@@ -23,7 +23,7 @@ local function merge_environment(...)
 end
 
 local function escape(str)
-    return str:gsub('[&"<>\]', function(c)
+    return str:gsub('[&"<>]', function(c)
         if c == '&' then return '&amp;'
         elseif c == '"' then return '\"'
         elseif c == '\\' then return '\\\\'
