@@ -464,7 +464,7 @@ function do_login ()
         end
 
         -- Connect to the first domain (self)
-        return redirect(ngx.var.scheme.."://"..ngx.var.http_host.."/?ssologin="..args.user)
+        return redirect(ngx.var.scheme.."://"..ngx.var.http_host..conf["portal_path"].."?ssologin="..args.user)
     else
         ngx.status = ngx.HTTP_UNAUTHORIZED
         flash("fail", "Wrong username/password combination")
@@ -486,7 +486,7 @@ function do_logout()
         for _, value in ipairs(conf["domains"]) do
             table.insert(logout[user]["domains"], value)
         end
-        return redirect(ngx.var.scheme.."://"..ngx.var.http_host.."/?ssologout="..user)
+        return redirect(ngx.var.scheme.."://"..ngx.var.http_host..conf["portal_path"].."?ssologout="..user)
     else
         flash("info", "Logged out")
         return redirect(portal_url)
@@ -511,7 +511,7 @@ function login_walkthrough (user)
     else
         -- Redirect to the next domain
         for _, domain in ipairs(login[user]["domains"]) do
-            return redirect(ngx.var.scheme.."://"..domain.."/?ssologin="..user)
+            return redirect(ngx.var.scheme.."://"..domain..conf["portal_path"].."?ssologin="..user)
         end
     end
 end
@@ -534,7 +534,7 @@ function logout_walkthrough (user)
     else
         -- Redirect to the next domain
         for _, domain in ipairs(logout[user]["domains"]) do
-            return redirect(ngx.var.scheme.."://"..domain.."/?ssologout="..user)
+            return redirect(ngx.var.scheme.."://"..domain..conf["portal_path"].."?ssologout="..user)
         end
     end
 end
