@@ -62,10 +62,16 @@ end
 function set_auth_cookie (user, domain)
     local maxAge = oneweek
     local expire = ngx.req.start_time() + maxAge
+    local session_key = cache:get("session_"..user)
+    if not session_key then
+        session_key = tostring(math.random(1111111, 9999999))
+        cache:add("session_"..user, session_key)
+    end
     local hash = ngx.md5(srvkey..
                "|" ..ngx.var.remote_addr..
                "|"..user..
-               "|"..expire)
+               "|"..expire..
+               "|"..session_key)
     local cookie_str = "; Domain=."..domain..
                        "; Path=/"..
                        "; Max-Age="..maxAge
@@ -111,11 +117,15 @@ function is_logged_in ()
         -- Check expire time
         if (ngx.req.start_time() <= tonumber(ngx.var.cookie_SSOwAuthExpire)) then
             -- Check hash
-            local hash = ngx.md5(srvkey..
-                    "|"..ngx.var.remote_addr..
-                    "|"..ngx.var.cookie_SSOwAuthUser..
-                    "|"..ngx.var.cookie_SSOwAuthExpire)
-            return hash == ngx.var.cookie_SSOwAuthHash
+            local session_key = cache:get("session_"..ngx.var.cookie_SSOwAuthUser)
+            if session_key and session_key ~= "" then
+                local hash = ngx.md5(srvkey..
+                        "|"..ngx.var.remote_addr..
+                        "|"..ngx.var.cookie_SSOwAuthUser..
+                        "|"..ngx.var.cookie_SSOwAuthExpire..
+                        "|"..session_key)
+                return hash == ngx.var.cookie_SSOwAuthHash
+            end
         end
     end
 
@@ -451,20 +461,12 @@ function do_login ()
 
     if authenticate(args.user, args.password) then
         ngx.status = ngx.HTTP_CREATED
-        local redirect_url = ngx.var.cookie_SSOwAuthRedirect
+        set_auth_cookie(args.user, ngx.var.host)
         if uri_args.r then
-            redirect_url = ngx.decode_base64(uri_args.r)
+            return redirect(portal_url.."?r="..uri_args.r)
+        else
+            return redirect(portal_url)
         end
-        if not redirect_url then redirect_url = portal_url end
-        login[args.user] = {}
-        login[args.user]["redirect_url"] = redirect_url
-        login[args.user]["domains"] = {}
-        for _, value in ipairs(conf["domains"]) do
-            table.insert(login[args.user]["domains"], value)
-        end
-
-        -- Connect to the first domain (self)
-        return redirect(ngx.var.scheme.."://"..ngx.var.http_host.."/?ssologin="..args.user)
     else
         ngx.status = ngx.HTTP_UNAUTHORIZED
         flash("fail", "Wrong username/password combination")
@@ -475,70 +477,11 @@ end
 function do_logout()
     local args = ngx.req.get_uri_args()
     if is_logged_in() then
-        local redirect_url = portal_url
-        if args.r then
-            redirect_url = ngx.decode_base64(args.r)
-        end
-        local user = ngx.var.cookie_SSOwAuthUser
-        logout[user] = {}
-        logout[user]["redirect_url"] = redirect_url
-        logout[user]["domains"] = {}
-        for _, value in ipairs(conf["domains"]) do
-            table.insert(logout[user]["domains"], value)
-        end
-        return redirect(ngx.var.scheme.."://"..ngx.var.http_host.."/?ssologout="..user)
-    else
+        cache:delete("session_"..ngx.var.cookie_SSOwAuthUser)
         flash("info", "Logged out")
         return redirect(portal_url)
     end
 end
-
-function login_walkthrough (user)
-    -- Set Authentication cookies
-    set_auth_cookie(user, ngx.var.host)
-    -- Remove domain from login table
-    domain_key = is_in_table(login[user]["domains"], ngx.var.host)
-    table.remove(login[user]["domains"], domain_key)
-
-    if table.getn(login[user]["domains"]) == 0 then
-        -- All the redirections has been made
-        local redirect_url = login[user]["redirect_url"]
-        login[user] = nil
-        if redirect_url == portal_url then
-            flash("win", "Logged in")
-        end
-        return redirect(redirect_url)
-    else
-        -- Redirect to the next domain
-        for _, domain in ipairs(login[user]["domains"]) do
-            return redirect(ngx.var.scheme.."://"..domain.."/?ssologin="..user)
-        end
-    end
-end
-
-function logout_walkthrough (user)
-    -- Expire Authentication cookies
-    delete_cookie()
-    -- Remove domain from logout table
-    domain_key = is_in_table(logout[user]["domains"], ngx.var.host)
-    table.remove(logout[user]["domains"], domain_key)
-
-    if table.getn(logout[user]["domains"]) == 0 then
-        -- All the redirections has been made
-        local redirect_url = logout[user]["redirect_url"]
-        logout[user] = nil
-        if redirect_url == portal_url then
-            flash("info", "Logged out")
-        end
-        return redirect(redirect_url)
-    else
-        -- Redirect to the next domain
-        for _, domain in ipairs(logout[user]["domains"]) do
-            return redirect(ngx.var.scheme.."://"..domain.."/?ssologout="..user)
-        end
-    end
-end
-
 
 function redirect (url)
     ngx.header["Set-Cookie"] = cookies
@@ -555,26 +498,6 @@ end
 --------------------------------------------------
 -- Routing
 --
-
--- Logging in/out
---   i.e. http://mydomain.org/?ssologin=myuser
-
-if ngx.var.request_method == "GET" then
-    local args = ngx.req.get_uri_args()
-
-    -- In login loop
-    local user = args.ssologin
-    if user and login[user] then
-        return login_walkthrough(user)
-    end
-
-    -- In logout loop
-    user = args.ssologout
-    if user and logout[user] then
-        return logout_walkthrough(user)
-    end
-end
-
 
 -- Portal
 --   i.e. http://mydomain.org/ssowat/*
@@ -593,6 +516,11 @@ then
         if uri_args.action and uri_args.action == 'logout' then
             -- Logout
             return do_logout()
+
+        elseif is_logged_in() and uri_args.r then
+            cda_key = tostring(math.random(1111111, 9999999))
+            login[cda_key] = ngx.var.cookie_SSOwAuthUser
+            return redirect(ngx.decode_base64(uri_args.r).."~sso~"..cda_key)
 
         elseif is_logged_in()                                             -- Authenticated
             or ngx.var.uri == conf["portal_path"]                         -- OR Want to serve portal login
@@ -625,6 +553,18 @@ then
             flash("fail", "Please log in from the portal")
             return redirect(portal_url)
         end
+    end
+end
+
+-- Logging in
+--   i.e. http://mydomain.org/~sso~a6e5320f
+
+if string.match(ngx.var.uri, "~sso~%d+$") then
+    cda_key = string.sub(ngx.var.uri, -7)
+    if login[cda_key] then
+        set_auth_cookie(login[cda_key], ngx.var.host)
+        login[cda_key] = nil
+        return redirect(string.gsub(ngx.var.uri, "~sso~%d+$", ""))
     end
 end
 
@@ -661,8 +601,6 @@ if is_logged_in() then
     end
     set_headers()
     return pass()
-else
-    delete_cookie()
 end
 
 
