@@ -254,7 +254,8 @@ function serve(uri)
         png  = "image/png",
         svg  = "image/svg+xml",
         ico  = "image/vnd.microsoft.icon",
-        woff = "application/x-font-woff"
+        woff = "application/x-font-woff",
+        json = "application/json"
     }
 
     -- Set Content-Type
@@ -273,6 +274,9 @@ function serve(uri)
     elseif ext == "ms" then
         local data = get_data_for(file)
         content = hige.render(content, data)
+    elseif ext == "json" then
+        local data = get_data_for(file)
+        content = json.encode(data)
     end
 
     -- Reset flash messages
@@ -336,6 +340,15 @@ function get_data_for(view)
 
     elseif view == "panel.ms" then
         data = { app = {} }
+        for url, name in pairs(conf["users"][user]) do
+            table.insert(data["app"], { url = url, name = name })
+        end
+    elseif view == "ynhpanel.json" then
+        data = {
+            app = {},
+            user = user,
+            portal_url = portal_url
+        }
         for url, name in pairs(conf["users"][user]) do
             table.insert(data["app"], { url = url, name = name })
         end
@@ -570,13 +583,6 @@ then
 end
 
 
--- Serve the panel JS
-
-if string.match(ngx.var.uri, "^/ynhpanel.js$") then
-    serve("/ynhsso/assets/js/ynhpanel.js")
-end
-
-
 -- Skipped urls
 --  i.e. http://mydomain.org/no_protection/
 
@@ -604,6 +610,12 @@ end
 --
 
 if is_logged_in() then
+    if string.match(ngx.var.uri, "^/ynhpanel.js$") then
+        serve("/ynhsso/assets/js/ynhpanel.js")
+    end
+    if string.match(ngx.var.uri, "^/ynhpanel.json$") then
+        serve("/ynhsso/assets/js/ynhpanel.json")
+    end
     if not has_access() then
         return redirect(portal_url)
     end
