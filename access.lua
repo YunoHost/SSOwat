@@ -499,6 +499,19 @@ end
 -- Routing
 --
 
+-- Logging in
+--   i.e. http://mydomain.org/~sso~a6e5320f
+
+if string.match(ngx.var.uri, "~sso~%d+$") then
+    cda_key = string.sub(ngx.var.uri, -7)
+    if login[cda_key] then
+        set_auth_cookie(login[cda_key], ngx.var.host)
+        login[cda_key] = nil
+        return redirect(string.gsub(ngx.var.uri, "~sso~%d+$", ""))
+    end
+end
+
+
 -- Portal
 --   i.e. http://mydomain.org/ssowat/*
 
@@ -556,16 +569,11 @@ then
     end
 end
 
--- Logging in
---   i.e. http://mydomain.org/~sso~a6e5320f
 
-if string.match(ngx.var.uri, "~sso~%d+$") then
-    cda_key = string.sub(ngx.var.uri, -7)
-    if login[cda_key] then
-        set_auth_cookie(login[cda_key], ngx.var.host)
-        login[cda_key] = nil
-        return redirect(string.gsub(ngx.var.uri, "~sso~%d+$", ""))
-    end
+-- Serve the panel JS
+
+if string.match(ngx.var.uri, "^/ynhpanel.js$") then
+    serve("/ynhsso/assets/js/ynhpanel.js")
 end
 
 
