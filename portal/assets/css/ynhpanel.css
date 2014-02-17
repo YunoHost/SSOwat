@@ -20,6 +20,7 @@
 	opacity: 0.5;
 	zoom: 1;filter: alpha(opacity=50);
 }
+#ynhportal.visible,
 #ynhportal:hover {
 	opacity: 1;
 	filter: alpha(opacity=100);

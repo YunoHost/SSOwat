@@ -177,6 +177,7 @@ domReady(function(){
       window.eventPreventDefault(e);
       // Toggle overlay on YNHPortal button
       Element.toggleClass(overlay, 'visible');
+      Element.toggleClass(portal, 'visible');
     });
 
     // Bind close button
@@ -185,6 +186,7 @@ domReady(function(){
       window.eventPreventDefault(e);
       // Hide overlay
       Element.removeClass(overlay, 'visible');
+      Element.removeClass(portal, 'visible');
     });
 
   };
