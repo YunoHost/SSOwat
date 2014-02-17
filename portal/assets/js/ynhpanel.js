@@ -119,6 +119,8 @@ function domReady(cb) {
   Main
 ---------------------------------------------------------- */
 domReady(function(){
+  // Don't do this in iframe
+  if (window.self !== window.top) {return false;}
 
   // Add portal stylesheet
   var portalStyle = document.createElement("link");
