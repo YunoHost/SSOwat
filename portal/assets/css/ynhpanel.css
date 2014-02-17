@@ -117,12 +117,15 @@
 	line-height: 1.4;
 	font-size: 3em;
 }
-#ynhoverlay .account-link {
+#ynhoverlay .header {
+	color: #ccc;
+}
+#ynhoverlay .header a {
 	display: inline-block;
 	text-decoration: none;
 	color: #ccc;
 }
-#ynhoverlay .account-link:hover {
+#ynhoverlay .header a:hover {
 	text-decoration: underline;
 	color: #fff;
 }

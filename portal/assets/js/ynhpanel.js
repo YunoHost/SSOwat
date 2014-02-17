@@ -159,6 +159,7 @@ domReady(function(){
     overlay.innerHTML += '<div class="header">' +
                         '<h1>'+ response.user +'</h1>' +
                         '<a class="account-link" href="'+ response.portal_url +'">View my account</a>' +
+                        ' | <a class="logout-link" href="'+ response.portal_url +'?action=logout">Logout</a>' +
                         '</div>';
 
     // Add application links
