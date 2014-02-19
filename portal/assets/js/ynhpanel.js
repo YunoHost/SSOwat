@@ -157,8 +157,11 @@ domReady(function(){
 
     // Add overlay header
     overlay.innerHTML += '<div class="header">' +
-                        '<h1>'+ response.user +'</h1>' +
-                        '<a class="account-link" href="'+ response.portal_url +'">View my account</a>' +
+                        '<h1>'+ response.user.name  +' <small>'+ response.user.mail +'</small></h1>' +
+                        ''  +
+                        // '<a class="account-link" href="'+ response.portal_url +'">'+ response.user.uid +'</a>' +
+                        '<a class="account-link" href="'+ response.portal_url +'edit.html">Edit</a>' +
+                        ' | <a class="logout-link" href="'+ response.portal_url +'password.html">Change password</a>' +
                         ' | <a class="logout-link" href="'+ response.portal_url +'?action=logout">Logout</a>' +
                         '</div>';
 

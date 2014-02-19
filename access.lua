@@ -344,9 +344,16 @@ function get_data_for(view)
             table.insert(data["app"], { url = url, name = name })
         end
     elseif view == "ynhpanel.json" then
+        local mails = get_mails(user)
         data = {
             app = {},
-            user = user,
+            user = {
+              uid = user,
+              name = cache:get(user..'-cn'),
+              givenName = cache:get(user..'-givenName'),
+              surname = cache:get(user..'-sn'),
+              mail = mails['mail']
+            },
             portal_url = portal_url
         }
         for url, name in pairs(conf["users"][user]) do
