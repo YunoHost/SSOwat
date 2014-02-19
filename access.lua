@@ -145,6 +145,23 @@ function has_access (user, url)
 end
 
 function authenticate (user, password)
+    if string.find(user, "@") then
+        ldap = lualdap.open_simple("localhost")
+        for dn, attribs in ldap:search {
+            base = "ou=users,dc=yunohost,dc=org",
+            scope = "onelevel",
+            sizelimit = 1,
+            filter = "(mail="..user..")",
+            attrs = {"uid"}
+        } do
+            if attribs["uid"] then
+                user = attribs["uid"]
+            else
+                return false
+            end
+        end
+        ldap:close()
+    end
     connected = lualdap.open_simple (
         "localhost",
         "uid=".. user ..",ou=users,dc=yunohost,dc=org",
@@ -154,9 +171,10 @@ function authenticate (user, password)
     cache:flush_expired()
     if connected then
         cache:add(user.."-password", password, oneweek)
+        return user
+    else
+        return false
     end
-
-    return connected
 end
 
 function set_headers (user)
@@ -479,9 +497,10 @@ function do_login ()
     local args = ngx.req.get_post_args()
     local uri_args = ngx.req.get_uri_args()
 
-    if authenticate(args.user, args.password) then
+    user = authenticate(args.user, args.password)
+    if user then
         ngx.status = ngx.HTTP_CREATED
-        set_auth_cookie(args.user, ngx.var.host)
+        set_auth_cookie(user, ngx.var.host)
         if uri_args.r then
             return redirect(portal_url.."?r="..uri_args.r)
         else
@@ -641,7 +660,8 @@ local auth_header = ngx.req.get_headers()["Authorization"]
 if auth_header then
     _, _, b64_cred = string.find(auth_header, "^Basic%s+(.+)$")
     _, _, user, password = string.find(ngx.decode_base64(b64_cred), "^(.+):(.+)$")
-    if authenticate(user, password) then
+    user = authenticate(user, password)
+    if user then
         set_headers(user)
         return pass()
     end
