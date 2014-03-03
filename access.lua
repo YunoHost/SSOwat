@@ -612,25 +612,52 @@ end
 -- Skipped urls
 --  i.e. http://mydomain.org/no_protection/
 
-for _, url in ipairs(conf["skipped_urls"]) do
-    if string.starts(ngx.var.host..ngx.var.uri, url) then
-        return pass()
+if conf["skipped_urls"] then
+    for _, url in ipairs(conf["skipped_urls"]) do
+        if string.starts(ngx.var.host..ngx.var.uri, url)
+        or string.starts(ngx.var.uri, url) then
+            return pass()
+        end
     end
 end
+
+if conf["skipped_regex"] then
+    for _, regex in ipairs(conf["skipped_regex"]) do
+        if string.match(ngx.var.host..ngx.var.uri, regex)
+        or string.match(ngx.var.uri, regex) then
+            return pass()
+        end
+    end
+end
+
 
 
 -- Unprotected urls
 --  i.e. http://mydomain.org/no_protection+headers/
 
-for _, url in ipairs(conf["unprotected_urls"]) do
-    if string.starts(ngx.var.host..ngx.var.uri, url) then
-        if is_logged_in() then
-            set_headers()
+if conf["unprotected_urls"] then
+    for _, url in ipairs(conf["unprotected_urls"]) do
+        if string.starts(ngx.var.host..ngx.var.uri, url)
+        or string.starts(ngx.var.uri, url) then
+            if is_logged_in() then
+                set_headers()
+            end
+            return pass()
         end
-        return pass()
     end
 end
 
+if conf["unprotected_regex"] then
+    for _, regex in ipairs(conf["unprotected_regex"]) do
+        if string.match(ngx.var.host..ngx.var.uri, regex)
+        or string.match(ngx.var.uri, regex) then
+            if is_logged_in() then
+                set_headers()
+            end
+            return pass()
+        end
+    end
+end
 
 -- Cookie validation
 --
