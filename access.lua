@@ -609,13 +609,39 @@ then
 end
 
 
+-- URL that must be protected
+function is_protected()
+    if not conf["protected_urls"] then
+        conf["protected_urls"] = {}
+    end
+    if not conf["protected_regex"] then
+        conf["protected_regex"] = {}
+    end
+
+    for _, url in ipairs(conf["protected_urls"]) do
+        if string.starts(ngx.var.host..ngx.var.uri, url)
+        or string.starts(ngx.var.uri, url) then
+            return true
+        end
+    end
+    for _, regex in ipairs(conf["protected_regex"]) do
+        if string.match(ngx.var.host..ngx.var.uri, regex)
+        or string.match(ngx.var.uri, regex) then
+            return true
+        end
+    end
+
+    return false
+end
+
 -- Skipped urls
 --  i.e. http://mydomain.org/no_protection/
 
 if conf["skipped_urls"] then
     for _, url in ipairs(conf["skipped_urls"]) do
-        if string.starts(ngx.var.host..ngx.var.uri, url)
-        or string.starts(ngx.var.uri, url) then
+        if (string.starts(ngx.var.host..ngx.var.uri, url)
+        or  string.starts(ngx.var.uri, url))
+        and not is_protected() then
             return pass()
         end
     end
@@ -623,8 +649,9 @@ end
 
 if conf["skipped_regex"] then
     for _, regex in ipairs(conf["skipped_regex"]) do
-        if string.match(ngx.var.host..ngx.var.uri, regex)
-        or string.match(ngx.var.uri, regex) then
+        if (string.match(ngx.var.host..ngx.var.uri, regex)
+        or  string.match(ngx.var.uri, regex))
+        and not is_protected() then
             return pass()
         end
     end
@@ -637,8 +664,9 @@ end
 
 if conf["unprotected_urls"] then
     for _, url in ipairs(conf["unprotected_urls"]) do
-        if string.starts(ngx.var.host..ngx.var.uri, url)
-        or string.starts(ngx.var.uri, url) then
+        if (string.starts(ngx.var.host..ngx.var.uri, url)
+        or  string.starts(ngx.var.uri, url))
+        and not is_protected() then
             if is_logged_in() then
                 set_headers()
             end
@@ -649,8 +677,9 @@ end
 
 if conf["unprotected_regex"] then
     for _, regex in ipairs(conf["unprotected_regex"]) do
-        if string.match(ngx.var.host..ngx.var.uri, regex)
-        or string.match(ngx.var.uri, regex) then
+        if (string.match(ngx.var.host..ngx.var.uri, regex)
+        or  string.match(ngx.var.uri, regex))
+        and not is_protected() then
             if is_logged_in() then
                 set_headers()
             end
