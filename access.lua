@@ -19,7 +19,7 @@ local conf = json.decode(conf_file:read("*all"))
 local persistent_conf_file = io.open(conf_path..".persistent", "r")
 if persistent_conf_file ~= nil then
     for k, v in pairs(json.decode(persistent_conf_file:read("*all"))) do
-       -- If key already exists and is an table, merge it 
+       -- If key already exists and is a table, merge it 
        if conf[k] and type(v) == "table" then
            for subk, subv in pairs(v) do
                if type(subk) == "number" then
