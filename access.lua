@@ -10,8 +10,30 @@ if not srvkey then
 end
 oneweek = 60 * 60 * 24 * 7
 cookies = {}
+
+-- Load conf file
 local conf_file = assert(io.open(conf_path, "r"), "Configuration file is missing")
 local conf = json.decode(conf_file:read("*all"))
+
+-- Load additional rules 
+local persistent_conf_file = io.open(conf_path..".persistent", "r")
+if persistent_conf_file ~= nil then
+    for k, v in pairs(json.decode(persistent_conf_file:read("*all"))) do
+       -- If key already exists and is an table, merge it 
+       if conf[k] and type(v) == "table" then
+           for subk, subv in pairs(v) do
+               if type(subk) == "number" then
+                   table.insert(conf[k], subv)
+               else
+                   conf[k][subk] = subv
+               end
+           end 
+        else
+           conf[k] = v
+	end
+    end
+end
+
 local portal_url = conf["portal_scheme"].."://"..
                    conf["portal_domain"]..
                    conf["portal_path"]
@@ -623,7 +645,7 @@ end
 
 if conf["redirected_urls"] then
     for url, redirect_url in pairs(conf["redirected_urls"]) do
-        if url == ngx.var.host..ngx.var.uri
+        if url == ngx.var.host..ngx.var.uri 
         or url == ngx.var.scheme.."://"..ngx.var.host..ngx.var.uri
         or url == ngx.var.uri then
             detect_redirection(redirect_url)
@@ -634,7 +656,7 @@ end
 if conf["redirected_regex"] then
     for regex, redirect_url in pairs(conf["redirected_regex"]) do
         if string.match(ngx.var.host..ngx.var.uri, regex)
-        or string.match(ngx.var.scheme.."://"..ngx.var.host..ngx.var.uri, regex)
+        or string.match(ngx.var.scheme.."://"..ngx.var.host..ngx.var.uri, regex) 
         or string.match(ngx.var.uri, regex) then
             detect_redirection(redirect_url)
         end
