@@ -608,6 +608,38 @@ then
     end
 end
 
+-- Redirected urls
+
+function detect_redirection(redirect_url)
+    if string.starts(redirect_url, "http://")
+    or string.starts(redirect_url, "https://") then
+        return redirect(redirect_url)
+    elseif  string.starts(redirect_url, "/") then
+        return redirect(ngx.var.scheme.."://"..ngx.var.host..redirect_url)
+    else
+        return redirect(ngx.var.scheme.."://"..redirect_url)
+    end
+end
+
+if conf["redirected_urls"] then
+    for url, redirect_url in pairs(conf["redirected_urls"]) do
+        if url == ngx.var.host..ngx.var.uri
+        or url == ngx.var.scheme.."://"..ngx.var.host..ngx.var.uri
+        or url == ngx.var.uri then
+            detect_redirection(redirect_url)
+        end
+    end
+end
+
+if conf["redirected_regex"] then
+    for regex, redirect_url in pairs(conf["redirected_regex"]) do
+        if string.match(ngx.var.host..ngx.var.uri, regex)
+        or string.match(ngx.var.scheme.."://"..ngx.var.host..ngx.var.uri, regex)
+        or string.match(ngx.var.uri, regex) then
+            detect_redirection(redirect_url)
+        end
+    end
+end
 
 -- URL that must be protected
 function is_protected()
