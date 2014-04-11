@@ -200,6 +200,9 @@ function authenticate (user, password)
 end
 
 function set_headers (user)
+    if ngx.var.scheme ~= "https" then
+        return redirect("https://"..ngx.var.http_host..ngx.var.uri)
+    end
     user = user or ngx.var.cookie_SSOwAuthUser
     if not cache:get(user.."-password") then
         flash("info", "Please log in to access to this content")
