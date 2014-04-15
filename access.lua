@@ -8,7 +8,6 @@ if not srvkey then
     srvkey = tostring(math.random(1111111, 9999999))
     cache:add("srvkey", srvkey)
 end
-oneweek = 60 * 60 * 24 * 7
 cookies = {}
 
 -- Load conf file
@@ -32,6 +31,10 @@ if persistent_conf_file ~= nil then
            conf[k] = v
 	end
     end
+end
+
+if not conf["session_timeout"] then
+    conf["session_timeout"] = 60 * 60 * 24 -- one day
 end
 
 local portal_url = conf["portal_scheme"].."://"..
@@ -82,7 +85,7 @@ function flash (wat, message)
 end
 
 function set_auth_cookie (user, domain)
-    local maxAge = oneweek
+    local maxAge = conf["session_timeout"]
     local expire = ngx.req.start_time() + maxAge
     local session_key = cache:get("session_"..user)
     if not session_key then
@@ -192,7 +195,7 @@ function authenticate (user, password)
 
     cache:flush_expired()
     if connected then
-        cache:add(user.."-password", password, oneweek)
+        cache:add(user.."-password", password, conf["session_timeout"])
         return user
     else
         return false
@@ -220,11 +223,11 @@ function set_headers (user)
             for k,v in pairs(attribs) do
                 if type(v) == "table" then
                     for k2,v2 in ipairs(v) do
-                        if k2 == 1 then cache:set(user.."-"..k, v2, oneweek) end
-                        cache:set(user.."-"..k.."|"..k2, v2, oneweek)
+                        if k2 == 1 then cache:set(user.."-"..k, v2, conf["session_timeout"]) end
+                        cache:set(user.."-"..k.."|"..k2, v2, conf["session_timeout"])
                     end
                 else
-                    cache:set(user.."-"..k, v, oneweek)
+                    cache:set(user.."-"..k, v, conf["session_timeout"])
                 end
             end
         end
@@ -430,7 +433,7 @@ function do_edit ()
                     local password = "{SHA}"..ngx.encode_base64(ngx.sha1_bin(args.newpassword))
                     if ldap:modify(dn, {'=', userPassword = password }) then
                         flash("win", "Password successfully changed")
-                        cache:set(user.."-password", args.newpassword, oneweek)
+                        cache:set(user.."-password", args.newpassword, conf["session_timeout"])
                         return redirect(portal_url.."info.html")
                     else
                         flash("fail", "An error occured on password changing")
