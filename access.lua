@@ -37,6 +37,10 @@ if not conf["session_timeout"] then
     conf["session_timeout"] = 60 * 60 * 24 -- one day
 end
 
+if not conf["session_max_timeout"] then
+    conf["session_max_timeout"] = 60 * 60 * 24 * 7 -- one week
+end
+
 local portal_url = conf["portal_scheme"].."://"..
                    conf["portal_domain"]..
                    conf["portal_path"]
@@ -85,12 +89,12 @@ function flash (wat, message)
 end
 
 function set_auth_cookie (user, domain)
-    local maxAge = conf["session_timeout"]
+    local maxAge = conf["session_max_timeout"]
     local expire = ngx.req.start_time() + maxAge
     local session_key = cache:get("session_"..user)
     if not session_key then
         session_key = tostring(math.random(1111111, 9999999))
-        cache:add("session_"..user, session_key)
+        cache:add("session_"..user, session_key, conf["session_max_timeout"])
     end
     local hash = ngx.md5(srvkey..
                "|" ..ngx.var.remote_addr..
@@ -103,14 +107,6 @@ function set_auth_cookie (user, domain)
     cook("SSOwAuthUser="..user..cookie_str)
     cook("SSOwAuthHash="..hash..cookie_str)
     cook("SSOwAuthExpire="..expire..cookie_str)
-end
-
-function set_redirect_cookie (redirect_url)
-    cook(
-        "SSOwAuthRedirect="..redirect_url..
-        "; Path="..conf["portal_path"]..
-        "; Max-Age=3600;"
-    )
 end
 
 function delete_cookie ()
@@ -144,12 +140,15 @@ function is_logged_in ()
             -- Check hash
             local session_key = cache:get("session_"..ngx.var.cookie_SSOwAuthUser)
             if session_key and session_key ~= "" then
-                local hash = ngx.md5(srvkey..
-                        "|"..ngx.var.remote_addr..
-                        "|"..ngx.var.cookie_SSOwAuthUser..
-                        "|"..ngx.var.cookie_SSOwAuthExpire..
-                        "|"..session_key)
-                return hash == ngx.var.cookie_SSOwAuthHash
+                -- Check cache
+                if cache:get(ngx.var.cookie_SSOwAuthUser.."-password") then
+                    local hash = ngx.md5(srvkey..
+                            "|"..ngx.var.remote_addr..
+                            "|"..ngx.var.cookie_SSOwAuthUser..
+                            "|"..ngx.var.cookie_SSOwAuthExpire..
+                            "|"..session_key)
+                    return hash == ngx.var.cookie_SSOwAuthHash
+                end
             end
         end
     end
@@ -180,8 +179,10 @@ function authenticate (user, password)
             attrs = {"uid"}
         } do
             if attribs["uid"] then
+                ngx.log(ngx.NOTICE, "Use email: "..user)
                 user = attribs["uid"]
             else
+                ngx.log(ngx.NOTICE, "Unknown email: "..user)
                 return false
             end
         end
@@ -196,24 +197,27 @@ function authenticate (user, password)
     cache:flush_expired()
     if connected then
         cache:add(user.."-password", password, conf["session_timeout"])
+        ngx.log(ngx.NOTICE, "Connected as: "..user)
         return user
     else
+        ngx.log(ngx.NOTICE, "Connection failed for: "..user)
         return false
     end
 end
 
 function set_headers (user)
     if ngx.var.scheme ~= "https" then
-        return redirect("https://"..ngx.var.http_host..ngx.var.uri)
+        return redirect("https://"..ngx.var.host..ngx.var.uri)
     end
     user = user or ngx.var.cookie_SSOwAuthUser
     if not cache:get(user.."-password") then
         flash("info", "Please log in to access to this content")
-        local back_url = ngx.var.scheme .. "://" .. ngx.var.http_host .. ngx.var.uri
+        local back_url = ngx.var.scheme .. "://" .. ngx.var.host .. ngx.var.uri
         return redirect(portal_url.."?r="..ngx.encode_base64(back_url))
     end
     if not cache:get(user.."-uid") then
         ldap = lualdap.open_simple("localhost")
+        ngx.log(ngx.NOTICE, "Reloading LDAP values for: "..user)
         for dn, attribs in ldap:search {
             base = "uid=".. user ..",ou=users,dc=yunohost,dc=org",
             scope = "base",
@@ -224,13 +228,17 @@ function set_headers (user)
                 if type(v) == "table" then
                     for k2,v2 in ipairs(v) do
                         if k2 == 1 then cache:set(user.."-"..k, v2, conf["session_timeout"]) end
-                        cache:set(user.."-"..k.."|"..k2, v2, conf["session_timeout"])
+                        cache:set(user.."-"..k.."|"..k2, v2, conf["session_max_timeout"])
                     end
                 else
                     cache:set(user.."-"..k, v, conf["session_timeout"])
                 end
             end
         end
+    else
+        -- Revalidate session for another day by default
+        password = cache:get(user.."-password")
+        cache:set(user.."-password", password, conf["session_timeout"])
     end
 
     -- Set HTTP Auth header
@@ -545,6 +553,7 @@ function do_logout()
     local args = ngx.req.get_uri_args()
     if is_logged_in() then
         cache:delete("session_"..ngx.var.cookie_SSOwAuthUser)
+        cache:delete(user.."-uid") -- Ugly trick to reload cache
         flash("info", "Logged out")
         return redirect(portal_url)
     end
@@ -552,6 +561,7 @@ end
 
 function redirect (url)
     ngx.header["Set-Cookie"] = cookies
+    ngx.log(ngx.INFO, "Redirect to: "..url)
     return ngx.redirect(url)
 end
 
@@ -573,6 +583,7 @@ if string.match(ngx.var.uri, "~sso~%d+$") then
     cda_key = string.sub(ngx.var.uri, -7)
     if login[cda_key] then
         set_auth_cookie(login[cda_key], ngx.var.host)
+        ngx.log(ngx.NOTICE, "Cross-domain authentication: "..login[cda_key].." connected on "..ngx.var.host)
         login[cda_key] = nil
         return redirect(string.gsub(ngx.var.uri, "~sso~%d+$", ""))
     end
@@ -597,7 +608,7 @@ then
             -- Logout
             return do_logout()
 
-        elseif is_logged_in() and uri_args.r then
+        elseif is_logged_in() and uri_args.r and ngx.decode_base64(uri_args.r) ~= portal_url then
             cda_key = tostring(math.random(1111111, 9999999))
             login[cda_key] = ngx.var.cookie_SSOwAuthUser
             return redirect(ngx.decode_base64(uri_args.r).."~sso~"..cda_key)
@@ -787,6 +798,6 @@ end
 --
 
 flash("info", "Please log in to access to this content")
-local back_url = ngx.var.scheme .. "://" .. ngx.var.http_host .. ngx.var.uri
+local back_url = ngx.var.scheme .. "://" .. ngx.var.host .. ngx.var.uri
 return redirect(portal_url.."?r="..ngx.encode_base64(back_url))
 
