@@ -33,44 +33,22 @@ if persistent_conf_file ~= nil then
     end
 end
 
-if not conf["portal_scheme"] then
-    conf["portal_scheme"] = "https"
-end
+-- Default configuration values
+default_conf = {
+    portal_scheme             = "https",
+    portal_path               = "/ssowat",
+    session_timeout           = 60 * 60 * 24,     -- one day
+    session_max_timeout       = 60 * 60 * 24 * 7, -- one week
+    login_arg                 = "sso_login",
+    ldap_host                 = "localhost",
+    ldap_group                = "ou=users,dc=yunohost,dc=org",
+    ldap_identifier           = "uid",
+    ldap_attributes           = {"uid", "givenname", "sn", "cn", "homedirectory", "mail", "maildrop"},
+    allow_mail_authentication = true
+}
 
-if not conf["portal_path"] then
-    conf["portal_path"] = "/ssowat"
-end
-
-if not conf["session_timeout"] then
-    conf["session_timeout"] = 60 * 60 * 24 -- one day
-end
-
-if not conf["session_max_timeout"] then
-    conf["session_max_timeout"] = 60 * 60 * 24 * 7 -- one week
-end
-
-if not conf["login_arg"] then
-    conf["login_arg"] = "sso_login"
-end
-
-if not conf["ldap_host"] then
-    conf["ldap_host"] = "localhost"
-end
-
-if not conf["ldap_group"] then
-    conf["ldap_group"] = "ou=users,dc=yunohost,dc=org"
-end
-
-if not conf["ldap_identifier"] then
-    conf["ldap_identifier"] = "uid"
-end
-
-if not conf["ldap_attributes"] then
-    conf["ldap_attributes"] = {"uid", "givenname", "sn", "cn", "homedirectory", "mail", "maildrop"}
-end
-
-if not conf["allow_mail_authentication"] then
-    conf["allow_mail_authentication"] = true
+for param, default_value in pairs(default_conf) do
+    conf[param] = conf[param] or default_value
 end
 
 local portal_url = conf["portal_scheme"].."://"..
@@ -546,7 +524,7 @@ function do_edit ()
                  end
                  table.insert(maildrop, 1, user)
 
-                 local dn = conf["ldap_indentifier"].."="..user..","..conf["ldap_group"]
+                 local dn = conf["ldap_identifier"].."="..user..","..conf["ldap_group"]
                  local ldap = lualdap.open_simple(conf["ldap_host"], dn, cache:get(user.."-password"))
                  local cn = args.givenName.." "..args.sn
                  if ldap:modify(dn, {'=', cn = cn,
