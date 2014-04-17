@@ -37,6 +37,7 @@ end
 default_conf = {
     portal_scheme             = "https",
     portal_path               = "/ssowat",
+    domains                   = { conf["portal_domain"] },
     session_timeout           = 60 * 60 * 24,     -- one day
     session_max_timeout       = 60 * 60 * 24 * 7, -- one week
     login_arg                 = "sso_login",
@@ -44,7 +45,8 @@ default_conf = {
     ldap_group                = "ou=users,dc=yunohost,dc=org",
     ldap_identifier           = "uid",
     ldap_attributes           = {"uid", "givenname", "sn", "cn", "homedirectory", "mail", "maildrop"},
-    allow_mail_authentication = true
+    allow_mail_authentication = true,
+    additional_headers        = { Remote-user = "uid" }
 }
 
 for param, default_value in pairs(default_conf) do
