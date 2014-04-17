@@ -553,7 +553,7 @@ function do_logout()
     local args = ngx.req.get_uri_args()
     if is_logged_in() then
         cache:delete("session_"..ngx.var.cookie_SSOwAuthUser)
-        cache:delete(user.."-uid") -- Ugly trick to reload cache
+        cache:delete(ngx.var.cookie_SSOwAuthUser.."-uid") -- Ugly trick to reload cache
         flash("info", "Logged out")
         return redirect(portal_url)
     end
