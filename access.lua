@@ -33,12 +33,24 @@ if persistent_conf_file ~= nil then
     end
 end
 
+if not conf["portal_scheme"] then
+    conf["portal_scheme"] = "https"
+end
+
+if not conf["portal_path"] then
+    conf["portal_path"] = "/ssowat"
+end
+
 if not conf["session_timeout"] then
     conf["session_timeout"] = 60 * 60 * 24 -- one day
 end
 
 if not conf["session_max_timeout"] then
     conf["session_max_timeout"] = 60 * 60 * 24 * 7 -- one week
+end
+
+if not conf["login_arg"] then
+    conf["login_arg"] = "sso_login"
 end
 
 local portal_url = conf["portal_scheme"].."://"..
@@ -86,6 +98,17 @@ function flash (wat, message)
     then
         flashs[wat] = message
     end
+end
+
+function uri_args_string (args)
+    if not args then
+        args = ngx.req.get_uri_args()
+    end
+    String = "?"
+    for k,v in pairs(args) do
+        String = String..k.."="..v.."&"
+    end
+    return string.sub(String, 1, string.len(String) - 1)
 end
 
 function set_auth_cookie (user, domain)
@@ -207,12 +230,12 @@ end
 
 function set_headers (user)
     if ngx.var.scheme ~= "https" then
-        return redirect("https://"..ngx.var.host..ngx.var.uri)
+        return redirect("https://"..ngx.var.host..ngx.var.uri..uri_args_string())
     end
     user = user or ngx.var.cookie_SSOwAuthUser
     if not cache:get(user.."-password") then
         flash("info", "Please log in to access to this content")
-        local back_url = ngx.var.scheme .. "://" .. ngx.var.host .. ngx.var.uri
+        local back_url = ngx.var.scheme .. "://" .. ngx.var.host .. ngx.var.uri .. uri_args_string()
         return redirect(portal_url.."?r="..ngx.encode_base64(back_url))
     end
     if not cache:get(user.."-uid") then
@@ -577,15 +600,19 @@ end
 --
 
 -- Logging in
---   i.e. http://mydomain.org/~sso~a6e5320f
+--   i.e. http://mydomain.org/?sso_login=a6e5320f
 
-if string.match(ngx.var.uri, "~sso~%d+$") then
-    cda_key = string.sub(ngx.var.uri, -7)
-    if login[cda_key] then
-        set_auth_cookie(login[cda_key], ngx.var.host)
-        ngx.log(ngx.NOTICE, "Cross-domain authentication: "..login[cda_key].." connected on "..ngx.var.host)
-        login[cda_key] = nil
-        return redirect(string.gsub(ngx.var.uri, "~sso~%d+$", ""))
+if ngx.var.host ~= conf["portal_domain"] and ngx.var.request_method == "GET" then
+    uri_args = ngx.req.get_uri_args()
+    if uri_args[conf.login_arg] then
+        cda_key = uri_args[conf.login_arg]
+        if login[cda_key] then
+            set_auth_cookie(login[cda_key], ngx.var.host)
+            ngx.log(ngx.NOTICE, "Cross-domain authentication: "..login[cda_key].." connected on "..ngx.var.host)
+            login[cda_key] = nil
+            uri_args[conf.login_arg] = nil
+            return redirect(ngx.var.uri..uri_args_string(uri_args))
+        end
     end
 end
 
@@ -608,10 +635,20 @@ then
             -- Logout
             return do_logout()
 
-        elseif is_logged_in() and uri_args.r and ngx.decode_base64(uri_args.r) ~= portal_url then
-            cda_key = tostring(math.random(1111111, 9999999))
-            login[cda_key] = ngx.var.cookie_SSOwAuthUser
-            return redirect(ngx.decode_base64(uri_args.r).."~sso~"..cda_key)
+        elseif is_logged_in() and uri_args.r then
+            back_url = ngx.decode_base64(uri_args.r)
+            if  not string.match(back_url, "^http[s]?:\/\/"..ngx.var.host.."\/")
+            and not string.match(back_url, ".*"..conf.login_arg.."=%d+$") then
+                cda_key = tostring(math.random(1111111, 9999999))
+                login[cda_key] = ngx.var.cookie_SSOwAuthUser
+                if string.match(back_url, ".*?.*") then
+                    back_url = back_url.."&"
+                else
+                    back_url = back_url.."?"
+                end
+                back_url = back_url.."sso_login="..cda_key
+            end
+            return redirect(back_url)
 
         elseif is_logged_in()                                             -- Authenticated
             or ngx.var.uri == conf["portal_path"]                         -- OR Want to serve portal login
@@ -798,6 +835,5 @@ end
 --
 
 flash("info", "Please log in to access to this content")
-local back_url = ngx.var.scheme .. "://" .. ngx.var.host .. ngx.var.uri
+local back_url = ngx.var.scheme .. "://" .. ngx.var.host .. ngx.var.uri .. uri_args_string()
 return redirect(portal_url.."?r="..ngx.encode_base64(back_url))
-
