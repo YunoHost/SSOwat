@@ -56,7 +56,7 @@ If you use YunoHost, you may want to edit the `/etc/ssowat/conf.json.persistent`
 
 ## Available parameters
 
-These are the SSOwat's available parameters. Only the first one is required, but it is recommended to know the others to fully understand what you can do with SSOwat.
+These are the SSOwat's configuration parameters. Only the first one is required, but it is recommended to know the others to fully understand what you can do with SSOwat.
 
 #### portal_domain
 
