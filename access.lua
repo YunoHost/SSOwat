@@ -53,6 +53,26 @@ if not conf["login_arg"] then
     conf["login_arg"] = "sso_login"
 end
 
+if not conf["ldap_host"] then
+    conf["ldap_host"] = "localhost"
+end
+
+if not conf["ldap_group"] then
+    conf["ldap_group"] = "ou=users,dc=yunohost,dc=org"
+end
+
+if not conf["ldap_identifier"] then
+    conf["ldap_identifier"] = "uid"
+end
+
+if not conf["ldap_attributes"] then
+    conf["ldap_attributes"] = {"uid", "givenname", "sn", "cn", "homedirectory", "mail", "maildrop"}
+end
+
+if not conf["allow_mail_authentication"] then
+    conf["allow_mail_authentication"] = true
+end
+
 local portal_url = conf["portal_scheme"].."://"..
                    conf["portal_domain"]..
                    conf["portal_path"]
@@ -192,18 +212,18 @@ function has_access (user, url)
 end
 
 function authenticate (user, password)
-    if string.find(user, "@") then
-        ldap = lualdap.open_simple("localhost")
+    if conf["allow_mail_authentication"] and string.find(user, "@") then
+        ldap = lualdap.open_simple(conf["ldap_host"])
         for dn, attribs in ldap:search {
-            base = "ou=users,dc=yunohost,dc=org",
+            base = conf["ldap_group"],
             scope = "onelevel",
             sizelimit = 1,
             filter = "(mail="..user..")",
-            attrs = {"uid"}
+            attrs = {conf["ldap_identifier"]}
         } do
-            if attribs["uid"] then
+            if attribs[conf["ldap_identifier"]] then
                 ngx.log(ngx.NOTICE, "Use email: "..user)
-                user = attribs["uid"]
+                user = attribs[conf["ldap_identifier"]]
             else
                 ngx.log(ngx.NOTICE, "Unknown email: "..user)
                 return false
@@ -212,8 +232,8 @@ function authenticate (user, password)
         ldap:close()
     end
     connected = lualdap.open_simple (
-        "localhost",
-        "uid=".. user ..",ou=users,dc=yunohost,dc=org",
+        conf["ldap_host"],
+        conf["ldap_identifier"].."=".. user ..","..conf["ldap_group"],
         password
     )
 
@@ -238,14 +258,14 @@ function set_headers (user)
         local back_url = ngx.var.scheme .. "://" .. ngx.var.host .. ngx.var.uri .. uri_args_string()
         return redirect(portal_url.."?r="..ngx.encode_base64(back_url))
     end
-    if not cache:get(user.."-uid") then
-        ldap = lualdap.open_simple("localhost")
+    if not cache:get(user.."-"..conf["ldap_identifier"]) then
+        ldap = lualdap.open_simple(conf["ldap_host"])
         ngx.log(ngx.NOTICE, "Reloading LDAP values for: "..user)
         for dn, attribs in ldap:search {
-            base = "uid=".. user ..",ou=users,dc=yunohost,dc=org",
+            base = conf["ldap_identifier"].."=".. user ..","..conf["ldap_group"],
             scope = "base",
             sizelimit = 1,
-            attrs = {"uid", "givenname", "sn", "cn", "homedirectory", "mail", "maildrop"}
+            attrs = conf["ldap_attributes"]
         } do
             for k,v in pairs(attribs) do
                 if type(v) == "table" then
@@ -459,8 +479,8 @@ function do_edit ()
             and args.currentpassword == cache:get(user.."-password")
             then
                 if args.newpassword == args.confirm then
-                    local dn = "uid="..user..",ou=users,dc=yunohost,dc=org"
-                    local ldap = lualdap.open_simple("localhost", dn, args.currentpassword)
+                    local dn = conf["ldap_identifier"].."="..user..","..conf["ldap_group"]
+                    local ldap = lualdap.open_simple(conf["ldap_host"], dn, args.currentpassword)
                     local password = "{SHA}"..ngx.encode_base64(ngx.sha1_bin(args.newpassword))
                     if ldap:modify(dn, {'=', userPassword = password }) then
                         flash("win", "Password successfully changed")
@@ -526,17 +546,16 @@ function do_edit ()
                  end
                  table.insert(maildrop, 1, user)
 
-                 local dn = "uid="..user..",ou=users,dc=yunohost,dc=org"
-                 local ldap = lualdap.open_simple("localhost", dn, cache:get(user.."-password"))
+                 local dn = conf["ldap_indentifier"].."="..user..","..conf["ldap_group"]
+                 local ldap = lualdap.open_simple(conf["ldap_host"], dn, cache:get(user.."-password"))
                  local cn = args.givenName.." "..args.sn
-                 if ldap:modify(dn, {'=', cn    = cn,
-                                          gecos = cn,
+                 if ldap:modify(dn, {'=', cn = cn,
                                           givenName = args.givenName,
                                           sn = args.sn,
                                           mail = mailalias,
                                           maildrop = maildrop })
                  then
-                     cache:delete(user.."-uid")
+                     cache:delete(user.."-"..conf["ldap_identifier"])
                      set_headers(user) -- Ugly trick to reload cache
                      flash("win", "Informations updated")
                      return redirect(portal_url.."info.html")
@@ -576,7 +595,7 @@ function do_logout()
     local args = ngx.req.get_uri_args()
     if is_logged_in() then
         cache:delete("session_"..ngx.var.cookie_SSOwAuthUser)
-        cache:delete(ngx.var.cookie_SSOwAuthUser.."-uid") -- Ugly trick to reload cache
+        cache:delete(ngx.var.cookie_SSOwAuthUser.."-"..conf["ldap_identifier"]) -- Ugly trick to reload cache
         flash("info", "Logged out")
         return redirect(portal_url)
     end
