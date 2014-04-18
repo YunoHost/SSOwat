@@ -45,8 +45,7 @@ default_conf = {
     ldap_group                = "ou=users,dc=yunohost,dc=org",
     ldap_identifier           = "uid",
     ldap_attributes           = {"uid", "givenname", "sn", "cn", "homedirectory", "mail", "maildrop"},
-    allow_mail_authentication = true,
-    additional_headers        = { Remote-user = "uid" }
+    allow_mail_authentication = true
 }
 
 for param, default_value in pairs(default_conf) do
