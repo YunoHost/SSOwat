@@ -589,6 +589,12 @@ end
 function pass ()
     delete_redirect_cookie()
     ngx.req.set_header("Set-Cookie", cookies)
+    if string.ends(ngx.var.uri, "/")
+    or string.ends(ngx.var.uri, ".html")
+    or string.ends(ngx.var.uri, ".htm")
+    then
+        ngx.header["Content-Type"] = "text/html"
+    end
     return
 end
 
