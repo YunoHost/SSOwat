@@ -14,11 +14,11 @@ cookies = {}
 local conf_file = assert(io.open(conf_path, "r"), "Configuration file is missing")
 local conf = json.decode(conf_file:read("*all"))
 
--- Load additional rules 
+-- Load additional rules
 local persistent_conf_file = io.open(conf_path..".persistent", "r")
 if persistent_conf_file ~= nil then
     for k, v in pairs(json.decode(persistent_conf_file:read("*all"))) do
-       -- If key already exists and is a table, merge it 
+       -- If key already exists and is a table, merge it
        if conf[k] and type(v) == "table" then
            for subk, subv in pairs(v) do
                if type(subk) == "number" then
@@ -26,7 +26,7 @@ if persistent_conf_file ~= nil then
                else
                    conf[k][subk] = subv
                end
-           end 
+           end
         else
            conf[k] = v
 	end
@@ -635,7 +635,7 @@ then
 
         elseif is_logged_in() and uri_args.r then
             back_url = ngx.decode_base64(uri_args.r)
-            if  not string.match(back_url, "^http[s]?:\/\/"..ngx.var.host.."\/")
+            if  not string.match(back_url, "^http[s]?://"..ngx.var.host.."/")
             and not string.match(back_url, ".*"..conf.login_arg.."=%d+$") then
                 cda_key = tostring(math.random(1111111, 9999999))
                 login[cda_key] = ngx.var.cookie_SSOwAuthUser
@@ -697,7 +697,7 @@ end
 
 if conf["redirected_urls"] then
     for url, redirect_url in pairs(conf["redirected_urls"]) do
-        if url == ngx.var.host..ngx.var.uri 
+        if url == ngx.var.host..ngx.var.uri
         or url == ngx.var.scheme.."://"..ngx.var.host..ngx.var.uri
         or url == ngx.var.uri then
             detect_redirection(redirect_url)
@@ -708,7 +708,7 @@ end
 if conf["redirected_regex"] then
     for regex, redirect_url in pairs(conf["redirected_regex"]) do
         if string.match(ngx.var.host..ngx.var.uri, regex)
-        or string.match(ngx.var.scheme.."://"..ngx.var.host..ngx.var.uri, regex) 
+        or string.match(ngx.var.scheme.."://"..ngx.var.host..ngx.var.uri, regex)
         or string.match(ngx.var.uri, regex) then
             detect_redirection(redirect_url)
         end
