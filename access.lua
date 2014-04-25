@@ -204,7 +204,7 @@ function authenticate (user, password)
                 ngx.log(ngx.NOTICE, "Use email: "..user)
                 user = attribs[conf["ldap_identifier"]]
             else
-                ngx.log(ngx.NOTICE, "Unknown email: "..user)
+                ngx.log(ngx.ERR, "Unknown email: "..user)
                 return false
             end
         end
@@ -222,7 +222,7 @@ function authenticate (user, password)
         ngx.log(ngx.NOTICE, "Connected as: "..user)
         return user
     else
-        ngx.log(ngx.NOTICE, "Connection failed for: "..user)
+        ngx.log(ngx.ERR, "Connection failed for: "..user)
         return false
     end
 end
