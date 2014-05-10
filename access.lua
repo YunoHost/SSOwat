@@ -491,39 +491,43 @@ function do_edit ()
                  end
 
                  local mail_pattern = "[A-Za-z0-9%.%%%+%-]+@[A-Za-z0-9%.%%%+%-]+%.%w%w%w?%w?"
-
+                 local domains = conf["domains"]
+                 local mails = {}
                  table.insert(mailalias, 1, args.mail)
                  for k, mail in ipairs(mailalias) do
-                     if mail == "" then
-                         table.remove(mailalias, k)
-                     elseif not mail:match(mail_pattern) then
-                         flash("fail", "Invalid mail address: "..mail)
-                         return redirect(portal_url.."edit.html")
-                     else
-                         local domains = conf["domains"]
-                         local domain_valid = false
-                         for _, domain in ipairs(domains) do
-                             if string.ends(mail, "@"..domain) then
-                                 domain_valid = true
-                                 break
-                             end
-                         end
-                         if not domain_valid then
-                             flash("fail", "Invalid domain for mail "..mail)
+                     if mail ~= "" then
+                         if not mail:match(mail_pattern) then
+                             flash("fail", "Invalid mail address: "..mail)
                              return redirect(portal_url.."edit.html")
+                         else
+                             local domain_valid = false
+                             for _, domain in ipairs(domains) do
+                                 if string.ends(mail, "@"..domain) then
+                                     domain_valid = true
+                                     break
+                                 end
+                             end
+                             if domain_valid then
+                                 table.insert(mails, mail)
+                             else
+                                 flash("fail", "Invalid domain for mail "..mail)
+                                 return redirect(portal_url.."edit.html")
+                             end
                          end
                      end
                  end
 
+                 local drops = {}
                  for k, mail in ipairs(maildrop) do
-                     if mail == "" then
-                         table.remove(maildrop, k)
-                     elseif not mail:match(mail_pattern) then
-                         flash("fail", "Invalid mail forward address: "..mail)
-                         return redirect(portal_url.."edit.html")
+                     if mail ~= "" then
+                         if not mail:match(mail_pattern) then
+                             flash("fail", "Invalid mail forward address: "..mail)
+                             return redirect(portal_url.."edit.html")
+                         end
+                         table.insert(drops, mail)
                      end
                  end
-                 table.insert(maildrop, 1, user)
+                 table.insert(drops, 1, user)
 
                  local dn = conf["ldap_identifier"].."="..user..","..conf["ldap_group"]
                  local ldap = lualdap.open_simple(conf["ldap_host"], dn, cache:get(user.."-password"))
@@ -531,10 +535,14 @@ function do_edit ()
                  if ldap:modify(dn, {'=', cn = cn,
                                           givenName = args.givenName,
                                           sn = args.sn,
-                                          mail = mailalias,
-                                          maildrop = maildrop })
+                                          mail = mails,
+                                          maildrop = drops })
                  then
                      cache:delete(user.."-"..conf["ldap_identifier"])
+                     for _, v in ipairs({2, 3, 4, 5, 6, 7, 8, 9, 10}) do
+                         cache:delete(user.."-maildrop|"..v)
+                         cache:delete(user.."-mail|"..v)
+                     end
                      set_headers(user) -- Ugly trick to reload cache
                      flash("win", "Informations updated")
                      return redirect(portal_url.."info.html")
