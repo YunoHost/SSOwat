@@ -520,7 +520,7 @@ function do_edit ()
                  for k, mail in ipairs(mailalias) do
                      if mail ~= "" then
                          if not mail:match(mail_pattern) then
-                             flash("fail", "Invalid mail address: "..mail)
+                             flash("fail", t("invalid_mail")..": "..mail)
                              return redirect(portal_url.."edit.html")
                          else
                              local domain_valid = false
@@ -533,7 +533,7 @@ function do_edit ()
                              if domain_valid then
                                  table.insert(mails, mail)
                              else
-                                 flash("fail", "Invalid domain for mail "..mail)
+                                 flash("fail", t("invalid_domain")..mail)
                                  return redirect(portal_url.."edit.html")
                              end
                          end
@@ -544,7 +544,7 @@ function do_edit ()
                  for k, mail in ipairs(maildrop) do
                      if mail ~= "" then
                          if not mail:match(mail_pattern) then
-                             flash("fail", "Invalid mail forward address: "..mail)
+                             flash("fail", t("invalid_mailforward")..": "..mail)
                              return redirect(portal_url.."edit.html")
                          end
                          table.insert(drops, mail)
@@ -567,13 +567,13 @@ function do_edit ()
                          cache:delete(user.."-mail|"..v)
                      end
                      set_headers(user) -- Ugly trick to reload cache
-                     flash("win", "Informations updated")
+                     flash("win", t("informations_updated"))
                      return redirect(portal_url.."info.html")
                  else
-                     flash("fail", "An error occured on user saving")
+                     flash("fail", t("user_saving_fail"))
                  end
              else
-                 flash("fail", "Missing required fields")
+                 flash("fail", t("missing_required_fields"))
              end
              return redirect(portal_url.."edit.html")
          end
