@@ -150,3 +150,6 @@ Array of regular expressions to be matched against URLS **and** URIs and their r
 
 2-level array containing usernames and their allowed URLs along with an App name (**example**: `{ "kload": { "kload.fr/myapp/": "My App" } }`)
 
+#### default_language
+
+Language code used by default in views (**default**: `en`)
