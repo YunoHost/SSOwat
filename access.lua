@@ -9,6 +9,10 @@ if not srvkey then
     cache:add("srvkey", srvkey)
 end
 cookies = {}
+lang = ngx.req.get_headers()["Accept-Language"]
+if lang then
+    lang = string.sub(lang, 1, 2)
+end
 
 -- Load conf file
 local conf_file = assert(io.open(conf_path, "r"), "Configuration file is missing")
@@ -45,7 +49,8 @@ default_conf = {
     ldap_group                = "ou=users,dc=yunohost,dc=org",
     ldap_identifier           = "uid",
     ldap_attributes           = {"uid", "givenname", "sn", "cn", "homedirectory", "mail", "maildrop"},
-    allow_mail_authentication = true
+    allow_mail_authentication = true,
+    default_language          = "en"
 }
 
 for param, default_value in pairs(default_conf) do
@@ -85,6 +90,14 @@ end
 function string.ends (String, End)
    return End=='' or string.sub(String, -string.len(End)) == End
 end
+
+function t (key)
+   if lang and i18n[lang] then
+       return i18n[lang][key] or ""
+   else
+       return i18n[conf["default_language"]][key] or ""
+   end
+end 
 
 function cook (cookie_str)
     table.insert(cookies, cookie_str)
@@ -233,7 +246,7 @@ function set_headers (user)
     end
     user = user or ngx.var.cookie_SSOwAuthUser
     if not cache:get(user.."-password") then
-        flash("info", "Please log in to access to this content")
+        flash("info", t("please_login"))
         local back_url = ngx.var.scheme .. "://" .. ngx.var.host .. ngx.var.uri .. uri_args_string()
         return redirect(portal_url.."?r="..ngx.encode_base64(back_url))
     end
@@ -371,7 +384,7 @@ function get_data_for(view)
     local data = {}
 
     if view == "login.html" then
-        data["title"] = "YunoHost Login"
+        data["title"] = t("login")
 
     elseif view == "info.html" then
         set_headers(user)
@@ -395,7 +408,7 @@ function get_data_for(view)
     elseif view == "password.html" then
 
         data = {
-            title     = "Change password",
+            title     = t("change_password"),
             connected = true
         }
 
@@ -404,7 +417,7 @@ function get_data_for(view)
 
         local mails = get_mails(user)
         data = {
-            title     = "Edit "..user,
+            title     = t("edit").." "..user,
             connected = true,
             uid       = user,
             sn        = cache:get(user.."-sn"),
@@ -437,6 +450,16 @@ function get_data_for(view)
         end
     end
 
+    -- View translation (use "t_key")
+    if lang and i18n[lang] then
+        translate_table = i18n[lang]
+    else
+        translate_table = i18n[conf["default_language"]]
+    end
+    for k, v in pairs(translate_table) do
+        data["t_"..k] = v
+    end
+
     data['flash_fail'] = {flashs["fail"]}
     data['flash_win']  = {flashs["win"] }
     data['flash_info'] = {flashs["info"]}
@@ -462,17 +485,17 @@ function do_edit ()
                     local ldap = lualdap.open_simple(conf["ldap_host"], dn, args.currentpassword)
                     local password = "{SHA}"..ngx.encode_base64(ngx.sha1_bin(args.newpassword))
                     if ldap:modify(dn, {'=', userPassword = password }) then
-                        flash("win", "Password successfully changed")
+                        flash("win", t("password_changed"))
                         cache:set(user.."-password", args.newpassword, conf["session_timeout"])
                         return redirect(portal_url.."info.html")
                     else
-                        flash("fail", "An error occured on password changing")
+                        flash("fail", t("password_changed_error"))
                     end
                 else
-                    flash("fail", "New passwords don't match")
+                    flash("fail", t("password_not_match"))
                 end
              else
-                flash("fail", "Actual password is wrong")
+                flash("fail", t("wrong_current_password"))
              end
              return redirect(portal_url.."password.html")
 
@@ -573,7 +596,7 @@ function do_login ()
         end
     else
         ngx.status = ngx.HTTP_UNAUTHORIZED
-        flash("fail", "Wrong username/password combination")
+        flash("fail", t("wrong_username_password"))
         return redirect(portal_url)
     end
 end
@@ -583,7 +606,7 @@ function do_logout()
     if is_logged_in() then
         cache:delete("session_"..ngx.var.cookie_SSOwAuthUser)
         cache:delete(ngx.var.cookie_SSOwAuthUser.."-"..conf["ldap_identifier"]) -- Ugly trick to reload cache
-        flash("info", "Logged out")
+        flash("info", t("logged_out"))
         return redirect(portal_url)
     end
 end
@@ -673,7 +696,7 @@ then
 
         else
             -- Redirect to portal
-            flash("info", "Please log in to access to this content")
+            flash("info", t("please_login"))
             return redirect(portal_url)
         end
 
@@ -690,7 +713,7 @@ then
             end
         else
             -- Redirect to portal
-            flash("fail", "Please log in from the portal")
+            flash("fail", t("please_login_from_portal"))
             return redirect(portal_url)
         end
     end
@@ -846,6 +869,6 @@ end
 -- Else redirect to portal
 --
 
-flash("info", "Please log in to access to this content")
+flash("info", t("please_login"))
 local back_url = ngx.var.scheme .. "://" .. ngx.var.host .. ngx.var.uri .. uri_args_string()
 return redirect(portal_url.."?r="..ngx.encode_base64(back_url))

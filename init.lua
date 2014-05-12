@@ -9,11 +9,22 @@ json = require "json"
 lualdap = require "lualdap"
 math = require "math"
 hige = require "hige"
+lfs = require "lfs"
 
 -- Shared table
 flashs = {}
 login = {}
 logout = {}
+i18n = {}
+
+local locale_dir = script_path.."portal/locales/"
+for file in lfs.dir(locale_dir) do
+    if string.sub(file, -4) == "json" then
+        local lang = string.sub(file, 1, 2)
+        local locale_file = io.open(locale_dir..file, "r")
+        i18n[lang] = json.decode(locale_file:read("*all"))
+    end
+end 
 
 -- Path of the configuration
 conf_path = "/etc/ssowat/conf.json"

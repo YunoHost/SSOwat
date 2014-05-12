@@ -26,12 +26,12 @@
     <div class="visible-sm" style="height: 20px"></div>
     <div class="col-md-8">
         <div class="row">
-            <div class="col-sm-4 text-right hidden-xs"><strong>Mail</strong></div>
-            <div class="col-sm-4 visible-xs "><h4>Mail</h4></div>
+            <div class="col-sm-4 text-right hidden-xs"><strong>{{t_mail}}</strong></div>
+            <div class="col-sm-4 visible-xs "><h4>{{t_mail}}</h4></div>
             <div class="col-sm-8"><blockquote>{{mail}}</blockquote></div>
             <div class="clearfix"></div><br>
-            <div class="col-sm-4 text-right hidden-xs"><strong>Aliases</strong></div>
-            <div class="col-sm-4 visible-xs "><h4>Aliases</h4></div>
+            <div class="col-sm-4 text-right hidden-xs"><strong>{{t_aliases}}</strong></div>
+            <div class="col-sm-4 visible-xs "><h4>{{t_aliases}}</h4></div>
             <div class="col-sm-8">
                 <blockquote>
                 {{#mailalias}}
@@ -40,8 +40,8 @@
                 </blockquote>
             </div>
             <div class="clearfix"></div><br>
-            <div class="col-sm-4 text-right hidden-xs"><strong>Forward</strong></div>
-            <div class="col-sm-4 visible-xs "><h4>Forward</h4></div>
+            <div class="col-sm-4 text-right hidden-xs"><strong>{{t_forward}}</strong></div>
+            <div class="col-sm-4 visible-xs "><h4>{{t_forward}}</h4></div>
             <div class="col-sm-8">
                 <blockquote>
                 {{#maildrop}}
@@ -55,10 +55,10 @@
 <hr>
 <div class="row">
     <div class="col-sm-6 text-center">
-        <a href="password.html" class="btn btn-lg btn-danger">Change password</a>
+        <a href="password.html" class="btn btn-lg btn-danger">{{t_change_password}}</a>
     </div>
     <div class="visible-xs" style="height: 20px"></div>
     <div class="col-sm-6 text-center">
-        <a href="edit.html" class="btn btn-lg btn-warning">Edit</a>
+        <a href="edit.html" class="btn btn-lg btn-warning">{{t_edit}}</a>
     </div>
 </div>
