@@ -1,7 +1,4 @@
-</div>
-</div>
-</div>
-</div>
-<div style="height: 20px"></div>
+  </div>
+  <script src="assets/js/global.js"></script>
 </body>
 </html>

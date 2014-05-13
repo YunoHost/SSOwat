@@ -135,6 +135,16 @@ domReady(function(){
   portal.setAttribute('href', '/ynhsso/');
   document.body.insertBefore(portal, null);
 
+  // Create overlay element
+  var overlay = document.createElement("div");
+  overlay.setAttribute("id","ynhoverlay");
+  overlay.setAttribute("style","display:none");
+
+  document.body.insertBefore(overlay, null);
+
+  //Color Application
+  var colors = ['bluebg','purplebg','redbg','orangebg','greenbg','darkbluebg','lightbluebg','yellowbg','lightpinkbg'];
+
   // Get user's app
   var r = new XMLHttpRequest();
   r.open("GET", "/ynhpanel.json", true);
@@ -143,55 +153,102 @@ domReady(function(){
     if (r.readyState != 4 || r.status != 200) return;
 
     // Response is JSON
+    document.querySelector('body').classList.add('ynh-panel-active');
     response = JSON.parse(r.responseText);
 
-    // Create overlay element
-    var overlay = document.createElement("div");
-    overlay.setAttribute("id","ynhoverlay");
-
     // Append close button
-    var closeBtn = document.createElement("div");
+    /*var closeBtn = document.createElement("div");
     closeBtn.setAttribute("id","ynhclose");
     closeBtn.innerHTML = "X";
-    overlay.insertBefore(closeBtn, null);
+    overlay.insertBefore(closeBtn, null);*/
 
     // Add overlay header
-    overlay.innerHTML += '<div class="header">' +
-                        '<h1>'+ response.user.name  +' <small>'+ response.user.mail +'</small></h1>' +
-                        ''  +
-                        // '<a class="account-link" href="'+ response.portal_url +'">'+ response.user.uid +'</a>' +
-                        '<a class="account-link" href="'+ response.portal_url +'edit.html">Edit</a>' +
-                        ' | <a class="logout-link" href="'+ response.portal_url +'password.html">Change password</a>' +
-                        ' | <a class="logout-link" href="'+ response.portal_url +'?action=logout">Logout</a>' +
+    overlay.innerHTML += '<div class="wrapper">' +
+                          '<ul class="ul-reset user-menu"><li><a class="icon icon-connexion" href="'+ response.portal_url +'?action=logout">Logout</a></li></ul>'+
+                          '<div id="yuno-user" class="user-container col colNomarge">'+
+                            '<a class="user-img" href="'+ response.portal_url +'edit.html"><img src="'+ response.portal_url +'assets/img/avatar.png"></a>' +
+                            '<div class="user-info">' +
+                                '<h2><a href="'+ response.portal_url +'edit.html">'+ response.user.uid +'<small>'+ response.user.name  +'</small></</a></h2>'+
+                                '<span class="user-mail">'+ response.user.mail +'</span>'+
+                            '</div>' +
+                          '</div>' +
                         '</div>';
 
     // Add application links
     var links = [];
-    Array.each(response.app, function(app){
-      links.push('<li><a href="//'+app.url+'" data-first-letter="'+ app.name.substr(0,1) +'">'+app.name+'</a></li>');
+    Array.prototype.forEach.call(response.app, function(app, n){
+      links.push('<li><a class="'+colors[n]+'" href="//'+app.url+'"><span class="first-letter" data-first-letter="'+ app.name.substr(0,2) +'"></span><span class="sourcePro">'+app.name+'</span></a></li>');
     });
-    overlay.innerHTML += '<ul>'+ links.join('') +'</ul>';
+    overlay.innerHTML += '<div id="yuno-apps" class="wrapper apps"><ul class="ul-reset listing-apps col colNomarge sourceProBold">'+ links.join('') +'</ul></div>';
 
     // Add overlay to DOM
-    document.body.insertBefore(overlay, null);          
+    
+    var ynhssoPath = window.location.pathname;
+
+    if(ynhssoPath == '/ynhsso/') {
+      //Element.toggleClass(overlay, 'visible');
+      Element.toggleClass(portal, 'visible');
+    }
+
+    var btn = document.getElementById('logo'),
+        yunoverlay = document.getElementById('ynhoverlay'),
+        user = document.getElementById('yuno-user'),
+        apps = document.getElementById('yuno-apps');
+      
+      /*var btnApps = document.querySelectorAll('.btnClick');
+      var closeBtn = document.querySelectorAll('.close');
+      Array.prototype.forEach.call(btnApps, function(el) {
+        el.addEventListener('click', function(e){
+          e.preventDefault();
+          var link = this.getAttribute('data-id');
+          
+          //overlay.classList.add(link);
+        })
+      })*/
+    
+    var pfx = ["webkit", "moz", "MS", "o", ""];
+    function PrefixedEvent(element, type, callback) {
+      for (var p = 0; p < pfx.length; p++) {
+        if (!pfx[p]) type = type.toLowerCase();
+        element.addEventListener(pfx[p]+type, callback, false);
+      }
+    }
 
     // Bind YNH Button
     window.addEvent(portal, 'click', function(e){
       // Prevent default click
       window.eventPreventDefault(e);
       // Toggle overlay on YNHPortal button
-      Element.toggleClass(overlay, 'visible');
+      //Element.toggleClass(overlay, 'visible');
       Element.toggleClass(portal, 'visible');
+
+      if(yunoverlay.classList.contains('yuno-active')) {
+          yunoverlay.classList.add('yuno-fadeOut');
+          PrefixedEvent(yunoverlay, "AnimationEnd", function(){
+            if(yunoverlay.classList.contains('yuno-fadeOut')) {
+              yunoverlay.classList.remove('yuno-active');
+            }
+          });
+          apps.classList.remove('yuno-fadeIn', 'yuno-delay');
+          apps.classList.remove('yuno-fadeInLeft', 'yuno-delay');
+          user.classList.remove('yuno-slideintop');
+        }else {
+          yunoverlay.classList.remove('yuno-fadeOut');
+          yunoverlay.classList.add('yuno-active');
+          
+          apps.classList.add('yuno-fadeInLeft', 'yuno-delay');
+          user.classList.add('yuno-slideintop');
+        }
     });
 
     // Bind close button
-    window.addEvent(document.getElementById('ynhclose'), 'click', function(e){
+    /*window.addEvent(document.getElementById('ynhclose'), 'click', function(e){
       // Prevent default click
       window.eventPreventDefault(e);
       // Hide overlay
       Element.removeClass(overlay, 'visible');
       Element.removeClass(portal, 'visible');
-    });
+    });*/
 
   };
   r.send();

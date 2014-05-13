@@ -1,0 +1,621 @@
+/* ==========================================================================
+   Sommaire
+   1 = Layout general
+   2 = Apps
+   3 = User
+   4 = Login Form
+   5 = Colors
+   6 = Form Edit
+   ========================================================================== */
+
+/* ==========================================================================
+   1 = Layout general
+   ========================================================================== */
+
+body {
+  background: #41444F;
+  font-family: 'source_sans_proregular';
+  overflow-y: scroll;
+}
+
+
+/* Layout */
+
+.overlay {
+  padding: 2%;
+}
+
+.inner {
+  max-width: 50em;
+  margin: auto;
+}
+
+.wrapper {
+  width: 90%;
+  margin: 2% 5%;
+  z-index: 10;
+}
+
+.logo {
+  text-align: center;
+  margin-bottom: 0;
+  opacity: 0.7;
+}
+
+.logo img {
+  border-radius: 5px;
+  margin-top: 1em;
+  width: 4em;
+}
+
+.logged .logo {
+  position: fixed;
+  bottom: 0;
+  right: 1em;
+  z-index: 0;
+  opacity: 0.7;
+}
+  .logged .logo img {
+    width: 2.5em;
+    padding: 0.3em;
+    border-radius: 5px;
+  }
+
+.ynh-panel-active .logo {
+  display: none;
+}
+
+.wrapper {
+  position: relative;
+  z-index: 1;
+}
+
+.messages {
+  max-width: none;
+  text-align: center;
+  width: 90%;
+  margin: 2% 5%;
+  padding: 1.5em 15%;
+}
+
+
+/* Fonts & Colors */
+
+a { text-decoration: none; }
+
+h1,
+h2, 
+h3, 
+h4, 
+h5, 
+h6 {
+  font-family: 'source_sans_probold';
+  font-weight: normal;
+}
+
+.cwhite {
+  color: #FFF;
+}
+
+select, 
+.form-text, 
+textarea {
+  border: 0;
+  font-family: 'source_sans_proregular';
+}
+
+
+.sourcePro {
+  font-family: 'source_sans_proregular';
+}
+
+.sourceProBold {
+  font-family: 'source_sans_probold';
+}
+
+.sourceProBlack {
+  font-family: 'SourceSansPro-Black';
+}
+
+
+/* Icons */
+
+[class^="icon-"]:before, [class*=" icon-"]:before {
+  font-family: 'icomoon';
+  speak: none;
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
+  margin-right: 0.5em;
+
+  /* Better Font Rendering =========== */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-user:before {
+  content: "\e800";
+}
+.icon-lock:before {
+  content: "\e801";
+}
+.icon-left-open:before {
+  content: "\e802";
+}
+.icon-right-open-1:before {
+  content: "\e803";
+}
+.icon-upload:before {
+  content: "\e604";
+}
+.icon-comments:before {
+  content: "\e602";
+}
+.icon-envelope:before {
+  content: "\e603";
+}
+.icon-connexion:before {
+  content: "\e600";
+}
+
+
+
+/* ==========================================================================
+   2 = Apps
+   ========================================================================== */
+
+.apps { margin: 4% 5%; }
+
+.first-letter:before {
+  content: attr(data-first-letter);
+}
+
+.listing-apps li {
+  margin: 0 0 1em 1em;
+  box-shadow: 2px 2px 3px rgba(0, 0, 0, 0.4), 
+              -2px -2px 3px 0 rgba(0, 0, 0, 0.7) inset;
+}
+
+.listing-apps a {
+  display: block;
+  position: relative;
+  padding: 0.2em;
+  top: 0;
+  left: 0;
+  width: 2.7em;
+  height: 2.7em;
+  background: #666;
+  color: #FFFFFF;
+  font-size: 4em;
+          transition: all 0.3s ease;
+  -webkit-transition: all 0.3s ease;
+}
+  .listing-apps a:hover,
+  .listing-apps a:focus {
+    left: -10px;
+    top: -10px;
+    box-shadow: none;
+  }
+  .listing-apps a:hover:before,
+  .listing-apps a:focus:before {
+    height: 10px;
+  }
+  .listing-apps a:hover:after,
+  .listing-apps a:focus:after {
+    width: 10px;
+  }
+
+  .listing-apps a:hover:after, 
+  .listing-apps a:focus:after,
+  .listing-apps a:hover:before,
+  .listing-apps a:focus:before {
+    background: #333;
+  }
+
+  .listing-apps a:after,
+  .listing-apps a:before {
+    content: "";
+    position: absolute;
+            transition: all 0.3s ease;
+    -webkit-transition: all 0.3s ease;
+  }
+
+  .listing-apps a:before {
+    width: 100%;
+    height: 0;
+    left: 5px;
+    top: 100%;
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.4);
+            transform: skew(45deg, 0deg);
+    -webkit-transform: skew(45deg, 0deg);
+  }
+
+  .listing-apps a:after {
+    width: 0;
+    height: 100%;
+    left: 100%;
+    top: 5px;
+    box-shadow: 5px 0 10px rgba(0, 0, 0, 0.4);
+            transform: skew(0deg, 45deg);
+    -webkit-transform: skew(0deg, 45deg);
+  }
+
+.listing-apps span {
+  display: block;
+  margin: -1.2em 0 0 0.2em;
+}    
+  .listing-apps .first-letter { margin: 0; }
+  .listing-apps span + span { font-size: 0.3em; }
+
+
+
+/* ==========================================================================
+   3 = User
+   ========================================================================== */
+
+.user-container { padding: 0.4em 1em; }
+
+.user-container a { color: #FFF; }
+
+.user-container h2 {
+  font-size: 1.5em;
+  margin-bottom: 0;
+}
+  .user-container h2 small {
+    font-size: 0.75em;
+    font-family: 'source_sans_proregular';
+    display: block;
+    margin-top: -0.6em;
+  }
+
+.user-info { margin-left: 0.5em;}
+
+.user-mail {
+  color: #999;
+  font-size: 0.9em;
+  display: block;
+  margin-top: -0.2em;
+}
+
+.user-img {
+  margin-right: 1em;
+  border: 3px solid #FFF;
+  width: 4em;
+  height: 4em;
+  border-radius: 90px;
+  overflow: hidden;
+  margin: 0.2em auto;
+}
+
+.user-menu {
+  float: right;
+}
+  .user-menu a {
+    color: #999;
+    display: block;
+    padding: 1.25em 3em;
+    position: relative;
+            transition: all 0.3s ease;
+    -webkit-transition: all 0.3s ease;
+    z-index: 1;
+  }
+    .user-menu a:hover,
+    .user-menu a:focus {
+      color: #FFF;
+    }
+
+
+
+/* ==========================================================================
+   4 = Forms
+   ========================================================================== */
+
+
+/* Extend artichaut-buttons.css */
+.link-btn { background: none;}
+  .link-btn:hover, 
+  .link-btn:focus {background: none;text-decoration: underline;}
+
+
+.form-text {
+  padding: 0.8em;
+  width: 100%;
+}
+
+
+.form-section {
+  /*float: left;*/
+  display: inline-block;
+  vertical-align: top;
+  width: 47%;
+}
+.form-section + .form-section {margin-left:5%;}
+
+label {
+  display: inline-block;
+  padding: 0.3em 1em;
+  background: rgba(0, 0, 0, 0.25);
+  color: #FFF;
+  font-size: 1.2em;
+  margin-top: 1em;
+  margin-bottom: 0em;
+  font-family: 'source_sans_probold';
+  font-weight: normal;
+}
+label {cursor: pointer;}
+
+label + .help-link {
+  display: inline-block;
+  color: #fff;
+  font-weight: bold;
+  margin-left: 1em;
+}
+
+.btn {
+  cursor: pointer;
+}
+
+.btn-group {
+  margin-top: 4em;
+  text-align: right;
+}
+
+.form-group {
+  background: none;
+  margin-bottom: 2em;
+}
+
+.form-text {
+  background: #41444F;
+  background: none repeat scroll 0 0 rgba(255, 255, 255, 0.3);
+  color: #FFFFFF;
+  padding: 0.8em;
+  margin-bottom: 0.3em;
+  display: block;
+}
+.form-test:-moz-placeholder{color:#999999;}
+.form-text::-moz-placeholder{color:#999999;}
+.form-text:-ms-input-placeholder{color:#999999;}
+.form-text::-webkit-input-placeholder{color:#999999;}
+
+
+.form-text:last-child {margin-bottom:0;}
+
+.form-text:hover,
+.form-text:focus {
+  background-color: rgba(255, 255, 255, 0.15);
+}
+
+.form-text:disabled { color: #999; }
+.form-text:disabled:hover {background-color:rgba(255, 255, 255, 0.3);}
+input:disabled {
+  cursor: not-allowed;
+}
+
+
+
+/* ==========================================================================
+   4 = Login form
+   ========================================================================== */
+
+.login-form {
+  width: 21em;
+  margin: 0 auto;
+}
+
+.login-form .btn {
+  width: 100%; 
+  padding: 0.8em 1em;
+}
+
+.login-form .form-group {
+  position: relative;
+  margin-bottom: 1em;
+  background: #FFF;
+}
+
+  .login-form label {
+    display: inline-block;
+    min-width: 1em;
+    margin: 0;
+    padding: 0;
+    font-size: 1em;
+  }
+
+  .login-form label:before {
+    background: #EEE;
+    color: #666;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 2.5em;
+    height: 100%;
+    line-height: 2.5em;
+    text-align: center;
+  }
+
+  .login-form .form-text {
+    padding: 0.8em 0.8em 0.8em 3em;
+    width: 100%;
+    background: #FFF;
+    color: #41444F;
+  }
+
+
+/* ==========================================================================
+   5 = Colors
+   ========================================================================== */
+
+.listing-apps .purplebg {
+    background: #9B59B6!important;
+            transition: all 0.2s ease 0s;
+    -webkit-transition: all 0.2s ease 0s;
+}
+.purplebg:hover:after, 
+.purplebg:focus:after, 
+.purplebg:hover:before, 
+.purplebg:focus:before {
+    background: #532C64!important;
+}
+.yellowbg {
+    background: #F1C40F!important;
+            transition: all 0.2s ease 0s;
+    -webkit-transition: all 0.2s ease 0s;
+}
+.yellowbg:hover:after, 
+.yellowbg:focus:after, 
+.yellowbg:hover:before, 
+.yellowbg:focus:before {
+    background: #796307!important;
+}
+.pinkbg {
+    background: #D66D92!important;
+            transition: all 0.2s ease 0s;
+    -webkit-transition: all 0.2s ease 0s;
+}
+.pinkbg:hover:after, 
+.pinkbg:focus:after, 
+.pinkbg:hover:before, 
+.pinkbg:focus:before {
+    background: #992B52!important;
+}
+.orangebg {
+    background: #F39C12!important;
+            transition: all 0.2s ease 0s;
+    -webkit-transition: all 0.2s ease 0s;
+}
+.orangebg:hover:after, 
+.orangebg:focus:after, 
+.orangebg:hover:before, 
+.orangebg:focus:before {
+    background: #7F5006!important;
+}
+.redbg {
+    background: #E74C3C!important;
+            transition: all 0.2s ease 0s;
+    -webkit-transition: all 0.2s ease 0s;
+}
+.redbg:hover:after, 
+.redbg:focus:after, 
+.redbg:hover:before, 
+.redbg:focus:before {
+    background: #921E12!important;
+}
+.turquoisebg {
+    background: #1ABC9C!important;
+            transition: all 0.2s ease 0s;
+    -webkit-transition: all 0.2s ease 0s;
+}
+.turquoisebg:hover:after, 
+.turquoisebg:focus:after, 
+.turquoisebg:hover:before, 
+.turquoisebg:focus:before {
+    background: #0B4C3F!important;
+}
+.bluebg {
+    background: #3498DB!important;
+            transition: all 0.2s ease 0s;
+    -webkit-transition: all 0.2s ease 0s;
+}
+.bluebg:hover:after, 
+.bluebg:focus:after, 
+.bluebg:hover:before, 
+.bluebg:focus:before {
+    background: #16527A!important;
+}
+.greenbg {
+    background: #2ECC71!important;
+            transition: all 0.2s ease 0s;
+    -webkit-transition: all 0.2s ease 0s;
+}
+.greenbg:hover:after, 
+.greenbg:focus:after, 
+.greenbg:hover:before, 
+.greenbg:focus:before {
+    background: #176437!important;
+}
+.darkbluebg {
+    background: #34495E!important;
+            transition: all 0.2s ease 0s;
+    -webkit-transition: all 0.2s ease 0s;
+}
+.darkbluebg:hover:after, 
+.darkbluebg:focus:after, 
+.darkbluebg:hover:before, 
+.darkbluebg:focus:before {
+    background: #07090C!important;
+}
+.lightbluebg {
+    background: #6A93D4!important;
+            transition: all 0.2s ease 0s;
+    -webkit-transition: all 0.2s ease 0s;
+}
+.lightbluebg:hover:after, 
+.lightbluebg:focus:after, 
+.lightbluebg:hover:before, 
+.lightbluebg:focus:before {
+    background: #2B5394!important;
+}
+.lightpinkbg {
+    background: #F76F87!important;
+            transition: all 0.2s ease 0s;
+    -webkit-transition: all 0.2s ease 0s;
+}
+.lightpinkbg:hover:after, 
+.lightpinkbg:focus:after, 
+.lightpinkbg:hover:before, 
+.lightpinkbg:focus:before {
+    background: #DA0C31!important;
+}
+.lightyellow {
+    background: #FFC973!important;
+            transition: all 0.2s ease 0s;
+    -webkit-transition: all 0.2s ease 0s;
+}
+.lightyellow:hover:after, 
+.lightyellow:focus:after, 
+.lightyellow:hover:before, 
+.lightyellow:focus:before {
+    background: #F39500!important;
+}
+.lightgreen {
+    background: #B5F36D!important;
+            transition: all 0.2s ease 0s;
+    -webkit-transition: all 0.2s ease 0s;
+}
+.lightgreen:hover:after, 
+.lightgreen:focus:after, 
+.lightgreen:hover:before, 
+.lightgreen:focus:before {
+    background: #77CF11!important;
+}
+.purpledarkbg {
+    background: #8E44AD!important;
+            transition: all 0.2s ease 0s;
+    -webkit-transition: all 0.2s ease 0s;
+}
+.purpledarkbg:hover:after, 
+.purpledarkbg:focus:after, 
+.purpledarkbg:hover:before, 
+.purpledarkbg:focus:before {
+    background: #432051!important;
+}
+
+/* ==========================================================================
+   6 = Form Edit
+   ========================================================================== */
+
+
+.form-edit .form-group .btn:before {
+  content:"+";
+  display: inline-block;
+  padding-right: 0.75em;
+  font-weight: bold;
+}
+
+
+.form-section:first-child .btn-group {
+  text-align: left;
+}

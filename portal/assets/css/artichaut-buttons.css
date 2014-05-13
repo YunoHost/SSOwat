@@ -1,0 +1,83 @@
+/* ==========================================================================
+   Sommaire
+
+   1 = Default button
+   2 = Important button
+   3 = Validate button
+   4 = Warning button
+   5 = Classic button
+   ========================================================================== */
+
+/* ==========================================================================
+   1 = Default button
+   ========================================================================== */
+
+.btn {
+  background: #999;
+  display: inline-block;
+  padding: 0.5em 1em;
+  line-height: normal;
+  text-decoration: none;
+  color: #FFF; 
+}
+
+.large-btn {
+  padding: 0.8em 1.5em;
+  font-size: 1.1em;
+}
+
+button.btn,
+input.btn {
+  border:0;
+  cursor:pointer;
+}
+
+  .btn:hover, 
+  .btn:focus {
+    background: #AAA;
+  }
+
+
+/* ==========================================================================
+   2 = Important button
+   ========================================================================== */
+
+.important-btn { background: #c0392b;
+}
+  .important-btn:hover, 
+  .important-btn:focus {
+    background: #e74c3c;
+  }
+
+/* ==========================================================================
+   3 = Validate button
+   ========================================================================== */
+
+.validate-btn { background: #27ae60;
+}
+  .validate-btn:hover, 
+  .validate-btn:focus {
+    background: #2ecc71;
+  }
+
+/* ==========================================================================
+   3 = Warning button
+   ========================================================================== */
+
+.warning-btn { background: #e67e22;
+}
+  .warning-btn:hover, 
+  .warning-btn:focus {
+    background: #f39c12;
+  }
+
+/* ==========================================================================
+   5 = Classic button
+   ========================================================================== */
+
+.classic-btn { background: #2980b9;
+}
+  .classic-btn:hover, 
+  .classic-btn:focus {
+    background: #3498db;
+  }

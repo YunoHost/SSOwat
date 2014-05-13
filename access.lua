@@ -384,9 +384,15 @@ function get_data_for(view)
     local data = {}
 
     if view == "login.html" then
-        data["title"] = t("login")
+        data = {
+            title = t("login"),
+            connected = false
+        }
 
-    elseif view == "info.html" then
+    elseif view == "info.html"
+        or view == "edit.html"
+        or view == "password.html"
+        or view == "ynhpanel.json" then
         set_headers(user)
 
         local mails = get_mails(user)
@@ -395,56 +401,14 @@ function get_data_for(view)
             connected = true,
             uid       = user,
             cn        = cache:get(user.."-cn"),
+            sn        = cache:get(user.."-sn"),
+            givenName = cache:get(user.."-givenName"),
             mail      = mails["mail"],
             mailalias = mails["mailalias"],
             maildrop  = mails["maildrop"],
             app = {}
         }
 
-        for url, name in pairs(conf["users"][user]) do
-            table.insert(data["app"], { url = url, name = name })
-        end
-
-    elseif view == "password.html" then
-
-        data = {
-            title     = t("change_password"),
-            connected = true
-        }
-
-    elseif view == "edit.html" then
-        set_headers(user)
-
-        local mails = get_mails(user)
-        data = {
-            title     = t("edit").." "..user,
-            connected = true,
-            uid       = user,
-            sn        = cache:get(user.."-sn"),
-            givenName = cache:get(user.."-givenName"),
-            mail      = mails["mail"],
-            mailalias = mails["mailalias"],
-            maildrop  = mails["maildrop"]
-        }
-
-    elseif view == "panel.ms" then
-        data = { app = {} }
-        for url, name in pairs(conf["users"][user]) do
-            table.insert(data["app"], { url = url, name = name })
-        end
-    elseif view == "ynhpanel.json" then
-        local mails = get_mails(user)
-        data = {
-            app = {},
-            user = {
-              uid = user,
-              name = cache:get(user..'-cn'),
-              givenName = cache:get(user..'-givenName'),
-              surname = cache:get(user..'-sn'),
-              mail = mails['mail']
-            },
-            portal_url = portal_url
-        }
         for url, name in pairs(conf["users"][user]) do
             table.insert(data["app"], { url = url, name = name })
         end

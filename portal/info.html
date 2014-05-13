@@ -1,64 +1,23 @@
-<div class="row">
-    <div class="col-md-4 text-center">
-        <h3>My apps</h3>
-        <div class="visible-sm visible-xs" style="height: 20px"></div>
+<div class="wrapper user">
+  <ul class="ul-reset user-menu">
+    <li><a class="icon icon-connexion" href="?action=logout">Logout</a></li>
+  </ul>
+
+  <div class="user-container col colNomarge">
+    <a class="user-img" href="edit.html"><img src="assets/img/avatar.png"></a>
+    <div class="user-info">
+      <h2><a href="info.html">{{{uid}}}<small>{{givenName}} {{sn}}</small></a></h2>
+      <span class="user-mail">{{mail}}</span>
     </div>
-    <div class="col-md-8">
-        <div class="row">
-        {{#app}}
-        <div class="col-sm-3 text-center" style="float: left; width: 130px; height: 130px">
-            <a style="font-size: 44px; padding: 15%;" class="btn btn-lg btn-primary btn-block" href="https://{{url}}" title="{{name}}">
-                <div style="font-family: 'monospace'; width:28px; margin-left: 21px; overflow: hidden">{{name}}</div>
-            </a>
-            <a href="https://{{url}}"><h6>{{name}}</h6></a>
-        </div>
-        {{/app}}
-        </div>
-    </div>
+  </div>
 </div>
-<hr>
-<div class="row">
-    <div class="col-md-4 text-center">
-        <h3>Profile</h3>
-        <div class="visible-sm visible-xs" style="height: 20px"></div>
-        <img src="assets/img/avatar.png">
-    </div>
-    <div class="visible-sm" style="height: 20px"></div>
-    <div class="col-md-8">
-        <div class="row">
-            <div class="col-sm-4 text-right hidden-xs"><strong>{{t_mail}}</strong></div>
-            <div class="col-sm-4 visible-xs "><h4>{{t_mail}}</h4></div>
-            <div class="col-sm-8"><blockquote>{{mail}}</blockquote></div>
-            <div class="clearfix"></div><br>
-            <div class="col-sm-4 text-right hidden-xs"><strong>{{t_aliases}}</strong></div>
-            <div class="col-sm-4 visible-xs "><h4>{{t_aliases}}</h4></div>
-            <div class="col-sm-8">
-                <blockquote>
-                {{#mailalias}}
-                    <div style="line-height: 25px">{{.}}</div>
-                {{/mailalias}}
-                </blockquote>
-            </div>
-            <div class="clearfix"></div><br>
-            <div class="col-sm-4 text-right hidden-xs"><strong>{{t_forward}}</strong></div>
-            <div class="col-sm-4 visible-xs "><h4>{{t_forward}}</h4></div>
-            <div class="col-sm-8">
-                <blockquote>
-                {{#maildrop}}
-                    <div style="line-height: 25px">{{.}}</div>
-                {{/maildrop}}
-                </blockquote>
-            </div>
-        </div>
-    </div>
-</div>
-<hr>
-<div class="row">
-    <div class="col-sm-6 text-center">
-        <a href="password.html" class="btn btn-lg btn-danger">{{t_change_password}}</a>
-    </div>
-    <div class="visible-xs" style="height: 20px"></div>
-    <div class="col-sm-6 text-center">
-        <a href="edit.html" class="btn btn-lg btn-warning">{{t_edit}}</a>
-    </div>
+
+<div id="apps" class="wrapper apps">
+  <ul class="ul-reset listing-apps col colNomarge sourceProBold">
+  {{#app}}
+  <li>
+      <a href="https://{{url}}"><span class="first-letter"></span><span class="sourcePro">{{name}}</span></a>
+  </li>
+  {{/app}}
+  </ul>
 </div>

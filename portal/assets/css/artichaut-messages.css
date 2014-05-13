@@ -1,0 +1,15 @@
+/* ==========================================================================
+   Sommaire
+
+   1 = Messages
+   ========================================================================== */
+
+.messages { 
+  color: #FFF;
+  margin-bottom: 1em;
+}
+
+.danger { background: #c0392b; }
+.warning { background: #e67e22; }
+.success { background: #27ae60; }
+.info { background: #2980b9; }
