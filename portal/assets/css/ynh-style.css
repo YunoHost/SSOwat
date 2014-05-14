@@ -146,6 +146,7 @@ textarea {
 .icon-connexion:before { content: '\e802'; }
 .icon-pencil:before { content: '\e804'; }
 .icon-trash:before { content: '\e80c'; }
+.icon-angle-left:before { content: '\e803'; }
 
 
 /* ==========================================================================
@@ -247,8 +248,35 @@ textarea {
   color: #fff;
 }
 
+.user-container-edit:after,
+.user-container-password:after {
+  content: '\e803';
+  font-family: 'ynh_ssowat';
+  display: block;
+  height: 1em;
+  width: 1em;
+  position: absolute;
+  top: 50%;
+  left: -16px;
+  z-index: 0;
+  margin-top: -0.75em;
+  font-size: 2em;
+  font-weight: normal;
+  color: #b4b4b4;
+  opacity: 0;
+          transition: all 0.1s ease;
+  -webkit-transition: all 0.1s ease;
+}
+.user-container-edit:hover:after,
+.user-container-password:hover:after {
+  left: -20px;
+  opacity: 1;
+}
+
 .user-container:before {
   display: block;
+  position: relative;
+  z-index: 1;
   float: left;
   margin-right: 10px;
   content: '\e801';
@@ -263,6 +291,8 @@ textarea {
   background: #b4b4b4;
   color: #dedede;
   overflow: hidden;
+          transition: all 0.1s ease;
+  -webkit-transition: all 0.1s ease;
 }
 .user-container:hover:before {
   color: #fff;
@@ -285,13 +315,16 @@ textarea {
   content: '\e804';
   font-family: 'ynh_ssowat';
   color: #b4b4b4;
-  display: none;
+  display: inline-block;vertical-align: text-top;
   font-size: 0.8em;
   width: 1em;
   height: 1em;
   margin-left: .5em;
+  opacity: 0;
+          transition: all 0.1s ease;
+  -webkit-transition: all 0.1s ease;
 }
-.user-container-info:hover  .user-username:after {display: inline-block;vertical-align: text-top;}
+.user-container-info:hover  .user-username:after {opacity: 1;}
 
 .user-container .user-mail {
   color: #999;
@@ -310,6 +343,8 @@ textarea {
     padding: 1.25em 1em;
     position: relative;
     z-index: 1;
+          transition: all 0.1s ease;
+  -webkit-transition: all 0.1s ease;
   }
     .user-menu a:hover,
     .user-menu a:focus {
@@ -381,11 +416,15 @@ label + .help-link {
   background: #41444f;
   color: #fff;
   font-weight: bold;
+          transition: all 0.1s ease;
+  -webkit-transition: all 0.1s ease;
 }
 label + .help-link:hover {background: #30333b;}
 
 .btn {
   cursor: pointer;
+          transition: all 0.1s ease;
+  -webkit-transition: all 0.1s ease;
 }
 
 .btn-group {
@@ -406,6 +445,8 @@ label + .help-link:hover {background: #30333b;}
   margin-bottom: 0.3em;
   display: block;
   position: relative;z-index: 1; /* prevent strange label overlap */
+          transition: all 0.1s ease;
+  -webkit-transition: all 0.1s ease;
 }
 .form-test:-moz-placeholder{color:#ccc;}
 .form-text::-moz-placeholder{color:#ccc;}
