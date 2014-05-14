@@ -829,13 +829,13 @@ end
 
 if is_logged_in() then
     if string.match(ngx.var.uri, "^/ynhpanel.js$") then
-        serve("/ynhsso/assets/js/ynhpanel.js")
+        serve("/yunohost/sso/assets/js/ynhpanel.js")
     end
     if string.match(ngx.var.uri, "^/ynhpanel.css$") then
-        serve("/ynhsso/assets/css/ynhpanel.css")
+        serve("/yunohost/sso/assets/css/ynhpanel.css")
     end
     if string.match(ngx.var.uri, "^/ynhpanel.json$") then
-        serve("/ynhsso/assets/js/ynhpanel.json")
+        serve("/yunohost/sso/assets/js/ynhpanel.json")
     end
     if not has_access() then
         return redirect(portal_url)
