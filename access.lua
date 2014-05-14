@@ -397,15 +397,16 @@ function get_data_for(view)
 
         local mails = get_mails(user)
         data = {
-            title     = user.." <small>"..cache:get(user.."-cn").."</small>",
-            connected = true,
-            uid       = user,
-            cn        = cache:get(user.."-cn"),
-            sn        = cache:get(user.."-sn"),
-            givenName = cache:get(user.."-givenName"),
-            mail      = mails["mail"],
-            mailalias = mails["mailalias"],
-            maildrop  = mails["maildrop"],
+            title      = user.." <small>"..cache:get(user.."-cn").."</small>",
+            connected  = true,
+            portal_url = portal_url,
+            uid        = user,
+            cn         = cache:get(user.."-cn"),
+            sn         = cache:get(user.."-sn"),
+            givenName  = cache:get(user.."-givenName"),
+            mail       = mails["mail"],
+            mailalias  = mails["mailalias"],
+            maildrop   = mails["maildrop"],
             app = {}
         }
 
