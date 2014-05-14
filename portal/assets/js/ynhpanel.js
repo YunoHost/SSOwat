@@ -132,7 +132,7 @@ domReady(function(){
   // Create portal link
   var portal = document.createElement('a');
   portal.setAttribute('id', 'ynhportal');
-  portal.setAttribute('href', '/ynhsso/');
+  portal.setAttribute('href', '/yunohost/sso/');
   document.body.insertBefore(portal, null);
 
   // Create overlay element
@@ -168,8 +168,8 @@ domReady(function(){
                           '<div id="yuno-user" class="user-container col colNomarge">'+
                             '<a class="user-img" href="'+ response.portal_url +'edit.html"><img src="'+ response.portal_url +'assets/img/avatar.png"></a>' +
                             '<div class="user-info">' +
-                                '<h2><a href="'+ response.portal_url +'edit.html">'+ response.user.uid +'<small>'+ response.user.name  +'</small></</a></h2>'+
-                                '<span class="user-mail">'+ response.user.mail +'</span>'+
+                                '<h2><a href="'+ response.portal_url +'edit.html">'+ response.uid +'<small>'+ response.givenName + ' ' + response.sn +'</small></</a></h2>'+
+                                '<span class="user-mail">'+ response.mail +'</span>'+
                             '</div>' +
                           '</div>' +
                         '</div>';
