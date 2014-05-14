@@ -9,7 +9,7 @@
    7 = Media queries Tablet
    ========================================================================== */
 
-body {overflow-y: scroll;}
+body {/*overflow-y: scroll;*/}
 
 #ynhportal,
 #ynhportal *
@@ -101,7 +101,7 @@ body {overflow-y: scroll;}
 	position: static;
 	color: #fff;
 	font-family: inherit;
-	font-size: 1rem; /* 100% */
+	font-size: inherit;
 	font-style: normal;
 	font-weight: normal;
 	font-variant: normal;
@@ -155,7 +155,7 @@ body {overflow-y: scroll;}
 	position: fixed;
 	z-index: 1000;
 	bottom: 20px;
-	right: 20px;
+	right: 35px;
   width: 100px;
   height: 90px;
   padding: 12px;
@@ -220,21 +220,6 @@ body {overflow-y: scroll;}
 	display: block!important;
 }
 
-
-/* Close button */
-#ynhclose {
-	display: block;
-	float: right;
-	margin: 2%;
-	cursor: pointer;
-	z-index: 1002;
-
-	font-weight: bold;
-	font-size: 1.5em;
-}
-#ynhclose:hover {color:pink;}
-
-
 /* Header */
 #ynhoverlay .header {
 	display: block;
@@ -268,9 +253,11 @@ body {overflow-y: scroll;}
 
 #ynhoverlay .listing-apps { letter-spacing: -5px; }
 
+#ynhoverlay .listing-apps .first-letter:before {
+	content: attr(data-first-letter);
+}
+
 #ynhoverlay .listing-apps li {
-	display: inline-block;
-	letter-spacing: normal;
   margin: 0 0 1em 1em;
   box-shadow: 2px 2px 3px rgba(0, 0, 0, 0.4), 
               -2px -2px 3px 0 rgba(0, 0, 0, 0.7) inset;
@@ -282,14 +269,13 @@ body {overflow-y: scroll;}
   padding: 0.2em;
   top: 0;
   left: 0;
-  width: 173px;
-  height: 173px;
+  width: 2.7em;
+  height: 2.7em;
   background: #666;
-  color: #FFFFFF;
+  color: #fff;
   font-size: 4em;
-  font-family: 'source_sans_probold';
-          transition: all 0.2s ease;
-  -webkit-transition: all 0.2s ease;
+          transition: all 0.3s ease;
+  -webkit-transition: all 0.3s ease;
 }
   #ynhoverlay .listing-apps a:hover,
   #ynhoverlay .listing-apps a:focus {
@@ -317,8 +303,8 @@ body {overflow-y: scroll;}
   #ynhoverlay .listing-apps a:before {
     content: "";
     position: absolute;
-            transition: all 0.2s ease;
-    -webkit-transition: all 0.2s ease;
+            transition: all 0.3s ease;
+    -webkit-transition: all 0.3s ease;
   }
 
   #ynhoverlay .listing-apps a:before {
@@ -343,20 +329,13 @@ body {overflow-y: scroll;}
 
 #ynhoverlay .listing-apps span {
   display: block;
-  font-size: 1em;
-  padding-top: 0.3em;
-  line-height: 1;
+  margin: -1.2em 0 0 0.2em;
 }    
+  #ynhoverlay .listing-apps .first-letter { margin: 0; }
+  #ynhoverlay .listing-apps span + span { font-size: 0.3em; }
 
-#ynhoverlay .listing-apps span + span {
-	font-size: 0.3em;
-	margin: -0.3em 0 0 0.2em;
-  padding-top: 0;
-}
 
-#ynhoverlay .listing-apps .first-letter:before {
-	content: attr(data-first-letter);
-}    
+
 
 /* ==========================================================================
    3 = User
