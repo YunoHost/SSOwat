@@ -48,8 +48,8 @@ body {
 
 .logged .logo {
   position: fixed;
-  bottom: 1em;
-  right: 1em;
+  bottom: 20px;
+  right: 20px;
   z-index: 0;
   opacity: 0.7;
 }

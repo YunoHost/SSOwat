@@ -156,23 +156,16 @@ domReady(function(){
     document.querySelector('body').classList.add('ynh-panel-active');
     response = JSON.parse(r.responseText);
 
-    // Append close button
-    /*var closeBtn = document.createElement("div");
-    closeBtn.setAttribute("id","ynhclose");
-    closeBtn.innerHTML = "X";
-    overlay.insertBefore(closeBtn, null);*/
-
     // Add overlay header
-    overlay.innerHTML += '<div class="wrapper">' +
-                          '<ul class="ul-reset user-menu"><li><a class="icon icon-connexion" href="'+ response.portal_url +'?action=logout">Logout</a></li></ul>'+
-                          '<div id="yuno-user" class="user-container col colNomarge">'+
-                            '<a class="user-img" href="'+ response.portal_url +'edit.html"><img src="'+ response.portal_url +'assets/img/avatar.png"></a>' +
-                            '<div class="user-info">' +
-                                '<h2><a href="'+ response.portal_url +'edit.html">'+ response.uid +'<small>'+ response.givenName + ' ' + response.sn +'</small></</a></h2>'+
-                                '<span class="user-mail">'+ response.mail +'</span>'+
-                            '</div>' +
-                          '</div>' +
+    overlay.innerHTML += '<div class="wrapper info">' +
+                          '<ul class="ul-reset user-menu"><li><a class="icon icon-connexion" href="'+ response.portal_url +'?action=logout">'+response.t_logout+'</a></li></ul>'+
+                          '<a class="user-container user-container-info" href="'+ response.portal_url +'edit.html">' +
+                            '<h2 class="user-username">'+ response.uid +'</h2>' +
+                            '<small class="user-fullname">'+ response.givenName + ' ' + response.sn +'</small>' +
+                            '<span class="user-mail">'+ response.mail +'</span>' +
+                          '</a>'
                         '</div>';
+
 
     // Add application links
     var links = [];
@@ -182,29 +175,10 @@ domReady(function(){
     overlay.innerHTML += '<div id="yuno-apps" class="wrapper apps"><ul class="ul-reset listing-apps col colNomarge sourceProBold">'+ links.join('') +'</ul></div>';
 
     // Add overlay to DOM
-    
-    var ynhssoPath = window.location.pathname;
-
-    if(ynhssoPath == '/ynhsso/') {
-      //Element.toggleClass(overlay, 'visible');
-      Element.toggleClass(portal, 'visible');
-    }
-
     var btn = document.getElementById('logo'),
         yunoverlay = document.getElementById('ynhoverlay'),
         user = document.getElementById('yuno-user'),
         apps = document.getElementById('yuno-apps');
-      
-      /*var btnApps = document.querySelectorAll('.btnClick');
-      var closeBtn = document.querySelectorAll('.close');
-      Array.prototype.forEach.call(btnApps, function(el) {
-        el.addEventListener('click', function(e){
-          e.preventDefault();
-          var link = this.getAttribute('data-id');
-          
-          //overlay.classList.add(link);
-        })
-      })*/
     
     var pfx = ["webkit", "moz", "MS", "o", ""];
     function PrefixedEvent(element, type, callback) {
@@ -240,15 +214,6 @@ domReady(function(){
           user.classList.add('yuno-slideintop');
         }
     });
-
-    // Bind close button
-    /*window.addEvent(document.getElementById('ynhclose'), 'click', function(e){
-      // Prevent default click
-      window.eventPreventDefault(e);
-      // Hide overlay
-      Element.removeClass(overlay, 'visible');
-      Element.removeClass(portal, 'visible');
-    });*/
 
   };
   r.send();
