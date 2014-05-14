@@ -1,26 +1,35 @@
 document.addEventListener('DOMContentLoaded', function() {
-  var liMenu = document.querySelectorAll('#apps a'),
-      colors = ['bluebg','purplebg','redbg','orangebg','greenbg','darkbluebg','lightbluebg','yellowbg','lightpinkbg'],
-      addMailAlias = document.getElementById('add-mailalias'),
-      addMaildrop = document.getElementById('add-maildrop'),
-      formMailAlias = document.getElementById('form-add-mail-alias'),
-      formMailDrop = document.getElementById('form-add-mail-drop');
+
+  // Variables
+  var liMenu = document.querySelectorAll('#apps a')
+    , colors = ['bluebg','purplebg','redbg','orangebg','greenbg','darkbluebg','lightbluebg','yellowbg','lightpinkbg']
+    , addMailAlias = document.getElementById('add-mailalias')
+    , addMaildrop = document.getElementById('add-maildrop')
+  ;
 
   [].forEach.call(liMenu, function(el, i) {
-    var text = el.textContent,
-        splitText = text.split("");
-
+    // Add color class.
     el.classList.add(colors[i]);
-    el.querySelector('.first-letter').setAttribute('data-first-letter',splitText[0]+splitText[1]);
+    // Set first-letter data attribute.
+    el.querySelector('.first-letter').setAttribute('data-first-letter',el.textContent.substring(0, 2));
   });
 
   addMailAlias.addEventListener('click', function(){
-    var inputAlias = document.querySelector('.mailalias-input');
-    formMailAlias.insertBefore(inputAlias.cloneNode(true), addMailAlias);
+    // Clone last input.
+    var inputAliasClone = document.querySelector('.mailalias-input').cloneNode(true);
+    // Empty value.
+    inputAliasClone.value = '';
+    // Append to form-group.
+    addMailAlias.parentNode.insertBefore(inputAliasClone, addMailAlias);
   });
 
   addMaildrop.addEventListener('click', function(){
-    var inputDrop = document.querySelector('.maildrop-input');
-    formMailDrop.insertBefore(inputDrop.cloneNode(true), addMaildrop);
+    // Clone last input.
+    var inputDropClone = document.querySelector('.maildrop-input').cloneNode(true);
+    // Empty value.
+    inputDropClone.value = '';
+    // Append to form-group.
+    addMaildrop.parentNode.insertBefore(inputDropClone, addMaildrop);
   });
+
 });
