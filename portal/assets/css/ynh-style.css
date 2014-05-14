@@ -441,6 +441,10 @@ input:disabled {
     background: #fff;
     color: #41444f;
   }
+  .login-form .form-test:-moz-placeholder{color:#999;}
+  .login-form .form-text::-moz-placeholder{color:#999;}
+  .login-form .form-text:-ms-input-placeholder{color:#999;}
+  .login-form .form-text::-webkit-input-placeholder{color:#999;}
 
 
 /* Edit form*/
