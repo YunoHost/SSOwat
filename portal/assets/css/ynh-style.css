@@ -43,19 +43,19 @@ body {
 }
 
 .logo img {
-  border-radius: 5px;
   margin-top: 1em;
   width: 4em;
 }
 
 .logged .logo {
   position: fixed;
-  bottom: 0;
+  bottom: 1em;
   right: 1em;
   z-index: 0;
   opacity: 0.7;
 }
   .logged .logo img {
+    margin-top: 0;
     width: 2.5em;
     padding: 0.3em;
     border-radius: 5px;
@@ -73,6 +73,12 @@ body {
 .messages {
   max-width: none;
   text-align: center;
+  width: 21em;
+  margin: 2% auto;
+  padding: 1.5em 0;
+}
+
+.logged .messages {
   width: 90%;
   margin: 2% 5%;
   padding: 1.5em 15%;
@@ -121,7 +127,7 @@ textarea {
 /* Icons */
 
 [class^="icon-"]:before, [class*=" icon-"]:before {
-  font-family: 'icomoon';
+  font-family: 'ynh_ssowat';
   speak: none;
   font-style: normal;
   font-weight: normal;
@@ -135,31 +141,9 @@ textarea {
   -moz-osx-font-smoothing: grayscale;
 }
 
-.icon-user:before {
-  content: "\e800";
-}
-.icon-lock:before {
-  content: "\e801";
-}
-.icon-left-open:before {
-  content: "\e802";
-}
-.icon-right-open-1:before {
-  content: "\e803";
-}
-.icon-upload:before {
-  content: "\e604";
-}
-.icon-comments:before {
-  content: "\e602";
-}
-.icon-envelope:before {
-  content: "\e603";
-}
-.icon-connexion:before {
-  content: "\e600";
-}
-
+.icon-user:before { content: '\e801'; }
+.icon-lock:before { content: '\e800'; }
+.icon-connexion:before { content: '\e802'; }
 
 
 /* ==========================================================================

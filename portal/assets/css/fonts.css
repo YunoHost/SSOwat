@@ -1,8 +1,10 @@
 @font-face {
-  font-family: 'icomoon';
-  src:url('../fonts/icomoon.eot?-w1vs4');
-  src:url('../fonts/icomoon.eot?#iefix-w1vs4') format('embedded-opentype'),
-    url('../fonts/icomoon.ttf?-w1vs4') format('truetype');
+  font-family: 'ynh_ssowat';
+  src: url('../fonts/ynh_ssowat/ynh_ssowat.eot?97758757');
+  src: url('../fonts/ynh_ssowat/ynh_ssowat.eot?97758757#iefix') format('embedded-opentype'),
+       url('../fonts/ynh_ssowat/ynh_ssowat.woff?97758757') format('woff'),
+       url('../fonts/ynh_ssowat/ynh_ssowat.ttf?97758757') format('truetype'),
+       url('../fonts/ynh_ssowat/ynh_ssowat.svg?97758757#ynh_ssowat') format('svg');
   font-weight: normal;
   font-style: normal;
 }
