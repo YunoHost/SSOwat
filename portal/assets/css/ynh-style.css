@@ -307,7 +307,7 @@ textarea {
   .user-menu a {
     color: #999;
     display: block;
-    padding: 1.25em 3em;
+    padding: 1.25em 1em;
     position: relative;
     z-index: 1;
   }
@@ -315,6 +315,12 @@ textarea {
     .user-menu a:focus {
       color: #fff;
     }
+
+@media screen and (max-width: 480px) {
+  .user-menu {
+    float: none;
+  }
+}
 
 
 
