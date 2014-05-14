@@ -4,7 +4,7 @@
   </ul>
 
   <div class="user-container col colNomarge">
-    <a class="user-img" href="info.html"><img src="assets/img/avatar.png"></a>
+    <a class="user-img" href="info.html"></a>
     <div class="user-info">
       <h2><a href="info.html">{{{uid}}}<small>{{givenName}} {{sn}}</small></a></h2>
       <span class="user-mail">{{mail}}</span>
@@ -25,10 +25,6 @@
         <input type="text" id="givenName" name="givenName" class="form-control form-text" value="{{givenName}}" placeholder="{{t_firstname}}" required>
         <input type="text" name="sn" class="form-control form-text" value="{{sn}}" placeholder="{{t_lastname}}" required>
       </div>
-
-      <div class="btn-group">
-        <a href="password.html" class="btn validate-btn large-btn">{{t_change_password}}</a>
-      </div>
     </div>
 
     <div class="form-section">
@@ -43,22 +39,25 @@
         <a class="btn link-btn" id="add-mailalias">{{t_add_mail}}</a>
       </div>
 
-        <div class="form-group" id="form-add-mail-drop">
-          <label for="mailforward" class="control-label">{{t_mail_forward}}</label>
-          <a class="help-link" href="#">?</a>
-          {{#maildrop}}
-          <input type="email" name="maildrop[]" class="form-control form-text" value="{{.}}">
-          <br>
-          {{/maildrop}}
-          <input id="mailforward" type="email" name="maildrop[]" class="form-control maildrop-input form-text" placeholder="{{t_new_forward}}">
-          <a class="btn link-btn" id="add-maildrop">{{t_add_forward}}</a>
-        </div>
-
-        <div class="btn-group">
-          <a href="info.html" class="btn large-btn">{{t_cancel}}</a>
-          <input type="submit" class="btn classic-btn large-btn" value="{{t_ok}}">
-        </div>
-
+      <div class="form-group" id="form-add-mail-drop">
+        <label for="mailforward" class="control-label">{{t_mail_forward}}</label>
+        <a class="help-link" href="#">?</a>
+        {{#maildrop}}
+        <input type="email" name="maildrop[]" class="form-control form-text" value="{{.}}">
+        {{/maildrop}}
+        <input id="mailforward" type="email" name="maildrop[]" class="form-control maildrop-input form-text" placeholder="{{t_new_forward}}">
+        <a class="btn link-btn" id="add-maildrop">{{t_add_forward}}</a>
       </div>
+    </div>
+
+    <div class="btn-group">
+      <a href="info.html" class="btn large-btn">{{t_cancel}}</a>
+      <input type="submit" class="btn classic-btn large-btn" value="{{t_ok}}">
+    </div>
+
+    <div class="btn-group">
+      <a href="password.html" class="btn validate-btn large-btn">{{t_change_password}}</a>
+    </div>
+
   </form>
 </div>
