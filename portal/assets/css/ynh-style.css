@@ -329,6 +329,15 @@ textarea {
    ========================================================================== */
 
 
+[type="submit"],
+[type="password"],
+[type="email"],
+[type="text"] {
+  /* <3 Apple */
+  -webkit-appearance: none;
+  -webkit-border-radius:0;
+}
+
 /* Extend artichaut-buttons.css */
 .link-btn { background: none;}
   .link-btn:hover, 
