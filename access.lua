@@ -468,18 +468,25 @@ function do_edit ()
              if args.givenName and args.sn and args.mail then
 
                  local mailalias = {}
-                 if args["mailalias[]"] and type(args["mailalias[]"]) == "table" then
+                 if args["mailalias[]"] then
+                     if type(args["mailalias[]"]) == "string" then
+                         args["mailalias[]"] = {args["mailalias[]"]}
+                     end
                      mailalias = args["mailalias[]"]
                  end
 
                  local maildrop = {}
-                 if args["maildrop[]"] and type(args["maildrop[]"]) == "table" then
+                 if args["maildrop[]"] then
+                     if type(args["maildrop[]"]) == "string" then
+                         args["maildrop[]"] = {args["maildrop[]"]}
+                     end
                      maildrop = args["maildrop[]"]
                  end
 
                  local mail_pattern = "[A-Za-z0-9%.%%%+%-]+@[A-Za-z0-9%.%%%+%-]+%.%w%w%w?%w?"
                  local domains = conf["domains"]
                  local mails = {}
+                 local filter = "(|"
                  table.insert(mailalias, 1, args.mail)
                  for k, mail in ipairs(mailalias) do
                      if mail ~= "" then
@@ -496,13 +503,15 @@ function do_edit ()
                              end
                              if domain_valid then
                                  table.insert(mails, mail)
+                                 filter = filter.."(mail="..mail..")"
                              else
-                                 flash("fail", t("invalid_domain")..mail)
+                                 flash("fail", t("invalid_domain").." "..mail)
                                  return redirect(portal_url.."edit.html")
                              end
                          end
                      end
                  end
+                 filter = filter..")"
 
                  local drops = {}
                  for k, mail in ipairs(maildrop) do
@@ -519,6 +528,26 @@ function do_edit ()
                  local dn = conf["ldap_identifier"].."="..user..","..conf["ldap_group"]
                  local ldap = lualdap.open_simple(conf["ldap_host"], dn, cache:get(user.."-password"))
                  local cn = args.givenName.." "..args.sn
+                 for dn, attribs in ldap:search {
+                     base = conf["ldap_group"],
+                     scope = "onelevel",
+                     filter = filter,
+                     attrs = {conf["ldap_identifier"], "mail"}
+                 } do
+                     ngx.log(4, filter)
+                     ngx.log(4, attribs[conf["ldap_identifier"]])
+                     if attribs[conf["ldap_identifier"]] and attribs[conf["ldap_identifier"]] ~= user then
+                         if type(attribs["mail"]) == "string" then
+                             attribs["mail"] = {attribs["mail"]}
+                         end
+                         for _, mail in ipairs(attribs["mail"]) do
+                             if is_in_table(mails, mail) then
+                                 flash("fail", t("mail_already_used").." "..mail)
+                             end
+                         end
+                         return redirect(portal_url.."edit.html")
+                     end
+                 end
                  if ldap:modify(dn, {'=', cn = cn,
                                           givenName = args.givenName,
                                           sn = args.sn,
