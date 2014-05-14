@@ -144,6 +144,8 @@ textarea {
 .icon-user:before { content: '\e801'; }
 .icon-lock:before { content: '\e800'; }
 .icon-connexion:before { content: '\e802'; }
+.icon-pencil:before { content: '\e804'; }
+.icon-trash:before { content: '\e80c'; }
 
 
 /* ==========================================================================
@@ -239,35 +241,16 @@ textarea {
    3 = User
    ========================================================================== */
 
-.user-container { padding: 0.4em 1em; }
-
-.user-container a { color: #fff; }
-
-.user-container h2 {
-  font-size: 1.5em;
-  margin-bottom: 0;
+.user-container {
+  display:block;
+  padding: 0.4em 1em;
+  color: #fff;
 }
-  .user-container h2 small {
-    font-size: 0.75em;
-    font-family: 'source_sans_proregular';
-    display: block;
-    margin-top: -0.6em;
-  }
 
-.user-info { margin-left: 0.5em;}
-
-.user-mail {
-  color: #999;
-  font-size: 0.9em;
+.user-container:before {
   display: block;
-  margin-top: -0.2em;
-}
-
-.user-img {
-  margin-right: 1em;
-  margin: 0.2em auto;
-}
-.user-img:before {
+  float: left;
+  margin-right: 10px;
   content: '\e801';
   display: block;
   font-family: 'ynh_ssowat';
@@ -281,9 +264,42 @@ textarea {
   color: #dedede;
   overflow: hidden;
 }
-.user-img:hover:before {
+.user-container:hover:before {
   color: #fff;
 }
+
+.user-container .user-username {
+  font-size: 1.5em;
+  margin: 0;
+}
+
+.user-container .user-fullname {
+  font-size: 1em;
+  font-family: 'source_sans_proregular';
+  display: block;
+  margin-top: -0.6em;
+}
+
+
+.user-container-info .user-username:after {
+  content: '\e804';
+  font-family: 'ynh_ssowat';
+  color: #b4b4b4;
+  display: none;
+  font-size: 0.8em;
+  width: 1em;
+  height: 1em;
+  margin-left: .5em;
+}
+.user-container-info:hover  .user-username:after {display: inline-block;vertical-align: text-top;}
+
+.user-container .user-mail {
+  color: #999;
+  font-size: 0.9em;
+  display: block;
+  margin-top: -0.2em;
+}
+
 
 .user-menu {
   float: right;
