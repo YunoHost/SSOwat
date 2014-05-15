@@ -34,6 +34,9 @@ body {
   margin: 2% 5%;
   z-index: 10;
 }
+.wrapper:before,
+.wrapper:after {content: " ";display: table;}
+.wrapper:after {clear: both;}
 
 .logo {
   text-align: center;
@@ -70,15 +73,14 @@ body {
 }
 
 .messages {
-  max-width: none;
   text-align: center;
-  width: 21em;
-  margin: 2% auto;
+  max-width: 21em;
+  margin: 2% auto 1em auto;
   padding: 1.5em;
 }
 
 .logged .messages {
-  width: 90%;
+  max-width: none;
   margin: 2% 5%;
   padding: 1.5em 15%;
 }
@@ -236,6 +238,26 @@ textarea {
   .listing-apps .first-letter { margin: 0; }
   .listing-apps span + span { font-size: 0.3em; }
 
+@media screen and (max-width: 450px) {
+  .apps {margin: 10% 5%;}
+  .listing-apps a {font-size: 3em;}
+  .listing-apps span + span { font-size: 0.32em; }
+  .listing-apps a:hover,
+  .listing-apps a:focus {left: -5px;top: -5px;}
+  .listing-apps a:hover:before,
+  .listing-apps a:focus:before {height: 5px;}
+  .listing-apps a:hover:after,
+  .listing-apps a:focus:after {width: 5px;}
+  .listing-apps a:before {left: 3px;box-shadow: 0 3px 5px rgba(0, 0, 0, 0.4);}
+  .listing-apps a:after {top: 3px;box-shadow: 3px 0 5px rgba(0, 0, 0, 0.4);}
+}
+@media screen and (max-width: 350px) {
+  .listing-apps a {
+    width: 2.5em;
+    height: 2.5em;
+    font-size: 2.8em;
+  }
+}
 
 
 /* ==========================================================================
@@ -244,6 +266,8 @@ textarea {
 
 .user-container {
   display:block;
+  position: relative;
+  max-width: 320px;
   padding: 0.4em 1em;
   color: #fff;
 }
@@ -271,6 +295,12 @@ textarea {
 .user-container-password:hover:after {
   left: -20px;
   opacity: 1;
+}
+@media screen and (max-width: 480px) {
+  .user-container-edit:after,
+  .user-container-password:after {left: -10px;}
+  .user-container-edit:hover:after,
+  .user-container-password:hover:after {left: -14px;}
 }
 
 .user-container:before {

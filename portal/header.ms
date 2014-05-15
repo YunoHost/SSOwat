@@ -19,16 +19,14 @@
 
   <div class="overlay">
     {{#flash_win}}
-    <div class="box messages success inner">{{.}}</div>
+    <div class="wrapper messages success">{{.}}</div>
     {{/flash_win}}
 
     {{#flash_fail}}
-    <div class="box messages danger inner">{{.}}</div>
+    <div class="wrapper messages danger">{{.}}</div>
     {{/flash_fail}}
 
     {{#flash_info}}
-    <div class="box messages info inner">{{.}}</div>
+    <div class="wrapper messages info">{{.}}</div>
     {{/flash_info}}
-
-    
 

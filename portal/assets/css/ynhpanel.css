@@ -146,6 +146,9 @@ body {/*overflow-y: scroll;*/}
   -webkit-transition: all 0.2s ease;
   z-index: 10;
 }
+#ynhoverlay .wrapper:before,
+#ynhoverlay .wrapper:after {content: " ";display: table;}
+#ynhoverlay .wrapper:after {clear: both;}
 
 /* ******************************************************************
 	Button
@@ -335,6 +338,28 @@ body {/*overflow-y: scroll;*/}
   #ynhoverlay .listing-apps span + span { font-size: 0.3em; }
 
 
+@media screen and (max-width: 450px) {
+  #ynhoverlay .apps {margin: 10% 5%;}
+  #ynhoverlay .listing-apps a {font-size: 3em;}
+  #ynhoverlay .listing-apps span + span { font-size: 0.32em; }
+  #ynhoverlay .listing-apps a:hover,
+  #ynhoverlay .listing-apps a:focus {left: -5px;top: -5px;}
+  #ynhoverlay .listing-apps a:hover:before,
+  #ynhoverlay .listing-apps a:focus:before {height: 5px;}
+  #ynhoverlay .listing-apps a:hover:after,
+  #ynhoverlay .listing-apps a:focus:after {width: 5px;}
+  #ynhoverlay .listing-apps a:before {left: 3px;box-shadow: 0 3px 5px rgba(0, 0, 0, 0.4);}
+  #ynhoverlay .listing-apps a:after {top: 3px;box-shadow: 3px 0 5px rgba(0, 0, 0, 0.4);}
+}
+@media screen and (max-width: 350px) {
+  #ynhoverlay .listing-apps a {
+    width: 2.5em;
+    height: 2.5em;
+    font-size: 2.8em;
+  }
+}
+
+
 
 
 /* ==========================================================================
@@ -343,6 +368,8 @@ body {/*overflow-y: scroll;*/}
 
 #ynhoverlay .user-container {
   display:block;
+  position: relative;
+  max-width: 320px;
   padding: 0.4em 1em;
   color: #fff;
 }
