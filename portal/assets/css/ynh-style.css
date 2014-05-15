@@ -497,6 +497,12 @@ input:disabled {
   cursor: not-allowed;
 }
 
+@media screen and (max-width: 480px) {
+  label,
+  label + .help-link {padding: 0.3em 0.8em;}
+  .form-text {padding: 0.8em;}
+  .form-group .btn {padding: 0.5em 0.8em;}
+}
 
 /* Login form */
 
