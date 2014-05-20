@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
   [].forEach.call(liMenu, function(el, i) {
     // Add color class.
-    el.classList.add(colors[i]);
+    el.classList.add(colors[i%colors.length]);
     // Set first-letter data attribute.
     el.querySelector('.first-letter').setAttribute('data-first-letter',el.textContent.substring(0, 2));
   });
