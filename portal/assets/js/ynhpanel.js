@@ -122,6 +122,17 @@ domReady(function(){
   // Don't do this in iframe
   if (window.self !== window.top) {return false;}
 
+  // Set and store meta viewport
+  var meta_viewport = document.querySelector('meta[name="viewport"]');
+  if (meta_viewport === null) {
+    meta_viewport = document.createElement('meta');
+    meta_viewport.setAttribute('name', "viewport");
+    meta_viewport.setAttribute('content', "");
+    document.getElementsByTagName('head')[0].insertBefore(meta_viewport, null);
+  }
+  meta_viewport = document.querySelector('meta[name="viewport"]');
+  meta_viewport_content = meta_viewport.getAttribute('content');
+
   // Add portal stylesheet
   var portalStyle = document.createElement("link");
   portalStyle.setAttribute("rel", "stylesheet");
@@ -154,7 +165,6 @@ domReady(function(){
     if (r.readyState != 4 || r.status != 200) return;
 
     // Response is JSON
-    document.querySelector('body').classList.add('ynh-panel-active');
     response = JSON.parse(r.responseText);
 
     // Add overlay header
@@ -196,8 +206,11 @@ domReady(function(){
       // Toggle overlay on YNHPortal button
       //Element.toggleClass(overlay, 'visible');
       Element.toggleClass(portal, 'visible');
+      Element.toggleClass(document.querySelector('html'), 'ynh-panel-active');
+
 
       if(yunoverlay.classList.contains('yuno-active')) {
+          meta_viewport.setAttribute('content', meta_viewport_content);
           yunoverlay.classList.add('yuno-fadeOut');
           PrefixedEvent(yunoverlay, "AnimationEnd", function(){
             if(yunoverlay.classList.contains('yuno-fadeOut')) {
@@ -208,6 +221,7 @@ domReady(function(){
           apps.classList.remove('yuno-fadeInLeft', 'yuno-delay');
           user.classList.remove('yuno-slideintop');
         }else {
+          meta_viewport.setAttribute('content', "width=device-width");
           yunoverlay.classList.remove('yuno-fadeOut');
           yunoverlay.classList.add('yuno-active');
           
