@@ -125,6 +125,7 @@ body {/*overflow-y: scroll;*/}
 #ynhoverlay .col > * {
   display: inline-block;
   letter-spacing: normal;
+  vertical-align: top;
 } 
 
 #ynhoverlay img {
