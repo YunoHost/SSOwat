@@ -133,6 +133,7 @@ domReady(function(){
   var portal = document.createElement('a');
   portal.setAttribute('id', 'ynhportal');
   portal.setAttribute('href', '/yunohost/sso/');
+  portal.setAttribute('class', 'disableAjax');
   document.body.insertBefore(portal, null);
 
   // Create overlay element
@@ -157,9 +158,9 @@ domReady(function(){
     response = JSON.parse(r.responseText);
 
     // Add overlay header
-    overlay.innerHTML += '<div class="wrapper info">' +
-                          '<ul class="ul-reset user-menu"><li><a class="icon icon-connexion" href="'+ response.portal_url +'?action=logout">'+response.t_logout+'</a></li></ul>'+
-                          '<a class="user-container user-container-info" href="'+ response.portal_url +'edit.html">' +
+    overlay.innerHTML += '<div id="yuno-user" class="wrapper info">' +
+                          '<ul class="ul-reset user-menu"><li><a class="icon icon-connexion disableAjax" href="'+ response.portal_url +'?action=logout">'+response.t_logout+'</a></li></ul>'+
+                          '<a class="user-container user-container-info disableAjax" href="'+ response.portal_url +'edit.html">' +
                             '<h2 class="user-username">'+ response.uid +'</h2>' +
                             '<small class="user-fullname">'+ response.givenName + ' ' + response.sn +'</small>' +
                             '<span class="user-mail">'+ response.mail +'</span>' +
@@ -170,7 +171,7 @@ domReady(function(){
     // Add application links
     var links = [];
     Array.prototype.forEach.call(response.app, function(app, n){
-      links.push('<li><a class="'+colors[n]+'" href="//'+app.url+'"><span class="first-letter" data-first-letter="'+ app.name.substr(0,2) +'"></span><span class="sourcePro">'+app.name+'</span></a></li>');
+      links.push('<li><a class="'+colors[n]+' disableAjax" href="//'+app.url+'"><span class="first-letter" data-first-letter="'+ app.name.substr(0,2) +'"></span><span class="sourcePro">'+app.name+'</span></a></li>');
     });
     overlay.innerHTML += '<div id="yuno-apps" class="wrapper apps"><ul class="ul-reset listing-apps col colNomarge sourceProBold">'+ links.join('') +'</ul></div>';
 
