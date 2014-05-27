@@ -1,9 +1,11 @@
+<!DOCTYPE html>
 <html>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" >
 <head>
+  <meta charset="utf-8">
   <meta name="format-detection" content="telephone=no" />
   <meta name="viewport" content="user-scalable=no, width=device-width, height=device-height" />
   <title>{{t_portal}}</title>
+  <meta name="robots" content="noindex, nofollow">
   <link rel="stylesheet" href="assets/css/artichaut.css">
   <link rel="stylesheet" href="assets/css/artichaut-col.css">
   <link rel="stylesheet" href="assets/css/artichaut-messages.css">
