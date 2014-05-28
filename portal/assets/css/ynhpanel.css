@@ -102,10 +102,12 @@ body {/*overflow-y: scroll;*/}
   margin: 0;
   padding: 0;
   border: 0;
+  border-radius: 0;
   vertical-align: baseline;
   text-align: left;
   line-height: 1.5;
   position: static;
+  background: none;
   color: #fff;
   font-family: inherit;
   font-size: inherit;
