@@ -523,7 +523,7 @@ input:disabled {
 }
 
   .login-form label {
-    display: inline-block;
+    display: block;
     min-width: 1em;
     margin: 0;
     padding: 0;
