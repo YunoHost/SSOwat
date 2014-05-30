@@ -118,7 +118,7 @@ function uri_args_string (args)
     end
     String = "?"
     for k,v in pairs(args) do
-        String = String..k.."="..v.."&"
+        String = String..tostring(k).."="..tostring(v).."&"
     end
     return string.sub(String, 1, string.len(String) - 1)
 end
