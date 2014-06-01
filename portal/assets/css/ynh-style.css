@@ -4,7 +4,8 @@
    2 = Apps
    3 = User
    4 = Form
-   5 = Colors
+   5 = Footer
+   6 = Colors
    ========================================================================== */
 
 /* ==========================================================================
@@ -574,8 +575,53 @@ input:disabled {
   }
 }
 
+
 /* ==========================================================================
-   5 = Colors
+   5 = Footer
+   ========================================================================== */
+
+.footer {
+  display: inline-block;
+  width: auto;
+}
+  .footer nav {
+    margin: 0 1em;
+    padding: 0.25em;
+    border-top: 1px solid #666;
+    font-size: 0.9em;
+  }
+  
+  .footer a {
+    display: inline-block;
+    vertical-align: top;
+    color: #999;
+  }
+  .footer a:before {
+    content: "•";
+    display: inline-block;
+    vertical-align: top;
+    padding: 0 0.5em 0 0.25em;
+    color: #666;
+  }
+  .footer a:first-child:before {content: none;}
+
+  .footer a:hover,
+  .footer a:active {
+    color: #fff;
+    text-decoration: none;
+  }
+
+@media screen and (max-width: 480px) {
+  .footer a {
+    display: block;
+  }
+  .footer a:before {
+    content: none;
+  }
+}
+
+/* ==========================================================================
+   6 = Colors
    ========================================================================== */
 
 .listing-apps .purplebg {

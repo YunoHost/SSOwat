@@ -183,7 +183,15 @@ domReady(function(){
     Array.prototype.forEach.call(response.app, function(app, n){
       links.push('<li><a class="'+colors[n%colors.length]+' disableAjax" href="//'+app.url+'"><span class="first-letter" data-first-letter="'+ app.name.substr(0,2) +'"></span><span class="sourcePro">'+app.name+'</span></a></li>');
     });
-    overlay.innerHTML += '<div id="yuno-apps" class="wrapper apps"><ul class="ul-reset listing-apps col colNomarge sourceProBold">'+ links.join('') +'</ul></div>';
+    overlay.innerHTML += '<div id="yuno-apps" class="wrapper apps"><ul class="ul-reset listing-apps col colNomarge sourceProBold">'+ links.join("\n") +'</ul></div>';
+
+    // Add footer links
+    overlay.innerHTML += '<div id="yuno-footer" class="wrapper footer"><nav>' + "\n" +
+                          '<a class="link-profile-edit" href="/yunohost/sso/edit.html">'+ response.t_footerlink_edit +'</a>' + "\n" +
+                          '<a class="link-documentation" href="//yunohost.org/docs" target="_blank">'+ response.t_footerlink_documentation +'</a>' + "\n" +
+                          '<a class="link-documentation" href="//yunohost.org/support" target="_blank">'+ response.t_footerlink_support +'</a>' + "\n" +
+                          '<a class="link-admin" href="/yunohost/admin">'+ response.t_footerlink_administration +'</a>' + "\n" +
+                        '</nav></div>';
 
     // Add overlay to DOM
     var btn = document.getElementById('logo'),

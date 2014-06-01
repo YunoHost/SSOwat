@@ -3,10 +3,10 @@
    1 = Font Face Base 64
    2 = Apps
    3 = User
-   4 = Color
-   5 = Animation
-   6 = Media queries Mobile
-   7 = Media queries Tablet
+   4 = Footer
+   5 = Color
+   6 = Animation
+   7 = Media queries
    ========================================================================== */
 
 html.ynh-panel-active {
@@ -491,7 +491,50 @@ body {/*overflow-y: scroll;*/}
 
 
 /* ==========================================================================
-   4 = Color
+   4 = Footer
+   ========================================================================== */
+
+#ynhoverlay .footer {
+  display: inline-block;
+  width: auto;
+}
+  #ynhoverlay .footer nav {
+    margin: 0 1em;
+    padding: 0.25em;
+    border-top: 1px solid #666;
+    font-size: 0.9em;
+  }
+  
+  #ynhoverlay .footer a {
+    display: inline-block;
+    vertical-align: top;
+    color: #999;
+  }
+  #ynhoverlay .footer a:before {
+    content: "•";
+    display: inline-block;
+    vertical-align: top;
+    padding: 0 0.5em 0 0.25em;
+    color: #666;
+  }
+  #ynhoverlay .footer a:first-child:before {content: none;}
+
+  #ynhoverlay .footer a:hover,
+  #ynhoverlay .footer a:active {
+    color: #fff;
+    text-decoration: none;
+  }
+@media screen and (max-width: 480px) {
+  #ynhoverlay .footer a {
+    display: block;
+  }
+  #ynhoverlay .footer a:before {
+    content: none;
+  }
+}
+
+/* ==========================================================================
+   5 = Color
    ========================================================================== */
 
 #ynhoverlay .listing-apps  {
@@ -627,7 +670,7 @@ body {/*overflow-y: scroll;*/}
 }
 
 /* ==========================================================================
-   5 = Animation
+   6 = Animation
    ========================================================================== */
 
 /*SlidetoLeft*/
@@ -852,7 +895,7 @@ body {/*overflow-y: scroll;*/}
 }
 
 /* ==========================================================================
-   6 = Media Queries Mobile
+   7 = Media Queries
    ========================================================================== */
 
 @media screen and (max-width: 500px) {

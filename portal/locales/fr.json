@@ -33,5 +33,9 @@
    "wrong_username_password": "Nom d'utilisateur ou mot de passe incorrect",
    "logged_out": "Déconnecté",
    "please_login": "Veuillez vous identifier pour accéder à cette page",
-   "please_login_from_portal": "Veuillez vous identifiez depuis le portail"                                                  
+   "please_login_from_portal": "Veuillez vous identifiez depuis le portail",
+   "footerlink_edit": "Éditer mon profil", 
+   "footerlink_documentation": "Documentation",
+   "footerlink_support": "Support",
+   "footerlink_administration": "Administration"
 }
