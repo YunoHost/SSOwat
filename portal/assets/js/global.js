@@ -7,14 +7,14 @@ document.addEventListener('DOMContentLoaded', function() {
     , addMaildrop = document.getElementById('add-maildrop')
   ;
 
-  [].forEach.call(liMenu, function(el, i) {
+  liMenu && [].forEach.call(liMenu, function(el, i) {
     // Add color class.
     el.classList.add(colors[i%colors.length]);
     // Set first-letter data attribute.
     el.querySelector('.first-letter').setAttribute('data-first-letter',el.textContent.substring(0, 2));
   });
 
-  addMailAlias.addEventListener('click', function(){
+  addMailAlias && addMailAlias.addEventListener('click', function(){
     // Clone last input.
     var inputAliasClone = document.querySelector('.mailalias-input').cloneNode(true);
     // Empty value.
@@ -23,7 +23,7 @@ document.addEventListener('DOMContentLoaded', function() {
     addMailAlias.parentNode.insertBefore(inputAliasClone, addMailAlias);
   });
 
-  addMaildrop.addEventListener('click', function(){
+  addMaildrop && addMaildrop.addEventListener('click', function(){
     // Clone last input.
     var inputDropClone = document.querySelector('.maildrop-input').cloneNode(true);
     // Empty value.
