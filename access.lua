@@ -319,7 +319,7 @@ function serve(uri)
 
     -- Access to directory root: forbidden
     if string.ends(rel_path, "/") then
-        return ngx.exit(403)
+        return ngx.exit(ngx.HTTP_FORBIDDEN)
     end
 
     -- Try to get file content
