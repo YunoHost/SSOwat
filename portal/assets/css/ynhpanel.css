@@ -115,6 +115,13 @@ body {/*overflow-y: scroll;*/}
   font-weight: normal;
   font-variant: normal;
   text-shadow: none;
+  text-transform: none;
+  width: auto;
+  height: auto;
+  min-width: auto;
+  min-height: auto;
+  max-width: none;
+  max-height: none;
 
   opacity: 1;
   filter: alpha(opacity=100);
@@ -432,6 +439,7 @@ body {/*overflow-y: scroll;*/}
   content: '\e804';
   font-family: 'ynh_ssowat';
   color: #b4b4b4;
+  background: none;
   display: inline-block;vertical-align: text-top;
   font-size: 0.8em;
   width: 1em;
