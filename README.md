@@ -140,11 +140,11 @@ List of regular expressions to be matched against URLs **and** URIs to ignore th
 
 #### redirected_urls
 
-Array of URLs and/or URIs to redirect and their redirect URI/URL (**example**: `{ "/", "example.org/subpath" }`)
+Array of URLs and/or URIs to redirect and their redirect URI/URL (**example**: `{ "/": "example.org/subpath" }`)
 
 #### redirected_regex
 
-Array of regular expressions to be matched against URLS **and** URIs and their redirect URI/URL (**example**: `{ "example.org/megusta$", "example.org/subpath" }`)
+Array of regular expressions to be matched against URLS **and** URIs and their redirect URI/URL (**example**: `{ "example.org/megusta$": "example.org/subpath" }`)
 
 #### users
 
