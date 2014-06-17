@@ -1,6 +1,6 @@
 {
    "portal": "Portail YunoHost",
-   "informations": "Vos informations",
+   "information": "Vos informations",
    "username": "Nom d'utilisateur",
    "password": "Mot de passe",
    "fullname": "Nom complet",
@@ -27,7 +27,7 @@
    "invalid_domain": "Nom de domaine invalide dans",
    "invalid_mailforward": "Adresse email de transfert invalide",
    "mail_already_used": "Adresse déjà utilisée :",
-   "informations_updated": "Informations mises à jour",
+   "information_updated": "Informations mises à jour",
    "user_saving_fail": "Une erreur s'est produite lors de la modification des informations",
    "missing_required_fields": "Champs requis manquants",
    "wrong_username_password": "Nom d'utilisateur ou mot de passe incorrect",
