@@ -464,7 +464,7 @@ function do_edit ()
              end
              return redirect(portal_url.."password.html")
 
-         -- Edit user informations
+         -- Edit user information
          elseif string.ends(ngx.var.uri, "edit.html") then
              if args.givenName and args.sn and args.mail then
 
@@ -561,7 +561,7 @@ function do_edit ()
                          cache:delete(user.."-mail|"..v)
                      end
                      set_headers(user) -- Ugly trick to reload cache
-                     flash("win", t("informations_updated"))
+                     flash("win", t("information_updated"))
                      return redirect(portal_url.."info.html")
                  else
                      flash("fail", t("user_saving_fail"))
