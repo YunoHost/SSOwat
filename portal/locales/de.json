@@ -1,6 +1,6 @@
 {
     "portal": "YunoHost Portal",
-    "informations": "Deine Informationen",
+    "information": "Deine Informationen",
     "username": "Benutzername",
     "password": "Passwort",
     "fullname": "Vollständiger Name",
@@ -27,7 +27,7 @@
     "invalid_domain": "Ungültige Domain in",
     "invalid_mailforward": "Ungültige E-Mail Weiterleitungsadresse",
     "mail_already_used": "E-Mail Adresse wird bereits verwendet:",
-    "informations_updated": "Informationen wurden aktualisiert",
+    "information_updated": "Informationen wurden aktualisiert",
     "user_saving_fail": "Beim ändern der Benutzerinformationen ist ein Fehler aufgetreten",
     "missing_required_fields": "Benötigte Felder fehlen",
     "wrong_username_password": "Falscher Benutzername oder Passwort",
