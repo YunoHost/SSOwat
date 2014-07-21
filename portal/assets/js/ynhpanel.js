@@ -190,7 +190,7 @@ domReady(function(){
                           '<a class="link-profile-edit" href="/yunohost/sso/edit.html">'+ response.t_footerlink_edit +'</a>' + "\n" +
                           '<a class="link-documentation" href="//yunohost.org/docs" target="_blank">'+ response.t_footerlink_documentation +'</a>' + "\n" +
                           '<a class="link-documentation" href="//yunohost.org/support" target="_blank">'+ response.t_footerlink_support +'</a>' + "\n" +
-                          '<a class="link-admin" href="/yunohost/admin">'+ response.t_footerlink_administration +'</a>' + "\n" +
+                          '<a class="link-admin" href="/yunohost/admin" target="_blank">'+ response.t_footerlink_administration +'</a>' + "\n" +
                         '</nav></div>';
 
     // Add overlay to DOM
@@ -198,7 +198,7 @@ domReady(function(){
         yunoverlay = document.getElementById('ynhoverlay'),
         user = document.getElementById('yuno-user'),
         apps = document.getElementById('yuno-apps');
-    
+
     var pfx = ["webkit", "moz", "MS", "o", ""];
     function PrefixedEvent(element, type, callback) {
       for (var p = 0; p < pfx.length; p++) {
@@ -232,7 +232,7 @@ domReady(function(){
           meta_viewport.setAttribute('content', "width=device-width");
           yunoverlay.classList.remove('yuno-fadeOut');
           yunoverlay.classList.add('yuno-active');
-          
+
           apps.classList.add('yuno-fadeInLeft', 'yuno-delay');
           user.classList.add('yuno-slideintop');
         }
