@@ -485,7 +485,29 @@ function do_edit ()
                  end
 
                  local mail_pattern = "[A-Za-z0-9%.%%%+%-]+@[A-Za-z0-9%.%%%+%-]+%.%w%w%w?%w?"
-                 local domains = conf["domains"]
+
+                 -- Limit domains per user
+                 local domains = {}
+                 local ldap = lualdap.open_simple(conf["ldap_host"])
+                 for dn, attribs in ldap:search {
+                     base = conf["ldap_group"],
+                     scope = "onelevel",
+                     sizelimit = 1,
+                     filter = "(uid="..user..")",
+                     attrs = {"mail"}
+                 } do
+                     for _, domain in ipairs(conf["domains"]) do
+                         for k, mail in ipairs(attribs["mail"]) do
+                             if string.ends(mail, "@"..domain) then
+                                 if not is_in_table(domains, domain) then
+                                     table.insert(domains, domain)
+                                 end
+                             end
+                         end
+                     end
+                 end
+                 ldap:close()
+
                  local mails = {}
                  local filter = "(|"
                  table.insert(mailalias, 1, args.mail)
