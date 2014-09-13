@@ -41,7 +41,8 @@ end
 default_conf = {
     portal_scheme             = "https",
     portal_path               = "/ssowat",
-    domains                   = { conf["portal_domain"] },
+    local_portal_domain       = "yunohost.local",
+    domains                   = { conf["portal_domain"], "yunohost.local" },
     session_timeout           = 60 * 60 * 24,     -- one day
     session_max_timeout       = 60 * 60 * 24 * 7, -- one week
     login_arg                 = "sso_login",
@@ -55,6 +56,11 @@ default_conf = {
 
 for param, default_value in pairs(default_conf) do
     conf[param] = conf[param] or default_value
+end
+
+if ngx.var.host == conf["local_portal_domain"] then
+    conf["original_portal_domain"] = conf["portal_domain"]
+    conf["portal_domain"] = conf["local_portal_domain"]
 end
 
 local portal_url = conf["portal_scheme"].."://"..
@@ -198,6 +204,9 @@ function has_access (user, url)
         return true
     end
     for u, _ in pairs(conf["users"][user]) do
+        if ngx.var.host == conf["local_portal_domain"] then
+            u = string.gsub(u, conf["original_portal_domain"], conf["local_portal_domain"])
+        end
         if string.starts(url, string.sub(u, 1, -2)) then return true end
     end
     return false
@@ -411,6 +420,9 @@ function get_data_for(view)
         }
 
         for url, name in pairs(conf["users"][user]) do
+            if ngx.var.host == conf["local_portal_domain"] then
+                url = string.gsub(url, conf["original_portal_domain"], conf["local_portal_domain"])
+            end
             table.insert(data["app"], { url = url, name = name })
         end
     end
