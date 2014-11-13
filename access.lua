@@ -406,7 +406,6 @@ function get_data_for(view)
 
         local mails = get_mails(user)
         data = {
-            title      = user.." <small>"..cache:get(user.."-cn").."</small>",
             connected  = true,
             portal_url = portal_url,
             uid        = user,
