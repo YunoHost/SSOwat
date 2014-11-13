@@ -152,10 +152,6 @@ body {/*overflow-y: scroll;*/}
   font-family: 'source_sans_probold';
 }
 
-#ynhoverlay .sourceProBlack {
-  font-family: 'SourceSansPro-Black';
-}
-
 #ynhoverlay .wrapper {
   width: 90%;
   margin: 2% 5%;

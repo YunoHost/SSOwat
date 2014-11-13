@@ -10,15 +10,6 @@
 }
 
 @font-face {
-  font-family: 'SourceSansPro-Black';
-  src: url('../fonts/SourceSansPro-Black.eot');
-  src: url('../fonts/SourceSansPro-Black.eot#iefix'),
-        url('../fonts/SourceSansPro-Black.ttf') format('truetype');
-  font-weight: normal;
-  font-style: normal;
-}
-
-@font-face {
     font-family: 'source_sans_probold';
     src: url('sourcesanspro-bold-webfont.eot');
     }
