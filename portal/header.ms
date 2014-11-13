@@ -2,16 +2,24 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <meta name="format-detection" content="telephone=no" />
-  <meta name="viewport" content="user-scalable=no, width=device-width, height=device-height" />
   <title>{{t_portal}}</title>
+
+  <!-- Responsive -->
+  <meta name="format-detection" content="telephone=no" />
+  <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1" />
+
+  <!-- Do not index SSOWat pages -->
   <meta name="robots" content="noindex, nofollow">
+
+  <!-- Stylesheets -->
   <link rel="stylesheet" href="assets/css/artichaut.css">
   <link rel="stylesheet" href="assets/css/artichaut-col.css">
   <link rel="stylesheet" href="assets/css/artichaut-messages.css">
   <link rel="stylesheet" href="assets/css/artichaut-buttons.css">
   <link rel="stylesheet" href="assets/css/fonts.css">
   <link rel="stylesheet" href="assets/css/ynh-style.css">
+
+  <!-- Icons -->
   <link rel="shortcut icon" href="assets/icons/favicon.ico">
   <link rel="apple-touch-icon" sizes="57x57" href="assets/icons/apple-touch-icon-57x57.png">
   <link rel="apple-touch-icon" sizes="114x114" href="assets/icons/apple-touch-icon-114x114.png">
