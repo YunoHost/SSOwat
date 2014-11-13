@@ -1,44 +1,110 @@
 /* ==========================================================================
-   Sommaire
    1 = Global
    2 = Apps
    3 = User
    4 = Form
    5 = Footer
    6 = Colors
+   7 = Internet Explorer
    ========================================================================== */
 
 /* ==========================================================================
    1 = Global
    ========================================================================== */
 
+* {
+  -webkit-box-sizing: border-box;
+     -moz-box-sizing: border-box;
+          box-sizing: border-box;
+}
+
+html {
+  font-family: sans-serif; /* 1 */
+  -ms-text-size-adjust: 100%; /* 2 */
+  -webkit-text-size-adjust: 100%; /* 2 */
+}
+
 body {
   background: #41444f;
   font-family: 'source_sans_proregular';
   overflow-y: scroll;
+  font-size: 1em;
+  line-height:1.5;
+  margin: 0;
+}
+
+h1:first-child,
+h2:first-child,
+h3:first-child,
+h4:first-child,
+h5:first-child,
+h6:first-child,
+p:first-child,
+ul:first-child,
+ol:first-child,
+dl:first-child{
+  margin-top: 0;
+}
+
+
+
+
+/* Responsive image */
+img {
+  max-width: 100%;
+  height :auto;
+}
+
+.element-invisible {
+  border: 0;
+  clip: rect(0 0 0 0);
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
+  width: 1px;
 }
 
 
 /* Layout */
-
 .overlay {
   padding: 2%;
-}
-
-.inner {
-  max-width: 50em;
-  margin: auto;
 }
 
 .wrapper {
   width: 90%;
   margin: 2% 5%;
-  z-index: 10;
+  position: relative;
+  z-index: 1;
 }
 .wrapper:before,
 .wrapper:after {content: " ";display: table;}
 .wrapper:after {clear: both;}
 
+
+.col {
+  letter-spacing: -5px; /*fix bug ff PC*/
+}
+
+.col > * {
+  display: inline-block;
+  vertical-align: top;
+  letter-spacing: normal;
+}
+
+.colMarge > * {
+  margin-left: 1%;
+}
+
+.colNomarge > * {
+  margin-left: 0;
+}
+
+
+
+
+/* Logo */
 .logo {
   text-align: center;
   margin-bottom: 0;
@@ -68,17 +134,20 @@ body {
   display: none;
 }
 
-.wrapper {
-  position: relative;
-  z-index: 1;
-}
 
+/* messages */
 .messages {
+  color: #FFF;
+  margin-bottom: 1em;
   text-align: center;
   max-width: 21em;
   margin: 2% auto 1em auto;
   padding: 1.5em;
 }
+.messages.danger { background: #c0392b; }
+.messages.warning { background: #e67e22; }
+.messages.success { background: #27ae60; }
+.messages.info { background: #2980b9; }
 
 .logged .messages {
   max-width: none;
@@ -99,6 +168,17 @@ h5,
 h6 {
   font-family: 'source_sans_probold';
   font-weight: normal;
+}
+
+/* headings */
+h1,
+.h1 {
+  font-size: 2.5em;
+}
+
+h2,
+.h2 {
+  font-size: 1.8em;
 }
 
 .cwhite {
@@ -162,7 +242,13 @@ textarea {
   content: attr(data-first-letter);
 }
 
+.listing-apps {
+  margin: 0;
+  padding: 0;
+}
+
 .listing-apps li {
+  list-style: none;
   margin: 0 0 1em 1em;
   box-shadow: 2px 2px 3px rgba(0, 0, 0, 0.4), 
               -2px -2px 3px 0 rgba(0, 0, 0, 0.7) inset;
@@ -394,7 +480,18 @@ textarea {
    4 = Forms
    ========================================================================== */
 
+button,
+input,
+select,
+textarea {
+    font-family: inherit;
+    font-size: 100%;
+    margin: 0;
+}
 
+input[type="search"] {
+    -webkit-appearance: textfield;
+}
 [type="submit"],
 [type="password"],
 [type="email"],
@@ -404,11 +501,17 @@ textarea {
   -webkit-border-radius:0;
 }
 
-/* Extend artichaut-buttons.css */
-.link-btn { background: none;}
-  .link-btn:hover, 
-  .link-btn:focus {background: #41444f;text-decoration: underline;}
+input::-moz-focus-inner { 
+    border: 0;
+    padding: 0;
+}
 
+@media screen and (-webkit-min-device-pixel-ratio:0){
+  select{
+    -webkit-appearance: none;
+    border-radius: 0;
+  }
+}
 
 .form-text {
   padding: 0.8em;
@@ -452,17 +555,6 @@ label + .help-link {
 }
 label + .help-link:hover {background: #30333b;}
 
-.btn {
-  cursor: pointer;
-          transition: all 0.1s ease;
-  -webkit-transition: all 0.1s ease;
-}
-
-.btn-group {
-  margin: 4em 0;
-  text-align: right;
-}
-
 .form-group {
   background: none;
   margin-bottom: 2em;
@@ -503,6 +595,63 @@ input:disabled {
   label + .help-link {padding: 0.3em 0.8em;}
   .form-text {padding: 0.8em;}
   .form-group .btn {padding: 0.5em 0.8em;}
+}
+
+
+
+/* Buttons */
+.btn {
+  background: #999;
+  display: inline-block;
+  padding: 0.5em 1em;
+  line-height: normal;
+  text-decoration: none;
+  color: #FFF;
+  cursor: pointer;
+          transition: all 0.1s ease;
+  -webkit-transition: all 0.1s ease;
+}
+
+.large-btn {
+  padding: 0.8em 1.5em;
+  font-size: 1.1em;
+}
+
+button.btn,
+input.btn {
+  border:0;
+  cursor:pointer;
+}
+
+  .btn:hover, 
+  .btn:focus {
+    background: #AAA;
+  }
+
+.important-btn { background: #c0392b;}
+  .important-btn:hover, 
+  .important-btn:focus {background: #e74c3c;}
+
+.validate-btn { background: #27ae60;}
+  .validate-btn:hover, 
+  .validate-btn:focus {background: #2ecc71;}
+
+.warning-btn { background: #e67e22;}
+  .warning-btn:hover, 
+  .warning-btn:focus {background: #f39c12;}
+
+.classic-btn { background: #2980b9;}
+  .classic-btn:hover, 
+  .classic-btn:focus {background: #3498db;}
+
+.link-btn { background: none;}
+  .link-btn:hover, 
+  .link-btn:focus {background: #41444f;text-decoration: underline;}
+
+
+.btn-group {
+  margin: 4em 0;
+  text-align: right;
 }
 
 /* Login form */
@@ -624,7 +773,7 @@ input:disabled {
    6 = Colors
    ========================================================================== */
 
-.listing-apps .purplebg {
+.purplebg {
     background: #9B59B6!important;
 }
 .purplebg:hover:after, 
@@ -753,3 +902,23 @@ input:disabled {
 
 
 
+/* ==========================================================================
+   Internet Explorer
+   ========================================================================== */
+
+/*IE8 and IE9*/
+
+article,
+aside,
+details,
+figcaption,
+figure,
+footer,
+header,
+hgroup,
+main,
+nav,
+section,
+summary {
+    display: block;
+}

@@ -12,10 +12,6 @@
   <meta name="robots" content="noindex, nofollow">
 
   <!-- Stylesheets -->
-  <link rel="stylesheet" href="assets/css/artichaut.css">
-  <link rel="stylesheet" href="assets/css/artichaut-col.css">
-  <link rel="stylesheet" href="assets/css/artichaut-messages.css">
-  <link rel="stylesheet" href="assets/css/artichaut-buttons.css">
   <link rel="stylesheet" href="assets/css/fonts.css">
   <link rel="stylesheet" href="assets/css/ynh-style.css">
 
