@@ -797,6 +797,18 @@ input.btn {
    6 = Colors
    ========================================================================== */
 
+.listing-apps li:nth-child(1) a,
+.bluebg {
+    background: #3498DB!important;
+}
+.bluebg:hover:after,
+.bluebg:focus:after,
+.bluebg:hover:before,
+.bluebg:focus:before {
+    background: #16527A!important;
+}
+
+.listing-apps li:nth-child(2) a,
 .purplebg {
     background: #9B59B6!important;
 }
@@ -806,33 +818,8 @@ input.btn {
 .purplebg:focus:before {
     background: #532C64!important;
 }
-.yellowbg {
-    background: #F1C40F!important;
-}
-.yellowbg:hover:after, 
-.yellowbg:focus:after, 
-.yellowbg:hover:before, 
-.yellowbg:focus:before {
-    background: #796307!important;
-}
-.pinkbg {
-    background: #D66D92!important;
-}
-.pinkbg:hover:after, 
-.pinkbg:focus:after, 
-.pinkbg:hover:before, 
-.pinkbg:focus:before {
-    background: #992B52!important;
-}
-.orangebg {
-    background: #F39C12!important;
-}
-.orangebg:hover:after, 
-.orangebg:focus:after, 
-.orangebg:hover:before, 
-.orangebg:focus:before {
-    background: #7F5006!important;
-}
+
+.listing-apps li:nth-child(3) a,
 .redbg {
     background: #E74C3C!important;
 }
@@ -842,24 +829,19 @@ input.btn {
 .redbg:focus:before {
     background: #921E12!important;
 }
-.turquoisebg {
-    background: #1ABC9C!important;
+
+.listing-apps li:nth-child(4) a,
+.orangebg {
+    background: #F39C12!important;
 }
-.turquoisebg:hover:after, 
-.turquoisebg:focus:after, 
-.turquoisebg:hover:before, 
-.turquoisebg:focus:before {
-    background: #0B4C3F!important;
+.orangebg:hover:after,
+.orangebg:focus:after,
+.orangebg:hover:before,
+.orangebg:focus:before {
+    background: #7F5006!important;
 }
-.bluebg {
-    background: #3498DB!important;
-}
-.bluebg:hover:after, 
-.bluebg:focus:after, 
-.bluebg:hover:before, 
-.bluebg:focus:before {
-    background: #16527A!important;
-}
+
+.listing-apps li:nth-child(5) a,
 .greenbg {
     background: #2ECC71!important;
 }
@@ -869,6 +851,8 @@ input.btn {
 .greenbg:focus:before {
     background: #176437!important;
 }
+
+.listing-apps li:nth-child(6) a,
 .darkbluebg {
     background: #34495E!important;
 }
@@ -878,6 +862,8 @@ input.btn {
 .darkbluebg:focus:before {
     background: #07090C!important;
 }
+
+.listing-apps li:nth-child(7) a,
 .lightbluebg {
     background: #6A93D4!important;
 }
@@ -887,6 +873,20 @@ input.btn {
 .lightbluebg:focus:before {
     background: #2B5394!important;
 }
+
+.listing-apps li:nth-child(8) a,
+.yellowbg {
+    background: #F1C40F!important;
+}
+.yellowbg:hover:after,
+.yellowbg:focus:after,
+.yellowbg:hover:before,
+.yellowbg:focus:before {
+    background: #796307!important;
+}
+
+
+.listing-apps li:nth-child(9) a,
 .lightpinkbg {
     background: #F76F87!important;
 }
@@ -895,6 +895,27 @@ input.btn {
 .lightpinkbg:hover:before, 
 .lightpinkbg:focus:before {
     background: #DA0C31!important;
+}
+
+/* Following colors are not used yet */
+.pinkbg {
+    background: #D66D92!important;
+}
+.pinkbg:hover:after,
+.pinkbg:focus:after,
+.pinkbg:hover:before,
+.pinkbg:focus:before {
+    background: #992B52!important;
+}
+
+.turquoisebg {
+    background: #1ABC9C!important;
+}
+.turquoisebg:hover:after,
+.turquoisebg:focus:after,
+.turquoisebg:hover:before,
+.turquoisebg:focus:before {
+    background: #0B4C3F!important;
 }
 .lightyellow {
     background: #FFC973!important;
