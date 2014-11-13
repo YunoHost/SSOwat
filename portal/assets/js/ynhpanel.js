@@ -190,7 +190,7 @@ domReady(function(){
                           '<a class="link-profile-edit" href="/yunohost/sso/edit.html">'+ response.t_footerlink_edit +'</a>' + "\n" +
                           '<a class="link-documentation" href="//yunohost.org/docs" target="_blank">'+ response.t_footerlink_documentation +'</a>' + "\n" +
                           '<a class="link-documentation" href="//yunohost.org/support" target="_blank">'+ response.t_footerlink_support +'</a>' + "\n" +
-                          '<a class="link-admin" href="/yunohost/admin" target="_blank">'+ response.t_footerlink_administration +'</a>' + "\n" +
+                          '<a class="link-admin" href="/yunohost/admin/" target="_blank">'+ response.t_footerlink_administration +'</a>' + "\n" +
                         '</nav></div>';
 
     // Add overlay to DOM
