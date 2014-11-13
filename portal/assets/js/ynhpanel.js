@@ -225,16 +225,10 @@ domReady(function(){
               yunoverlay.classList.remove('yuno-active');
             }
           });
-          apps.classList.remove('yuno-fadeIn', 'yuno-delay');
-          apps.classList.remove('yuno-fadeInLeft', 'yuno-delay');
-          user.classList.remove('yuno-slideintop');
         }else {
           meta_viewport.setAttribute('content', "width=device-width");
           yunoverlay.classList.remove('yuno-fadeOut');
           yunoverlay.classList.add('yuno-active');
-
-          apps.classList.add('yuno-fadeInLeft', 'yuno-delay');
-          user.classList.add('yuno-slideintop');
         }
     });
 

@@ -669,120 +669,14 @@ body {/*overflow-y: scroll;*/}
    6 = Animation
    ========================================================================== */
 
-/*SlidetoLeft*/
-
-@-webkit-keyframes slideInLeft {
-  0% {
-    
-    -ms-transform: translateX(0);
-    -webkit-transform: translateX(0);
-    transform: translateX(0);
-    
-  }
-
-  100% {
-    opacity: 0;
-    -webkit-transform: translateX(-2000px);
-    -ms-transform: translateX(-2000px);
-    transform: translateX(-2000px);
-  }
-}
-
-@keyframes slideInLeft {
-  0% {
-    
-    -ms-transform: translateX(0);
-    -webkit-transform: translateX(0);
-    transform: translateX(0);
-    
-  }
-
-  100% {
-    opacity: 0;
-    -webkit-transform: translateX(-2000px);
-    -ms-transform: translateX(-2000px);
-    transform: translateX(-2000px);
-  }
-}
-
-.yuno-slidetoleft {
-  -webkit-animation-name: slideInLeft;
-  animation-name: slideInLeft;
-  -webkit-animation-duration: 0.5s;
-  animation-duration: 0.5s;
-  -webkit-animation-fill-mode: both;
-  animation-fill-mode: both;
-}
-
-/*SlidetoLeft*/
-
-@-webkit-keyframes slideInTop {
-  0% {
-    opacity: 0;
-    -webkit-transform: translateY(-1000px);
-    -ms-transform: translateY(-1000px);
-    transform: translateY(-1000px);
-  }
-
-  100% {
-    -ms-transform: translateY(0);
-    -webkit-transform: translateY(0);
-    transform: translateY(0);
-  }
-}
-
-@keyframes slideInTop {
-  0% {
-    opacity: 0;
-    -webkit-transform: translateY(-1000px);
-    -ms-transform: translateY(-1000px);
-    transform: translateY(-1000px);
-  }
-
-  100% {
-    -ms-transform: translateY(0);
-    -webkit-transform: translateY(0);
-    transform: translateY(0);
-  }
-}
-
-.yuno-slideintop {
-  -webkit-animation-name: slideInTop;
-  animation-name: slideInTop;
-  -webkit-animation-duration: 0.3s;
-  animation-duration: 0.3s;
-  -webkit-animation-fill-mode: both;
-  animation-fill-mode: both;
-  -webkit-animation-timing-function: cubic-bezier(0.165, 0.840, 0.440, 1.000);
-  animation-timing-function: cubic-bezier(0.165, 0.840, 0.440, 1.000);
-}
-
-.yuno-slideintop.yuno-delay {
-  animation-delay: 0.5s;
-  -webkit-animation-delay: 0.5s;
-}
-
-
 /*FadeIn*/
-
 @-webkit-keyframes fadeIn {
-  0% {
-    opacity: 0;
-  }
-
-  100% {
-    opacity: 1;
-  }
+  0% {opacity: 0;}
+  100% {opacity: 1;}
 }
-
 @keyframes fadeIn {
-  0% {
-    opacity: 0;
-  }
-
-  100% {
-    opacity: 1;
-  }
+  0% {opacity: 0;}
+  100% {opacity: 1;}
 }
 
 .yuno-fadeIn {
@@ -795,36 +689,22 @@ body {/*overflow-y: scroll;*/}
   -webkit-animation-timing-function: cubic-bezier(0.165, 0.840, 0.440, 1.000);
   animation-timing-function: cubic-bezier(0.165, 0.840, 0.440, 1.000);
 }
-
+/*
 .yuno-fadeIn.yuno-delay {
   animation-delay: 0.5s;
   -webkit-animation-delay: 0.5s;
 }
+*/
 
 /*FadeOut*/
-
 @-webkit-keyframes fadeOut {
-  0% {
-    opacity: 1;
-  }
-
-  100% {
-    opacity: 0;
-  }
-
-  
+  0% {opacity: 1;}
+  100% {opacity: 0;}
 }
-
 @keyframes fadeOut {
-  0% {
-    opacity: 1;
-  }
-
-  100% {
-    opacity: 0;
-  } 
+  0% {opacity: 1;}
+  100% {opacity: 0;} 
 }
-
 .yuno-fadeOut {
   -webkit-animation-name: fadeOut;
   animation-name: fadeOut;
@@ -833,62 +713,13 @@ body {/*overflow-y: scroll;*/}
   -webkit-animation-fill-mode: both;
   animation-fill-mode: both;
 }
-
+/*
 .yuno-fadeOut.yuno-delay {
   animation-delay: 0.5s;
   -webkit-animation-delay: 0.5s;
 }
+*/
 
-
-/*FadeIn left*/
-
-@-webkit-keyframes fadeInLeft {
-  0% {
-    opacity: 0;
-    -webkit-transform: translateX(-100px);
-    -ms-transform: translateX(-100px);
-    transform: translateX(-100px);
-  }
-
-  100% {
-    opacity: 1;
-    -webkit-transform: translateX(0);
-    -ms-transform: translateX(0);
-    transform: translateX(0);
-  }
-}
-
-@keyframes fadeInLeft {
-  0% {
-    opacity: 0;
-    -webkit-transform: translateX(-100px);
-    -ms-transform: translateX(-100px);
-    transform: translateX(-100px);
-  }
-
-  100% {
-    opacity: 1;
-    -webkit-transform: translateX(0);
-    -ms-transform: translateX(0);
-    transform: translateX(0);
-  }
-}
-
-.yuno-fadeInLeft {
-  -webkit-animation-name: fadeInLeft;
-  animation-name: fadeInLeft;
-  -webkit-animation-duration: 0.3s;
-  animation-duration: 0.3s;
-  -webkit-animation-fill-mode: both;
-  animation-fill-mode: both;
-  -webkit-animation-timing-function: cubic-bezier(0.165, 0.840, 0.440, 1.000);
-  animation-timing-function: cubic-bezier(0.165, 0.840, 0.440, 1.000);
-}
-
-.yuno-fadeInLeft.yuno-delay {
-  animation-delay: 0.3s;
-  -webkit-animation-delay: 0.3s;
-}
 
 /* ==========================================================================
    7 = Media Queries
