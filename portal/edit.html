@@ -1,5 +1,5 @@
 <div class="wrapper user">
-  <ul class="ul-reset user-menu">
+  <ul class="user-menu">
     <li><a class="icon icon-connexion" href="?action=logout">{{t_logout}}</a></li>
   </ul>
 
@@ -16,12 +16,12 @@
     <div class="form-section">
       <div class="form-group">
         <label for="uid" class="control-label">{{t_username}}</label>
-        <input id="uid" type="text" name="uid" class="form-control form-text" value="{{uid}}" disabled required>
+        <input type="text" id="uid" name="uid" class="form-text" value="{{uid}}" disabled required>
       </div>
       <div class="form-group">
         <label for="givenName" class="control-label">{{t_fullname}}</label>
-        <input type="text" id="givenName" name="givenName" class="form-control form-text" value="{{givenName}}" placeholder="{{t_firstname}}" required>
-        <input type="text" name="sn" class="form-control form-text" value="{{sn}}" placeholder="{{t_lastname}}" required>
+        <input type="text" id="givenName" name="givenName" class="form-text" value="{{givenName}}" placeholder="{{t_firstname}}" required>
+        <input type="text" name="sn" class="form-text" value="{{sn}}" placeholder="{{t_lastname}}" required>
       </div>
     </div>
 
@@ -29,11 +29,11 @@
       <div class="form-group" id="form-add-mail-alias">
         <label for="mail" class="control-label">{{t_mail_addresses}}</label>
         <a class="help-link" href="#">?</a>
-        <input type="email" name="mail" class="form-control form-text" value="{{mail}}" placeholder="{{t_new_mail}}" required>
+        <input type="email" name="mail" class="form-text" value="{{mail}}" placeholder="{{t_new_mail}}" required>
         {{#mailalias}}
-        <input type="email" name="mailalias[]" class="form-control form-text" value="{{.}}">
+        <input type="email" name="mailalias[]" class="form-text" value="{{.}}">
         {{/mailalias}}
-        <input id="mail" type="email" name="mailalias[]" class="form-control mailalias-input form-text" placeholder="{{t_new_mail}}">
+        <input id="mail" type="email" name="mailalias[]" class="mailalias-input form-text" placeholder="{{t_new_mail}}">
         <a class="btn link-btn" id="add-mailalias">{{t_add_mail}}</a>
       </div>
 
@@ -41,9 +41,9 @@
         <label for="mailforward" class="control-label">{{t_mail_forward}}</label>
         <a class="help-link" href="#">?</a>
         {{#maildrop}}
-        <input type="email" name="maildrop[]" class="form-control form-text" value="{{.}}">
+        <input type="email" name="maildrop[]" class="form-text" value="{{.}}">
         {{/maildrop}}
-        <input id="mailforward" type="email" name="maildrop[]" class="form-control maildrop-input form-text" placeholder="{{t_new_forward}}">
+        <input id="mailforward" type="email" name="maildrop[]" class="maildrop-input form-text" placeholder="{{t_new_forward}}">
         <a class="btn link-btn" id="add-maildrop">{{t_add_forward}}</a>
       </div>
     </div>

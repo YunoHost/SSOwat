@@ -126,26 +126,6 @@ img {
 .wrapper:after {clear: both;}
 
 
-.col {
-  letter-spacing: -5px; /*fix bug ff PC*/
-}
-
-.col > * {
-  display: inline-block;
-  vertical-align: top;
-  letter-spacing: normal;
-}
-
-.colMarge > * {
-  margin-left: 1%;
-}
-
-.colNomarge > * {
-  margin-left: 0;
-}
-
-
-
 
 /* Logo */
 .logo {
@@ -236,19 +216,6 @@ textarea {
 }
 
 
-.sourcePro {
-  font-family: 'source_sans_proregular';
-}
-
-.sourceProBold {
-  font-family: 'source_sans_probold';
-}
-
-.sourceProBlack {
-  font-family: 'SourceSansPro-Black';
-}
-
-
 /* Icons */
 
 [class^="icon-"]:before, [class*=" icon-"]:before {
@@ -281,16 +248,17 @@ textarea {
 
 .apps { margin: 4% 5%; }
 
-.first-letter:before {
-  content: attr(data-first-letter);
-}
-
 .listing-apps {
   margin: 0;
   padding: 0;
+  letter-spacing: -5px; /*fix bug ff PC*/
+  font-family: 'source_sans_probold';
 }
 
 .listing-apps li {
+  display: inline-block;
+  vertical-align: top;
+  letter-spacing: normal;
   list-style: none;
   margin: 0 0 1em 1em;
   box-shadow: 2px 2px 3px rgba(0, 0, 0, 0.4), 
@@ -364,9 +332,16 @@ textarea {
 .listing-apps span {
   display: block;
   margin: -1.2em 0 0 0.2em;
-}    
+}
   .listing-apps .first-letter { margin: 0; }
-  .listing-apps span + span { font-size: 0.3em; }
+  .listing-apps .first-letter:before {
+    content: attr(data-first-letter);
+    display: inline-block;
+  }
+  .listing-apps .name {
+    font-family: 'source_sans_proregular';
+    font-size: 0.3em;
+  }
 
 @media screen and (max-width: 450px) {
   .apps {margin: 10% 5%;}
@@ -493,10 +468,15 @@ textarea {
   margin-top: -0.2em;
 }
 
-
+/* User menu */
 .user-menu {
   float: right;
+  margin: 0;
+  padding: 0;
 }
+  .user-menu li {
+    list-style: none;
+  }
   .user-menu a {
     color: #999;
     display: block;

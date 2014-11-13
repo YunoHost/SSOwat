@@ -129,14 +129,6 @@ body {/*overflow-y: scroll;*/}
 
 #ynhoverlay li { list-style-type: none; }
 
-#ynhoverlay .col { letter-spacing: -5px; }
-
-#ynhoverlay .col > * {
-  display: inline-block;
-  letter-spacing: normal;
-  vertical-align: top;
-} 
-
 #ynhoverlay img {
   max-width: 100%;
   height: auto;
@@ -144,13 +136,6 @@ body {/*overflow-y: scroll;*/}
 
 #ynhoverlay a { text-decoration: none; }
 
-#ynhoverlay .sourcePro {
-  font-family: 'source_sans_proregular';
-}
-
-#ynhoverlay .sourceProBold {
-  font-family: 'source_sans_probold';
-}
 
 #ynhoverlay .wrapper {
   width: 90%;
@@ -267,16 +252,20 @@ body {/*overflow-y: scroll;*/}
 
 #ynhoverlay .apps { margin: 4% 5%; }
 
-#ynhoverlay .listing-apps { letter-spacing: -5px; }
-
-#ynhoverlay .listing-apps .first-letter:before {
-  content: attr(data-first-letter);
+#ynhoverlay .listing-apps {
+  margin: 0;
+  padding: 0;
+  letter-spacing: -5px;
+  font-family: 'source_sans_probold';
 }
 
 #ynhoverlay .listing-apps li {
   margin: 0 0 1em 1em;
   box-shadow: 2px 2px 3px rgba(0, 0, 0, 0.4), 
               -2px -2px 3px 0 rgba(0, 0, 0, 0.7) inset;
+  display: inline-block;
+  letter-spacing: normal;
+  vertical-align: top;
 }
 
 #ynhoverlay .listing-apps a {
@@ -351,13 +340,20 @@ body {/*overflow-y: scroll;*/}
   display: block;
   margin: -1.2em 0 0 0.2em;
 }    
+#ynhoverlay .listing-apps .first-letter:before {
+  content: attr(data-first-letter);
+  display: inline-block;
+}
   #ynhoverlay .listing-apps .first-letter { margin: 0; }
-  #ynhoverlay .listing-apps span + span { font-size: 0.3em; }
+  #ynhoverlay .listing-apps .name {
+    font-family: 'source_sans_proregular';
+    font-size: 0.3em;
+  }
 
 @media screen and (max-width: 470px) {
   #ynhoverlay .apps {margin: 10% 5% 20% 5%;}
   #ynhoverlay .listing-apps a {font-size: 3em;}
-  #ynhoverlay .listing-apps span + span { font-size: 0.32em; }
+  #ynhoverlay .listing-apps .name { font-size: 0.32em; }
   #ynhoverlay .listing-apps a:hover,
   #ynhoverlay .listing-apps a:focus {left: -5px;top: -5px;}
   #ynhoverlay .listing-apps a:hover:before,
@@ -533,7 +529,7 @@ body {/*overflow-y: scroll;*/}
    5 = Color
    ========================================================================== */
 
-#ynhoverlay .listing-apps  {
+#ynhoverlay .listing-apps {
             transition: all 0.2s ease 0s;
        -moz-transition: all 0.2s ease 0s;
     -webkit-transition: all 0.2s ease 0s;
@@ -726,7 +722,7 @@ body {/*overflow-y: scroll;*/}
    ========================================================================== */
 
 @media screen and (max-width: 500px) {
-  #ynhoverlay .listing-apps span + span { font-size: 0.33em; }
+  #ynhoverlay .listing-apps .name { font-size: 0.33em; }
 
   #ynhoverlay .user-menu { float: none; }
   #ynhoverlay .user-menu a { padding: 0 1em; }

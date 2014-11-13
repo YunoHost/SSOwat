@@ -181,9 +181,9 @@ domReady(function(){
     // Add application links
     var links = [];
     Array.prototype.forEach.call(response.app, function(app, n){
-      links.push('<li><a class="'+colors[n%colors.length]+' disableAjax" href="//'+app.url+'"><span class="first-letter" data-first-letter="'+ app.name.substr(0,2) +'"></span><span class="sourcePro">'+app.name+'</span></a></li>');
+      links.push('<li><a class="'+colors[n%colors.length]+' disableAjax" href="//'+app.url+'"><span class="first-letter" data-first-letter="'+ app.name.substr(0,2) +'"></span><span class="name">'+app.name+'</span></a></li>');
     });
-    overlay.innerHTML += '<div id="yuno-apps" class="wrapper apps"><ul class="ul-reset listing-apps col colNomarge sourceProBold">'+ links.join("\n") +'</ul></div>';
+    overlay.innerHTML += '<div id="yuno-apps" class="wrapper apps"><ul class="listing-apps">'+ links.join("\n") +'</ul></div>';
 
     // Add footer links
     overlay.innerHTML += '<div id="yuno-footer" class="wrapper footer"><nav>' + "\n" +
