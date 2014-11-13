@@ -687,6 +687,11 @@ if ngx.var.host == conf["portal_domain"]
 then
     if ngx.var.request_method == "GET" then
 
+        -- Force portal scheme
+        if ngx.var.scheme ~= conf["portal_scheme"] then
+            return redirect(portal_url)
+        end
+
         -- http://mydomain.org/ssowat
         if ngx.var.uri.."/" == conf["portal_path"] then
             return redirect(portal_url)
