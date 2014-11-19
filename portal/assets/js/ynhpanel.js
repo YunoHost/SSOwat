@@ -124,6 +124,9 @@ var dragg = function(id) {
 
   // Start dragging
   window.addEvent(elem, 'mousedown', function(e){
+    // Prevent firefox native D'n'D behavior
+    window.eventPreventDefault(e);
+
     selected = elem;
     x_elem = x_pos - selected.offsetLeft;
     y_elem = y_pos - selected.offsetTop;
