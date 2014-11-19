@@ -105,6 +105,63 @@ window.eventPreventDefault = function(event) {
 };
 
 
+/* Draggable
+
+  Sources :
+  http://jsfiddle.net/5t3Ju/
+  http://stackoverflow.com/questions/9334084/moveable-draggable-div
+  http://jsfiddle.net/tovic/Xcb8d/light/
+-------------------------- */
+
+var dragg = function(id) {
+
+  // Variables
+  this.elem = document.getElementById(id),
+  this.selected = null,  // Selected element
+  this.dragged = false,  // Dragging status
+  this.x_pos = 0, this.y_pos = 0, // Stores x & y coordinates of the mouse pointer
+  this.x_elem = 0, this.y_elem = 0; // Stores top, left values (edge) of the element
+
+  // Start dragging
+  window.addEvent(elem, 'mousedown', function(e){
+    selected = elem;
+    x_elem = x_pos - selected.offsetLeft;
+    y_elem = y_pos - selected.offsetTop;
+  });
+
+  // Will be called when user dragging an element
+  window.addEvent(window, 'mousemove', function(e){
+    // Get position
+    x_pos = document.all ? window.event.clientX : e.pageX;
+    y_pos = document.all ? window.event.clientY : e.pageY;
+
+    if (selected !== null) {
+      dragged = true;
+      selected.style.left = (x_pos - x_elem) + 'px';
+      selected.style.top = (y_pos - y_elem) + 'px';
+    }
+  });
+
+  // Destroy the object when we are done
+  window.addEvent(window, 'mouseup', function(e){
+      selected = null;
+  });
+
+  // Handle click event
+  window.addEvent(elem, 'click', function(e){
+      // Prevent default event
+      window.eventPreventDefault(e);
+
+      // Do not prapagate to other click event if dragged out
+      if (dragged) {
+        e.stopImmediatePropagation();
+      }
+      // Reset dragging status
+      dragged = false;
+  });
+}
+
+
 /* Smallest DOMReady
   http://dustindiaz.com/smallest-domready-ever
 -------------------------- */
@@ -146,6 +203,10 @@ domReady(function(){
   portal.setAttribute('href', '/yunohost/sso/');
   portal.setAttribute('class', 'disableAjax');
   document.body.insertBefore(portal, null);
+
+  // Portal link is draggable, for user convenience
+  dragg('ynhportal');
+
 
   // Create overlay element
   var overlay = document.createElement("div");
