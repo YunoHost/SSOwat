@@ -603,6 +603,7 @@ function do_edit ()
                         cache:delete(user.."-mail|"..i)
                         i = i + 1
                      end
+                     local i = 2
                      while cache:get(user.."-maildrop|"..i) do
                         cache:delete(user.."-maildrop|"..i)
                         i = i + 1
