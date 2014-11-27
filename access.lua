@@ -299,15 +299,24 @@ end
 
 function get_mails(user)
     local mails = { mail = "", mailalias = {}, maildrop = {} }
+    -- default mail
+    mails["mail"] = cache:get(user.."-mail")
+
+    -- mail aliases
     if cache:get(user.."-mail|2") then
-        for _, v in ipairs({2, 3, 4, 5, 6, 7, 8, 9, 10}) do
-            table.insert(mails["mailalias"], cache:get(user.."-mail|"..v))
+        local i = 2
+        while cache:get(user.."-mail|"..i) do
+            table.insert(mails["mailalias"], cache:get(user.."-mail|"..i))
+            i = i + 1
         end
     end
-    mails["mail"] = cache:get(user.."-mail")
+
+    -- mail forward
     if cache:get(user.."-maildrop|2") then
-        for _, v in ipairs({2, 3, 4, 5, 6, 7, 8, 9, 10}) do
-            table.insert(mails["maildrop"], cache:get(user.."-maildrop|"..v))
+        local i = 2
+        while cache:get(user.."-maildrop|"..i) do
+            table.insert(mails["maildrop"], cache:get(user.."-maildrop|"..i))
+            i = i + 1
         end
     end
     return mails
