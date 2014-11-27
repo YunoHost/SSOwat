@@ -598,9 +598,14 @@ function do_edit ()
                                           maildrop = drops })
                  then
                      cache:delete(user.."-"..conf["ldap_identifier"])
-                     for _, v in ipairs({2, 3, 4, 5, 6, 7, 8, 9, 10}) do
-                         cache:delete(user.."-maildrop|"..v)
-                         cache:delete(user.."-mail|"..v)
+                     local i = 2
+                     while cache:get(user.."-mail|"..i) do
+                        cache:delete(user.."-mail|"..i)
+                        i = i + 1
+                     end
+                     while cache:get(user.."-maildrop|"..i) do
+                        cache:delete(user.."-maildrop|"..i)
+                        i = i + 1
                      end
                      set_headers(user) -- Ugly trick to reload cache
                      flash("win", t("information_updated"))
