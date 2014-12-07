@@ -766,9 +766,9 @@ end
 
 if conf["redirected_urls"] then
     for url, redirect_url in pairs(conf["redirected_urls"]) do
-        if url == ngx.var.host..ngx.var.uri
-        or url == ngx.var.scheme.."://"..ngx.var.host..ngx.var.uri
-        or url == ngx.var.uri then
+        if url == ngx.var.host..ngx.var.uri..uri_args_string()
+        or url == ngx.var.scheme.."://"..ngx.var.host..ngx.var.uri..uri_args_string()
+        or url == ngx.var.uri..uri_args_string() then
             detect_redirection(redirect_url)
         end
     end
@@ -776,9 +776,9 @@ end
 
 if conf["redirected_regex"] then
     for regex, redirect_url in pairs(conf["redirected_regex"]) do
-        if string.match(ngx.var.host..ngx.var.uri, regex)
-        or string.match(ngx.var.scheme.."://"..ngx.var.host..ngx.var.uri, regex)
-        or string.match(ngx.var.uri, regex) then
+        if string.match(ngx.var.host..ngx.var.uri..uri_args_string(), regex)
+        or string.match(ngx.var.scheme.."://"..ngx.var.host..ngx.var.uri..uri_args_string(), regex)
+        or string.match(ngx.var.uri..uri_args_string(), regex) then
             detect_redirection(redirect_url)
         end
     end
@@ -814,8 +814,8 @@ end
 
 if conf["skipped_urls"] then
     for _, url in ipairs(conf["skipped_urls"]) do
-        if (string.starts(ngx.var.host..ngx.var.uri, url)
-        or  string.starts(ngx.var.uri, url))
+        if (string.starts(ngx.var.host..ngx.var.uri..uri_args_string(), url)
+        or  string.starts(ngx.var.uri..uri_args_string(), url))
         and not is_protected() then
             return pass()
         end
@@ -824,8 +824,8 @@ end
 
 if conf["skipped_regex"] then
     for _, regex in ipairs(conf["skipped_regex"]) do
-        if (string.match(ngx.var.host..ngx.var.uri, regex)
-        or  string.match(ngx.var.uri, regex))
+        if (string.match(ngx.var.host..ngx.var.uri..uri_args_string(), regex)
+        or  string.match(ngx.var.uri..uri_args_string(), regex))
         and not is_protected() then
             return pass()
         end
@@ -839,8 +839,8 @@ end
 
 if conf["unprotected_urls"] then
     for _, url in ipairs(conf["unprotected_urls"]) do
-        if (string.starts(ngx.var.host..ngx.var.uri, url)
-        or  string.starts(ngx.var.uri, url))
+        if (string.starts(ngx.var.host..ngx.var.uri..uri_args_string(), url)
+        or  string.starts(ngx.var.uri..uri_args_string(), url))
         and not is_protected() then
             if is_logged_in() then
                 set_headers()
@@ -852,8 +852,8 @@ end
 
 if conf["unprotected_regex"] then
     for _, regex in ipairs(conf["unprotected_regex"]) do
-        if (string.match(ngx.var.host..ngx.var.uri, regex)
-        or  string.match(ngx.var.uri, regex))
+        if (string.match(ngx.var.host..ngx.var.uri..uri_args_string(), regex)
+        or  string.match(ngx.var.uri..uri_args_string(), regex))
         and not is_protected() then
             if is_logged_in() then
                 set_headers()
