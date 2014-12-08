@@ -299,15 +299,24 @@ end
 
 function get_mails(user)
     local mails = { mail = "", mailalias = {}, maildrop = {} }
+    -- default mail
+    mails["mail"] = cache:get(user.."-mail")
+
+    -- mail aliases
     if cache:get(user.."-mail|2") then
-        for _, v in ipairs({2, 3, 4, 5, 6, 7, 8, 9, 10}) do
-            table.insert(mails["mailalias"], cache:get(user.."-mail|"..v))
+        local i = 2
+        while cache:get(user.."-mail|"..i) do
+            table.insert(mails["mailalias"], cache:get(user.."-mail|"..i))
+            i = i + 1
         end
     end
-    mails["mail"] = cache:get(user.."-mail")
+
+    -- mail forward
     if cache:get(user.."-maildrop|2") then
-        for _, v in ipairs({2, 3, 4, 5, 6, 7, 8, 9, 10}) do
-            table.insert(mails["maildrop"], cache:get(user.."-maildrop|"..v))
+        local i = 2
+        while cache:get(user.."-maildrop|"..i) do
+            table.insert(mails["maildrop"], cache:get(user.."-maildrop|"..i))
+            i = i + 1
         end
     end
     return mails
@@ -589,9 +598,15 @@ function do_edit ()
                                           maildrop = drops })
                  then
                      cache:delete(user.."-"..conf["ldap_identifier"])
-                     for _, v in ipairs({2, 3, 4, 5, 6, 7, 8, 9, 10}) do
-                         cache:delete(user.."-maildrop|"..v)
-                         cache:delete(user.."-mail|"..v)
+                     local i = 2
+                     while cache:get(user.."-mail|"..i) do
+                        cache:delete(user.."-mail|"..i)
+                        i = i + 1
+                     end
+                     local i = 2
+                     while cache:get(user.."-maildrop|"..i) do
+                        cache:delete(user.."-maildrop|"..i)
+                        i = i + 1
                      end
                      set_headers(user) -- Ugly trick to reload cache
                      flash("win", t("information_updated"))
