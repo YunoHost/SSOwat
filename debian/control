@@ -1,0 +1,14 @@
+Source: ssowat
+Section: net
+Priority: extra
+Maintainer: Adrien Beudin <beudbeud@yunohost.org>
+Build-Depends: debhelper (>=8.0.0)
+Standards-Version: 3.9.1
+
+Package: ssowat
+Architecture: all
+Depends: yunohost-config-nginx, lua-ldap, lua-json
+Homepage: http://www.yunohost.org
+Description: SSOWAT
+ Websso for yunohost 
+

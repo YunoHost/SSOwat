@@ -1,0 +1,5 @@
+#!/bin/bash
+
+yunohost app ssowatconf > /dev/null 2>&1
+service nginx restart > /dev/null 2>&1
+exit 0

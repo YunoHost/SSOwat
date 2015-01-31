@@ -1,0 +1,5 @@
+src/init.lua /usr/share/ssowat
+src/access.lua /usr/share/ssowat
+src/hige.lua /usr/share/ssowat
+src/portal /usr/share/ssowat
+src/conf.json /etc/ssowat

@@ -1,0 +1,145 @@
+ssowat (2.0-rc~megusta5) test; urgency=low
+
+  * Test build: [enh] Add avahi daemon
+
+ -- Adrien Beudin <beudbeud@yunohost.org>  Tue, 16 Sep 2014 09:34:00 +0200
+
+ssowat (2.0-rc~megusta4) test; urgency=low
+
+  * Test build: [enh] Add avahi daemon
+
+ -- Adrien Beudin <beudbeud@yunohost.org>  Tue, 16 Sep 2014 09:21:55 +0200
+
+ssowat (2.0-rc~megusta3) megusta; urgency=low
+
+  * Production build: [enh] Limit domains per user
+
+ -- Adrien Beudin <beudbeud@yunohost.org>  Tue, 19 Aug 2014 16:04:40 +0200
+
+ssowat (2.0-rc~megusta2) megusta; urgency=low
+
+  * Production build: Bump version
+
+ -- Adrien Beudin <beudbeud@yunohost.org>  Mon, 09 Jun 2014 01:49:22 +0200
+
+ssowat (2.0-rc~megusta1) test; urgency=low
+
+  * Bump version
+
+ -- Adrien Beudin <beudbeud@yunohost.org>  Mon, 02 Jun 2014 22:16:40 +0200
+
+ssowat (1.0~megusta44) test; urgency=low
+
+  * Test build: Update from git
+
+ -- Adrien Beudin <beudbeud@yunohost.org>  Mon, 02 Jun 2014 22:15:40 +0200
+
+ssowat (1.0~megusta43) test; urgency=low
+
+  * Test build: Update from git
+
+ -- Adrien Beudin <beudbeud@yunohost.org>  Fri, 30 May 2014 12:18:32 +0200
+
+ssowat (1.0~megusta42) test; urgency=low
+
+  * Test build: Update from git
+
+ -- Adrien Beudin <beudbeud@yunohost.org>  Thu, 29 May 2014 13:00:35 +0200
+
+ssowat (1.0~megusta41) megusta; urgency=low
+
+  * Production build: [enh] Favicons
+
+ -- Adrien Beudin <beudbeud@yunohost.org>  Thu, 15 May 2014 13:16:03 +0200
+
+ssowat (1.0~megusta40) megusta; urgency=low
+
+  * Production build: [enh] Brand new style
+
+ -- Adrien Beudin <beudbeud@yunohost.org>  Thu, 15 May 2014 12:58:55 +0200
+
+ssowat (1.0~megusta39) test; urgency=low
+
+  * Test build: [enh] Brand new style
+
+ -- Adrien Beudin <beudbeud@yunohost.org>  Thu, 15 May 2014 12:54:30 +0200
+
+ssowat (1.0~megusta38) megusta; urgency=low
+
+  * Production build: [fix] Properly reload cache for mailaliases and
+    drops
+
+ -- Adrien Beudin <beudbeud@yunohost.org>  Sat, 10 May 2014 18:11:11 +0200
+
+ssowat (1.0~megusta37) megusta; urgency=low
+
+  * Production build: [bump] beta5 ?
+
+ -- Adrien Beudin <beudbeud@yunohost.org>  Sun, 27 Apr 2014 19:12:03 +0200
+
+ssowat (1.0~megusta36) megusta; urgency=low
+
+  * Test build: Update from git
+  * Production build: [bump] beta5 ?
+
+ -- Adrien Beudin <beudbeud@yunohost.org>  Sun, 27 Apr 2014 18:59:39 +0200
+
+ssowat (1.0~megusta35) test; urgency=low
+
+  * Test build: Update from git
+
+ -- Adrien Beudin <beudbeud@yunohost.org>  Mon, 21 Apr 2014 13:04:31 +0200
+
+ssowat (1.0~megusta34) test; urgency=low
+
+  * Test build: update from git
+
+ -- Adrien Beudin <beudbeud@yunohost.org>  Fri, 18 Apr 2014 13:09:52 +0200
+
+ssowat (1.0~megusta33) test; urgency=low
+
+  * Test build: Update from git
+
+ -- Adrien Beudin <beudbeud@yunohost.org>  Fri, 18 Apr 2014 12:56:11 +0200
+
+ssowat (1.0~megusta32) test; urgency=low
+
+  * Test build: Update from git
+
+ -- Adrien Beudin <beudbeud@yunohost.org>  Thu, 17 Apr 2014 12:25:16 +0200
+
+ssowat (1.0~megusta31) test; urgency=low
+
+  * Test build: [enh] Automaticaly renew session
+
+ -- Adrien Beudin <beudbeud@yunohost.org>  Wed, 16 Apr 2014 21:23:18 +0200
+
+ssowat (1.0~megusta30) test; urgency=low
+
+  * Test build: Update from git
+
+ -- Adrien Beudin <beudbeud@yunohost.org>  Tue, 15 Apr 2014 16:34:38 +0200
+
+ssowat (1.0~megusta29) test; urgency=low
+
+  * Test build: Update from git
+
+ -- Adrien Beudin <beudbeud@yunohost.org>  Fri, 11 Apr 2014 15:18:23 +0200
+
+ssowat (1.0~megusta28) test; urgency=low
+
+  * Test build: Update from git
+
+ -- Adrien Beudin <beudbeud@yunohost.org>  Fri, 11 Apr 2014 00:04:52 +0200
+
+ssowat (1.0~megusta27) test; urgency=low
+
+  * Test build: Update from git
+
+ -- Adrien Beudin <beudbeud@yunohost.org>  Fri, 11 Apr 2014 00:04:27 +0200
+
+ssowat (1.0~megusta26) megusta; urgency=low
+
+  * Production build: dump version
+
+ -- Adrien Beudin <beudbeud@yunohost.org>  Mon, 17 Mar 2014 17:36:50 +0100
