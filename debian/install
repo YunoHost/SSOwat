@@ -1,6 +1,7 @@
 init.lua /usr/share/ssowat
 access.lua /usr/share/ssowat
 helpers.lua /usr/share/ssowat
+config.lua /usr/share/ssowat
 hige.lua /usr/share/ssowat
 portal /usr/share/ssowat
 conf.json /etc/ssowat
