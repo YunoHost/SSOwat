@@ -1,0 +1,785 @@
+--
+-- helpers.lua
+--
+-- This is a file called at every request by the `access.lua` file. It contains
+-- a set of useful functions related to HTTP and LDAP.
+--
+
+
+-- Read a FS stored file
+function read_file(file)
+    local f = io.open(file, "rb")
+    if not f then return false end
+    local content = f:read("*all")
+    f:close()
+    return content
+end
+
+
+-- Lua has no sugar :D
+function is_in_table (t, v)
+    for key, value in ipairs(t) do
+        if value == v then return key end
+    end
+end
+
+
+-- Test whether a string starts with another
+function string.starts (String, Start)
+   return string.sub(String, 1, string.len(Start)) == Start
+end
+
+
+-- Test whether a string ends with another
+function string.ends (String, End)
+   return End=='' or string.sub(String, -string.len(End)) == End
+end
+
+
+-- Find a string by its translate key in the right language
+function t (key)
+   if lang and i18n[lang] then
+       return i18n[lang][key] or ""
+   else
+       return i18n[conf["default_language"]][key] or ""
+   end
+end 
+
+
+-- Set a cookie
+function cook (cookie_str)
+    table.insert(cookies, cookie_str)
+end
+
+
+-- Store a message in the flash shared table in order to display it at the
+-- next response
+function flash (wat, message)
+    if wat == "fail"
+    or wat == "win"
+    or wat == "info"
+    then
+        flashs[wat] = message
+    end
+end
+
+
+-- Convert a table of arguments to an URI string
+function uri_args_string (args)
+    if not args then
+        args = ngx.req.get_uri_args()
+    end
+    String = "?"
+    for k,v in pairs(args) do
+        String = String..tostring(k).."="..tostring(v).."&"
+    end
+    return string.sub(String, 1, string.len(String) - 1)
+end
+
+
+-- Compute and set the authentication cookie
+--
+-- Sets 3 cookies containing:
+-- * The username
+-- * The expiration time
+-- * A hash of those information along with the client IP address and a unique
+--   session key
+--
+-- It enables the SSO to quickly retrieve the username and the session
+-- expiration time, and to prove their authenticity to avoid session hijacking.
+--
+function set_auth_cookie (user, domain)
+    local maxAge = conf["session_max_timeout"]
+    local expire = ngx.req.start_time() + maxAge
+    local session_key = cache:get("session_"..user)
+    if not session_key then
+        session_key = tostring(math.random(1111111, 9999999))
+        cache:add("session_"..user, session_key, conf["session_max_timeout"])
+    end
+    local hash = ngx.md5(srvkey..
+               "|" ..ngx.var.remote_addr..
+               "|"..user..
+               "|"..expire..
+               "|"..session_key)
+    local cookie_str = "; Domain=."..domain..
+                       "; Path=/"..
+                       "; Max-Age="..maxAge
+    cook("SSOwAuthUser="..user..cookie_str)
+    cook("SSOwAuthHash="..hash..cookie_str)
+    cook("SSOwAuthExpire="..expire..cookie_str)
+end
+
+
+-- Expires the 3 session cookies
+function delete_cookie ()
+    expired_time = "Thu, Jan 01 1970 00:00:00 UTC;"
+    for _, domain in ipairs(conf["domains"]) do
+        local cookie_str = "; Domain=."..domain..
+                           "; Path=/"..
+                           "; Max-Age="..expired_time
+        cook("SSOwAuthUser=;"    ..cookie_str)
+        cook("SSOwAuthHash=;"    ..cookie_str)
+        cook("SSOwAuthExpire=;"  ..cookie_str)
+    end
+end
+
+
+-- Expires the redirection cookie
+function delete_redirect_cookie ()
+    expired_time = "Thu, Jan 01 1970 00:00:00 UTC;"
+    local cookie_str = "; Path="..conf["portal_path"]..
+                       "; Max-Age="..expired_time
+    cook("SSOwAuthRedirect=;" ..cookie_str)
+end
+
+
+-- Validate authentification
+--
+-- Check if the session cookies are set, and rehash server + client information
+-- to match the session hash.
+--
+function is_logged_in ()
+    if  ngx.var.cookie_SSOwAuthExpire and ngx.var.cookie_SSOwAuthExpire ~= ""
+    and ngx.var.cookie_SSOwAuthHash   and ngx.var.cookie_SSOwAuthHash   ~= ""
+    and ngx.var.cookie_SSOwAuthUser   and ngx.var.cookie_SSOwAuthUser   ~= ""
+    then
+        -- Check expire time
+        if (ngx.req.start_time() <= tonumber(ngx.var.cookie_SSOwAuthExpire)) then
+            -- Check hash
+            local session_key = cache:get("session_"..ngx.var.cookie_SSOwAuthUser)
+            if session_key and session_key ~= "" then
+                -- Check cache
+                if cache:get(ngx.var.cookie_SSOwAuthUser.."-password") then
+                    local hash = ngx.md5(srvkey..
+                            "|"..ngx.var.remote_addr..
+                            "|"..ngx.var.cookie_SSOwAuthUser..
+                            "|"..ngx.var.cookie_SSOwAuthExpire..
+                            "|"..session_key)
+                    return hash == ngx.var.cookie_SSOwAuthHash
+                end
+            end
+        end
+    end
+
+    return false
+end
+
+
+-- Check whether a user is allowed to access a URL using the `users` directive
+-- of the configuration file
+function has_access (user, url)
+    user = user or ngx.var.cookie_SSOwAuthUser
+    url = url or ngx.var.host..ngx.var.uri
+
+    -- If there are no `users` directive, or if the user has no ACL set, he can
+    -- access the URL by default
+    if not conf["users"] or not conf["users"][user] then
+        return true
+    end
+
+    -- Loop through user's ACLs and return if the URL is authorized.
+    for u, _ in pairs(conf["users"][user]) do
+
+        -- Replace the original domain by a local one if you are connected from
+        -- a non-global domain name.
+        if ngx.var.host == conf["local_portal_domain"] then
+            u = string.gsub(u, conf["original_portal_domain"], conf["local_portal_domain"])
+        end
+
+        if string.starts(url, string.sub(u, 1, -2)) then return true end
+    end
+    return false
+end
+
+
+-- Authenticate a user against the LDAP database using a username or an email
+-- address.
+-- Reminder: conf["ldap_identifier"] is "uid" by default
+function authenticate (user, password)
+
+    -- Try to find the username from an email address by openning an anonymous
+    -- LDAP connection and check if the email address exists
+    if conf["allow_mail_authentication"] and string.find(user, "@") then
+        ldap = lualdap.open_simple(conf["ldap_host"])
+        for dn, attribs in ldap:search {
+            base = conf["ldap_group"],
+            scope = "onelevel",
+            sizelimit = 1,
+            filter = "(mail="..user..")",
+            attrs = {conf["ldap_identifier"]}
+        } do
+            if attribs[conf["ldap_identifier"]] then
+                ngx.log(ngx.NOTICE, "Use email: "..user)
+                user = attribs[conf["ldap_identifier"]]
+            else
+                ngx.log(ngx.ERR, "Unknown email: "..user)
+                return false
+            end
+        end
+        ldap:close()
+    end
+
+    -- Now that we have a username, we can try connecting to the LDAP base.
+    connected = lualdap.open_simple (
+        conf["ldap_host"],
+        conf["ldap_identifier"].."=".. user ..","..conf["ldap_group"],
+        password
+    )
+
+    cache:flush_expired()
+
+    -- If we are connected, we can retrieve the password and put it in the
+    -- cache shared table in order to eventually reuse it later when updating
+    -- profile information or just passing credentials to an application.
+    if connected then
+        cache:add(user.."-password", password, conf["session_timeout"])
+        ngx.log(ngx.NOTICE, "Connected as: "..user)
+        return user
+
+    -- Else, the username/email or the password is wrong
+    else
+        ngx.log(ngx.ERR, "Connection failed for: "..user)
+        return false
+    end
+end
+
+
+-- Set the authentication headers in order to pass credentials to the
+-- application underneath.
+function set_headers (user)
+
+    -- We definetly don't want to pass credential on a non-encrypted
+    -- connection.
+    if ngx.var.scheme ~= "https" then
+        return redirect("https://"..ngx.var.host..ngx.var.uri..uri_args_string())
+    end
+
+    user = user or ngx.var.cookie_SSOwAuthUser
+
+    -- If the password is not in cache of if the cache has expired, ask for
+    -- logging.
+    if not cache:get(user.."-password") then
+        flash("info", t("please_login"))
+        local back_url = ngx.var.scheme .. "://" .. ngx.var.host .. ngx.var.uri .. uri_args_string()
+        return redirect(portal_url.."?r="..ngx.encode_base64(back_url))
+    end
+
+    -- If the user information is not in cache, open an LDAP connection and
+    -- fetch it.
+    if not cache:get(user.."-"..conf["ldap_identifier"]) then
+        ldap = lualdap.open_simple(conf["ldap_host"])
+        ngx.log(ngx.NOTICE, "Reloading LDAP values for: "..user)
+        for dn, attribs in ldap:search {
+            base = conf["ldap_identifier"].."=".. user ..","..conf["ldap_group"],
+            scope = "base",
+            sizelimit = 1,
+            attrs = conf["ldap_attributes"]
+        } do
+            for k,v in pairs(attribs) do
+                if type(v) == "table" then
+                    for k2,v2 in ipairs(v) do
+                        if k2 == 1 then cache:set(user.."-"..k, v2, conf["session_timeout"]) end
+                        cache:set(user.."-"..k.."|"..k2, v2, conf["session_max_timeout"])
+                    end
+                else
+                    cache:set(user.."-"..k, v, conf["session_timeout"])
+                end
+            end
+        end
+    else
+        -- Else, just revalidate session for another day by default
+        password = cache:get(user.."-password")
+        cache:set(user.."-password", password, conf["session_timeout"])
+    end
+
+    -- Set `authorization` header to enable HTTP authentification
+    ngx.req.set_header("Authorization", "Basic "..ngx.encode_base64(
+      user..":"..cache:get(user.."-password")
+    ))
+
+    -- Set optionnal additional headers (typically to pass email address)
+    for k, v in pairs(conf["additional_headers"]) do
+        ngx.req.set_header(k, cache:get(user.."-"..v))
+    end
+
+end
+
+
+-- Summarize email, aliases and forwards in a table for a specific user
+function get_mails(user)
+    local mails = { mail = "", mailalias = {}, maildrop = {} }
+
+    -- default mail
+    mails["mail"] = cache:get(user.."-mail")
+
+    -- mail aliases
+    if cache:get(user.."-mail|2") then
+        local i = 2
+        while cache:get(user.."-mail|"..i) do
+            table.insert(mails["mailalias"], cache:get(user.."-mail|"..i))
+            i = i + 1
+        end
+    end
+
+    -- mail forward
+    if cache:get(user.."-maildrop|2") then
+        local i = 2
+        while cache:get(user.."-maildrop|"..i) do
+            table.insert(mails["maildrop"], cache:get(user.."-maildrop|"..i))
+            i = i + 1
+        end
+    end
+    return mails
+end
+
+
+-- Yo dawg, this enables SSOwat to serve files in HTTP in an HTTP server
+-- Much reliable, very solid.
+--
+-- Takes an URI, and returns file content with the proper HTTP headers.
+-- It is used to render the SSOwat portal *only*.
+function serve(uri)
+    rel_path = string.gsub(uri, conf["portal_path"], "/")
+
+    -- Load login.html as index
+    if rel_path == "/" then
+        if is_logged_in() then
+            rel_path = "/info.html"
+        else
+            rel_path = "/login.html"
+        end
+    end
+
+    -- Access to directory root: forbidden
+    if string.ends(rel_path, "/") then
+        return ngx.exit(ngx.HTTP_FORBIDDEN)
+    end
+
+    -- Try to get file content
+    local content = read_file(script_path.."portal"..rel_path)
+    if not content then
+        return ngx.exit(ngx.HTTP_NOT_FOUND)
+    end
+
+    -- Extract file extension
+    _, file, ext = string.match(rel_path, "(.-)([^\\/]-%.?([^%.\\/]*))$")
+
+    -- Associate to MIME type
+    mime_types = {
+        html = "text/html",
+        ms   = "text/html",
+        js   = "text/javascript",
+        map  = "text/javascript",
+        css  = "text/css",
+        gif  = "image/gif",
+        jpg  = "image/jpeg",
+        png  = "image/png",
+        svg  = "image/svg+xml",
+        ico  = "image/vnd.microsoft.icon",
+        woff = "application/x-font-woff",
+        json = "application/json"
+    }
+
+    -- Set Content-Type
+    if mime_types[ext] then
+        ngx.header["Content-Type"] = mime_types[ext]
+    else
+        ngx.header["Content-Type"] = "text/plain"
+    end
+
+    -- Render as mustache
+    if ext == "html" then
+        local data = get_data_for(file)
+        local rendered = hige.render(read_file(script_path.."portal/header.ms"), data)
+        rendered = rendered..hige.render(content, data)
+        content = rendered..hige.render(read_file(script_path.."portal/footer.ms"), data)
+    elseif ext == "ms" then
+        local data = get_data_for(file)
+        content = hige.render(content, data)
+    elseif ext == "json" then
+        local data = get_data_for(file)
+        content = json.encode(data)
+    end
+
+    -- Reset flash messages
+    flashs["fail"] = nil
+    flashs["win"] = nil
+    flashs["info"] = nil
+
+    -- Ain't nobody got time for cache
+    ngx.header["Cache-Control"] = "no-cache"
+
+    -- Print file content
+    ngx.say(content)
+
+    -- Return 200 :-)
+    return ngx.exit(ngx.HTTP_OK)
+end
+
+
+-- Simple controller that computes a data table to populate a specific view.
+-- The resulting data table typically contains the user information, the page
+-- title, the flash notifications' content and the translated strings.
+function get_data_for(view)
+    local user = ngx.var.cookie_SSOwAuthUser
+    local data = {}
+
+    -- Pass all the translated strings to the view (to use with t_<key>)
+    if lang and i18n[lang] then
+        translate_table = i18n[lang]
+    else
+        translate_table = i18n[conf["default_language"]]
+    end
+    for k, v in pairs(translate_table) do
+        data["t_"..k] = v
+    end
+
+    -- Pass flash notification content
+    data['flash_fail'] = {flashs["fail"]}
+    data['flash_win']  = {flashs["win"] }
+    data['flash_info'] = {flashs["info"]}
+
+    -- For the login page we only need the page title
+    if view == "login.html" then
+        data = {
+            title = t("login"),
+            connected = false
+        }
+
+    -- For those views, we may need user information
+    elseif view == "info.html"
+        or view == "edit.html"
+        or view == "password.html"
+        or view == "ynhpanel.json" then
+        set_headers(user)
+
+        local mails = get_mails(user)
+        data = {
+            connected  = true,
+            portal_url = portal_url,
+            uid        = user,
+            cn         = cache:get(user.."-cn"),
+            sn         = cache:get(user.."-sn"),
+            givenName  = cache:get(user.."-givenName"),
+            mail       = mails["mail"],
+            mailalias  = mails["mailalias"],
+            maildrop   = mails["maildrop"],
+            app = {}
+        }
+
+        -- Add user's accessible URLs using the ACLs.
+        -- It is typically used to build the app list.
+        for url, name in pairs(conf["users"][user]) do
+
+            if ngx.var.host == conf["local_portal_domain"] then
+                url = string.gsub(url, conf["original_portal_domain"], conf["local_portal_domain"])
+            end
+            table.insert(data["app"], { url = url, name = name })
+        end
+    end
+
+    return data
+end
+
+
+-- Compute the user modification POST request
+-- It has to update cached information and edit the LDAP user entry
+-- according to the changes detected.
+function post_edit ()
+
+    -- We need these calls since we are in a POST request
+    ngx.req.read_body()
+    local args = ngx.req.get_post_args()
+
+    -- Ensure that user is logged in and has passed information
+    -- before continuing.
+    if is_logged_in() and args
+    then
+
+        -- Set HTTP status to 201
+        ngx.status = ngx.HTTP_CREATED
+        local user = ngx.var.cookie_SSOwAuthUser
+
+        -- In case of a password modification
+        -- TODO: split this into a new function
+        if string.ends(ngx.var.uri, "password.html") then
+
+            -- Check current password against the cached one
+            if args.currentpassword
+            and args.currentpassword == cache:get(user.."-password")
+            then
+                -- and the new password against the confirmation field's content
+                if args.newpassword == args.confirm then
+                    local dn = conf["ldap_identifier"].."="..user..","..conf["ldap_group"]
+
+                    -- Open the LDAP connection
+                    local ldap = lualdap.open_simple(conf["ldap_host"], dn, args.currentpassword)
+                    local password = "{SHA}"..ngx.encode_base64(ngx.sha1_bin(args.newpassword))
+
+                    -- Modify the LDAP information
+                    if ldap:modify(dn, {'=', userPassword = password }) then
+                        flash("win", t("password_changed"))
+
+                        -- Reset the password cache
+                        cache:set(user.."-password", args.newpassword, conf["session_timeout"])
+                        return redirect(portal_url.."info.html")
+                    else
+                        flash("fail", t("password_changed_error"))
+                    end
+                else
+                    flash("fail", t("password_not_match"))
+                end
+             else
+                flash("fail", t("wrong_current_password"))
+             end
+             return redirect(portal_url.."password.html")
+
+         
+         -- In case of profile modification
+         -- TODO: split this into a new function
+         elseif string.ends(ngx.var.uri, "edit.html") then
+
+             -- Check that needed arguments exist
+             if args.givenName and args.sn and args.mail then
+
+                 -- Unstack mailaliases
+                 local mailalias = {}
+                 if args["mailalias[]"] then
+                     if type(args["mailalias[]"]) == "string" then
+                         args["mailalias[]"] = {args["mailalias[]"]}
+                     end
+                     mailalias = args["mailalias[]"]
+                 end
+
+                 -- Unstack mail forwards
+                 local maildrop = {}
+                 if args["maildrop[]"] then
+                     if type(args["maildrop[]"]) == "string" then
+                         args["maildrop[]"] = {args["maildrop[]"]}
+                     end
+                     maildrop = args["maildrop[]"]
+                 end
+
+                 -- Limit domains per user:
+                 -- This ensures that a user already has an email address or an
+                 -- aliases that ends with a specific domain to claim new aliases
+                 -- on this domain.
+                 --
+                 -- I.E. You need to have xxx@domain.org to claim a
+                 --      yyy@domain.org alias.
+                 --
+                 local domains = {}
+                 local ldap = lualdap.open_simple(conf["ldap_host"])
+                 for dn, attribs in ldap:search {
+                     base = conf["ldap_group"],
+                     scope = "onelevel",
+                     sizelimit = 1,
+                     filter = "(uid="..user..")",
+                     attrs = {"mail"}
+                 } do
+                     -- Filter configuration's domain list to keep only
+                     -- "allowed" domains
+                     for _, domain in ipairs(conf["domains"]) do
+                         for k, mail in ipairs(attribs["mail"]) do
+                             if string.ends(mail, "@"..domain) then
+                                 if not is_in_table(domains, domain) then
+                                     table.insert(domains, domain)
+                                 end
+                             end
+                         end
+                     end
+                 end
+                 ldap:close()
+
+                 -- TODO: updates to support the new TLDs?
+                 local mail_pattern = "[A-Za-z0-9%.%%%+%-]+@[A-Za-z0-9%.%%%+%-]+%.%w%w%w?%w?"
+
+                 local mails = {}
+
+                 -- Build an LDAP filter so that we can ensure that email
+                 -- addresses are used only once.
+                 local filter = "(|"
+                 table.insert(mailalias, 1, args.mail)
+
+                 -- Loop through all the aliases
+                 for k, mail in ipairs(mailalias) do
+                     if mail ~= "" then
+                         -- Check the mail pattern
+                         if not mail:match(mail_pattern) then
+                             flash("fail", t("invalid_mail")..": "..mail)
+                             return redirect(portal_url.."edit.html")
+
+                         -- Check that the domain is known and allowed
+                         else
+                             local domain_valid = false
+                             for _, domain in ipairs(domains) do
+                                 if string.ends(mail, "@"..domain) then
+                                     domain_valid = true
+                                     break
+                                 end
+                             end
+                             if domain_valid then
+                                 table.insert(mails, mail)
+                                 filter = filter.."(mail="..mail..")"
+                             else
+                                 flash("fail", t("invalid_domain").." "..mail)
+                                 return redirect(portal_url.."edit.html")
+                             end
+                         end
+                     end
+                 end
+
+                 -- filter should look like "(|(mail=my@mail.tld)(mail=my@mail2.tld))"
+                 filter = filter..")"
+
+                 
+                 -- For email forwards, we only need to check that they look
+                 -- like actual emails
+                 local drops = {}
+                 for k, mail in ipairs(maildrop) do
+                     if mail ~= "" then
+                         if not mail:match(mail_pattern) then
+                             flash("fail", t("invalid_mailforward")..": "..mail)
+                             return redirect(portal_url.."edit.html")
+                         end
+                         table.insert(drops, mail)
+                     end
+                 end
+                 table.insert(drops, 1, user)
+
+
+                 -- We now have a list of validated emails and forwards.
+                 -- We need to check if there is a user with a claimed email
+                 -- already before writing modifications to the LDAP.
+                 local dn = conf["ldap_identifier"].."="..user..","..conf["ldap_group"]
+                 local ldap = lualdap.open_simple(conf["ldap_host"], dn, cache:get(user.."-password"))
+                 local cn = args.givenName.." "..args.sn
+
+                 for dn, attribs in ldap:search {
+                     base = conf["ldap_group"],
+                     scope = "onelevel",
+                     filter = filter,
+                     attrs = {conf["ldap_identifier"], "mail"}
+                 } do
+                     -- Another user with one of these emails has been found.
+                     if attribs[conf["ldap_identifier"]] and attribs[conf["ldap_identifier"]] ~= user then
+                         if type(attribs["mail"]) == "string" then
+                             attribs["mail"] = {attribs["mail"]}
+                         end
+                         for _, mail in ipairs(attribs["mail"]) do
+                             if is_in_table(mails, mail) then
+                                 flash("fail", t("mail_already_used").." "..mail)
+                             end
+                         end
+                         return redirect(portal_url.."edit.html")
+                     end
+                 end
+
+                 -- No problem so far, we can write modifications to the LDAP
+                 if ldap:modify(dn, {'=', cn = cn,
+                                          givenName = args.givenName,
+                                          sn = args.sn,
+                                          mail = mails,
+                                          maildrop = drops })
+                 then
+
+                     -- Then delete the cached information for the specific
+                     -- user.
+                     cache:delete(user.."-"..conf["ldap_identifier"])
+                     local i = 2
+                     while cache:get(user.."-mail|"..i) do
+                        cache:delete(user.."-mail|"..i)
+                        i = i + 1
+                     end
+                     local i = 2
+                     while cache:get(user.."-maildrop|"..i) do
+                        cache:delete(user.."-maildrop|"..i)
+                        i = i + 1
+                     end
+
+                     -- Ugly trick to force cache reloading
+                     set_headers(user)
+                     flash("win", t("information_updated"))
+                     return redirect(portal_url.."info.html")
+
+                 else
+                     flash("fail", t("user_saving_fail"))
+                 end
+             else
+                 flash("fail", t("missing_required_fields"))
+             end
+             return redirect(portal_url.."edit.html")
+         end
+    end
+end
+
+
+-- Compute the user login POST request
+-- It authenticates the user against the LDAP base then redirects to the portal
+function do_login ()
+
+    -- We need these calls since we are in a POST request
+    ngx.req.read_body()
+    local args = ngx.req.get_post_args()
+    local uri_args = ngx.req.get_uri_args()
+
+    user = authenticate(args.user, args.password)
+    if user then
+        ngx.status = ngx.HTTP_CREATED
+        set_auth_cookie(user, ngx.var.host)
+    else
+        ngx.status = ngx.HTTP_UNAUTHORIZED
+        flash("fail", t("wrong_username_password"))
+    end
+
+    -- Forward the `r` URI argument if it exists to redirect
+    -- the user properly after a successful login.
+    if uri_args.r then
+        return redirect(portal_url.."?r="..uri_args.r)
+    else
+        return redirect(portal_url)
+    end
+end
+
+
+-- Compute the user logout POST request
+-- It deletes session cached information to invalidate client side cookie
+-- information.
+function do_logout()
+
+    -- We need this call since we are in a POST request
+    local args = ngx.req.get_uri_args()
+
+    if is_logged_in() then
+        cache:delete("session_"..ngx.var.cookie_SSOwAuthUser)
+        cache:delete(ngx.var.cookie_SSOwAuthUser.."-"..conf["ldap_identifier"]) -- Ugly trick to reload cache
+        flash("info", t("logged_out"))
+        return redirect(portal_url)
+    end
+end
+
+
+-- Set cookie and redirect (needed to properly set cookie)
+function redirect (url)
+    ngx.header["Set-Cookie"] = cookies
+    ngx.log(ngx.INFO, "Redirect to: "..url)
+    return ngx.redirect(url)
+end
+
+
+-- Set cookie and go on with the response (needed to properly set cookie)
+function pass ()
+    delete_redirect_cookie()
+    ngx.req.set_header("Set-Cookie", cookies)
+
+    -- When we are in the SSOwat portal, we need a default `content-type`
+    if string.ends(ngx.var.uri, "/")
+    or string.ends(ngx.var.uri, ".html")
+    or string.ends(ngx.var.uri, ".htm")
+    then
+        ngx.header["Content-Type"] = "text/html"
+    end
+
+    return
+end
+
