@@ -38,12 +38,12 @@ end
 
 -- Find a string by its translate key in the right language
 function t (key)
-   if lang and i18n[lang] then
-       return i18n[lang][key] or ""
+   if conf.lang and i18n[conf.lang] then
+       return i18n[conf.lang][key] or ""
    else
        return i18n[conf["default_language"]][key] or ""
    end
-end 
+end
 
 
 -- Set a cookie
@@ -261,7 +261,7 @@ function set_headers (user)
     if not cache:get(user.."-password") then
         flash("info", t("please_login"))
         local back_url = ngx.var.scheme .. "://" .. ngx.var.host .. ngx.var.uri .. uri_args_string()
-        return redirect(portal_url.."?r="..ngx.encode_base64(back_url))
+        return redirect(conf.portal_url.."?r="..ngx.encode_base64(back_url))
     end
 
     -- If the user information is not in cache, open an LDAP connection and
@@ -425,8 +425,8 @@ function get_data_for(view)
     local data = {}
 
     -- Pass all the translated strings to the view (to use with t_<key>)
-    if lang and i18n[lang] then
-        translate_table = i18n[lang]
+    if conf.lang and i18n[conf.lang] then
+        translate_table = i18n[conf.lang]
     else
         translate_table = i18n[conf["default_language"]]
     end
@@ -456,7 +456,7 @@ function get_data_for(view)
         local mails = get_mails(user)
         data = {
             connected  = true,
-            portal_url = portal_url,
+            portal_url = conf.portal_url,
             uid        = user,
             cn         = cache:get(user.."-cn"),
             sn         = cache:get(user.."-sn"),
@@ -485,7 +485,7 @@ end
 -- Compute the user modification POST request
 -- It has to update cached information and edit the LDAP user entry
 -- according to the changes detected.
-function post_edit ()
+function edit_user ()
 
     -- We need these calls since we are in a POST request
     ngx.req.read_body()
@@ -522,7 +522,7 @@ function post_edit ()
 
                         -- Reset the password cache
                         cache:set(user.."-password", args.newpassword, conf["session_timeout"])
-                        return redirect(portal_url.."info.html")
+                        return redirect(conf.portal_url.."info.html")
                     else
                         flash("fail", t("password_changed_error"))
                     end
@@ -532,9 +532,9 @@ function post_edit ()
              else
                 flash("fail", t("wrong_current_password"))
              end
-             return redirect(portal_url.."password.html")
+             return redirect(conf.portal_url.."password.html")
 
-         
+
          -- In case of profile modification
          -- TODO: split this into a new function
          elseif string.ends(ngx.var.uri, "edit.html") then
@@ -607,7 +607,7 @@ function post_edit ()
                          -- Check the mail pattern
                          if not mail:match(mail_pattern) then
                              flash("fail", t("invalid_mail")..": "..mail)
-                             return redirect(portal_url.."edit.html")
+                             return redirect(conf.portal_url.."edit.html")
 
                          -- Check that the domain is known and allowed
                          else
@@ -623,7 +623,7 @@ function post_edit ()
                                  filter = filter.."(mail="..mail..")"
                              else
                                  flash("fail", t("invalid_domain").." "..mail)
-                                 return redirect(portal_url.."edit.html")
+                                 return redirect(conf.portal_url.."edit.html")
                              end
                          end
                      end
@@ -632,7 +632,7 @@ function post_edit ()
                  -- filter should look like "(|(mail=my@mail.tld)(mail=my@mail2.tld))"
                  filter = filter..")"
 
-                 
+
                  -- For email forwards, we only need to check that they look
                  -- like actual emails
                  local drops = {}
@@ -640,7 +640,7 @@ function post_edit ()
                      if mail ~= "" then
                          if not mail:match(mail_pattern) then
                              flash("fail", t("invalid_mailforward")..": "..mail)
-                             return redirect(portal_url.."edit.html")
+                             return redirect(conf.portal_url.."edit.html")
                          end
                          table.insert(drops, mail)
                      end
@@ -671,7 +671,7 @@ function post_edit ()
                                  flash("fail", t("mail_already_used").." "..mail)
                              end
                          end
-                         return redirect(portal_url.."edit.html")
+                         return redirect(conf.portal_url.."edit.html")
                      end
                  end
 
@@ -700,7 +700,7 @@ function post_edit ()
                      -- Ugly trick to force cache reloading
                      set_headers(user)
                      flash("win", t("information_updated"))
-                     return redirect(portal_url.."info.html")
+                     return redirect(conf.portal_url.."info.html")
 
                  else
                      flash("fail", t("user_saving_fail"))
@@ -708,7 +708,7 @@ function post_edit ()
              else
                  flash("fail", t("missing_required_fields"))
              end
-             return redirect(portal_url.."edit.html")
+             return redirect(conf.portal_url.."edit.html")
          end
     end
 end
@@ -716,7 +716,7 @@ end
 
 -- Compute the user login POST request
 -- It authenticates the user against the LDAP base then redirects to the portal
-function do_login ()
+function login ()
 
     -- We need these calls since we are in a POST request
     ngx.req.read_body()
@@ -735,17 +735,17 @@ function do_login ()
     -- Forward the `r` URI argument if it exists to redirect
     -- the user properly after a successful login.
     if uri_args.r then
-        return redirect(portal_url.."?r="..uri_args.r)
+        return redirect(conf.portal_url.."?r="..uri_args.r)
     else
-        return redirect(portal_url)
+        return redirect(conf.portal_url)
     end
 end
 
 
--- Compute the user logout POST request
+-- Compute the user logout request
 -- It deletes session cached information to invalidate client side cookie
 -- information.
-function do_logout()
+function logout()
 
     -- We need this call since we are in a POST request
     local args = ngx.req.get_uri_args()
@@ -754,7 +754,7 @@ function do_logout()
         cache:delete("session_"..ngx.var.cookie_SSOwAuthUser)
         cache:delete(ngx.var.cookie_SSOwAuthUser.."-"..conf["ldap_identifier"]) -- Ugly trick to reload cache
         flash("info", t("logged_out"))
-        return redirect(portal_url)
+        return redirect(conf.portal_url)
     end
 end
 
