@@ -1,3 +1,10 @@
+ssowat (2.1.2) testing; urgency=low
+
+  * [enh] Finish documenting the code
+  * [fix] Load modules as proper modules + typo
+
+ -- kload <kload@kload.fr>  Sun, 15 Feb 2015 13:08:34 +0100
+
 ssowat (2.1.1) unstable; urgency=low
 
   * Bump version to 2.1.1 to bootstrap new build workflow
