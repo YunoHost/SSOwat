@@ -125,7 +125,7 @@ then
 
         -- If all the previous cases have failed, redirect to portal
         else
-            hlp.flash("info", t("please_login"))
+            hlp.flash("info", hlp.t("please_login"))
             return hlp.redirect(conf.portal_url)
         end
 
@@ -145,7 +145,7 @@ then
             end
         else
             -- Redirect to portal
-            hlp.flash("fail", t("please_login_from_portal"))
+            hlp.flash("fail", hlp.t("please_login_from_portal"))
             return hlp.redirect(conf.portal_url)
         end
     end
@@ -357,6 +357,6 @@ end
 -- The default is to protect every URL by default.
 --
 
-hlp.flash("info", t("please_login"))
+hlp.flash("info", hlp.t("please_login"))
 local back_url = ngx.var.scheme .. "://" .. ngx.var.host .. ngx.var.uri .. hlp.uri_args_string()
 return hlp.redirect(conf.portal_url.."?r="..ngx.encode_base64(back_url))

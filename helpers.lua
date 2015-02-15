@@ -5,6 +5,7 @@
 -- a set of useful functions related to HTTP and LDAP.
 --
 
+module('helpers', package.seeall)
 
 -- Read a FS stored file
 function read_file(file)
@@ -422,22 +423,6 @@ end
 -- title, the flash notifications' content and the translated strings.
 function get_data_for(view)
     local user = ngx.var.cookie_SSOwAuthUser
-    local data = {}
-
-    -- Pass all the translated strings to the view (to use with t_<key>)
-    if conf.lang and i18n[conf.lang] then
-        translate_table = i18n[conf.lang]
-    else
-        translate_table = i18n[conf["default_language"]]
-    end
-    for k, v in pairs(translate_table) do
-        data["t_"..k] = v
-    end
-
-    -- Pass flash notification content
-    data['flash_fail'] = {flashs["fail"]}
-    data['flash_win']  = {flashs["win"] }
-    data['flash_info'] = {flashs["info"]}
 
     -- For the login page we only need the page title
     if view == "login.html" then
@@ -477,6 +462,21 @@ function get_data_for(view)
             table.insert(data["app"], { url = url, name = name })
         end
     end
+
+    -- Pass all the translated strings to the view (to use with t_<key>)
+    if conf.lang and i18n[conf.lang] then
+        translate_table = i18n[conf.lang]
+    else
+        translate_table = i18n[conf["default_language"]]
+    end
+    for k, v in pairs(translate_table) do
+        data["t_"..k] = v
+    end
+
+    -- Pass flash notification content
+    data['flash_fail'] = {flashs["fail"]}
+    data['flash_win']  = {flashs["win"] }
+    data['flash_info'] = {flashs["info"]}
 
     return data
 end
