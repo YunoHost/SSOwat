@@ -4,6 +4,7 @@
 -- This file loads the configuration from config files or default values.
 --
 
+module('config', package.seeall)
 
 function get_config ()
 
@@ -84,7 +85,7 @@ function get_config ()
     conf.lang = ngx.req.get_headers()["Accept-Language"]
 
     if conf.lang then
-        conf.lang = string.sub(lang, 1, 2)
+        conf.lang = string.sub(conf.lang, 1, 2)
     end
 
     return conf
