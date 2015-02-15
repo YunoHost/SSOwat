@@ -7,7 +7,7 @@ Standards-Version: 3.9.1
 
 Package: ssowat
 Architecture: all
-Depends: yunohost-config-nginx, lua-ldap, lua-json
+Depends: yunohost-config-nginx, lua-ldap, lua-json, lua-rex-pcre
 Homepage: http://www.yunohost.org
 Description: SSOWAT
  Websso for yunohost 

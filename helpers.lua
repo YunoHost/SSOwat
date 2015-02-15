@@ -591,8 +591,8 @@ function edit_user ()
                  end
                  ldap:close()
 
-                 -- TODO: updates to support the new TLDs?
-                 local mail_pattern = "[A-Za-z0-9%.%%%+%-]+@[A-Za-z0-9%.%%%+%-]+%.%w%w%w?%w?"
+                 local rex = require "rex_pcre"
+                 local mail_re = rex.new([[^[\w\.\-]+@([^\W_A-Z]+([\-]*[^\W_A-Z]+)*\.)+([^\W\d_]{2,})$]], rex.flags().UTF8)
 
                  local mails = {}
 
@@ -605,7 +605,7 @@ function edit_user ()
                  for k, mail in ipairs(mailalias) do
                      if mail ~= "" then
                          -- Check the mail pattern
-                         if not mail:match(mail_pattern) then
+                         if not mail_re:match(mail) then
                              flash("fail", t("invalid_mail")..": "..mail)
                              return redirect(conf.portal_url.."edit.html")
 
@@ -638,7 +638,7 @@ function edit_user ()
                  local drops = {}
                  for k, mail in ipairs(maildrop) do
                      if mail ~= "" then
-                         if not mail:match(mail_pattern) then
+                         if not mail_re:match(mail) then
                              flash("fail", t("invalid_mailforward")..": "..mail)
                              return redirect(conf.portal_url.."edit.html")
                          end
