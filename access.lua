@@ -64,7 +64,7 @@ end
 -- example: https://mydomain.org/ssowat*
 --
 -- If the URL matches the portal URL, serve a portal file or proceed to a
--- portal operations
+-- portal operation
 --
 if ngx.var.host == conf["portal_domain"]
    and hlp.string.starts(ngx.var.uri, string.sub(conf["portal_path"], 1, -2))
@@ -90,8 +90,13 @@ then
         if uri_args.action and uri_args.action == 'logout' then
             return hlp.logout()
 
+        -- If the `r` URI argument is set, it means that we want to
+        -- be redirected (typically after a login phase)
         elseif hlp.is_logged_in() and uri_args.r then
             back_url = ngx.decode_base64(uri_args.r)
+
+            -- In case the `back_url` is not on the same domain than the
+            -- current one, create a redirection with a CDA key
             if  not string.match(back_url, "^http[s]?://"..ngx.var.host.."/")
             and not string.match(back_url, ".*"..conf.login_arg.."=%d+$") then
                 cda_key = tostring(math.random(1111111, 9999999))
@@ -103,26 +108,33 @@ then
                 end
                 back_url = back_url.."sso_login="..cda_key
             end
+
             return hlp.redirect(back_url)
 
-        elseif hlp.is_logged_in()                                             -- Authenticated
-            or ngx.var.uri == conf["portal_path"]                         -- OR Want to serve portal login
-            or (string.starts(ngx.var.uri, conf["portal_path"].."assets")
+
+        -- In case we want to serve portal login or assets for portal, just
+        -- serve it
+        elseif hlp.is_logged_in()
+            or ngx.var.uri == conf["portal_path"]
+            or (hlp.string.starts(ngx.var.uri, conf["portal_path"].."assets")
                and (not ngx.var.http_referer
-                    or hlp.string.starts(ngx.var.http_referer, conf.portal_url)))  -- OR Want to serve assets for portal login
+                    or hlp.string.starts(ngx.var.http_referer, conf.portal_url)))
         then
-            -- Serve normal portal
             return hlp.serve(ngx.var.uri)
 
+
+        -- If all the previous cases have failed, redirect to portal
         else
-            -- Redirect to portal
             hlp.flash("info", t("please_login"))
             return hlp.redirect(conf.portal_url)
         end
 
+
+    -- `POST` method is basically use to achieve editing operations
     elseif ngx.var.request_method == "POST" then
 
-        -- CSRF protection
+        -- CSRF protection, only proceed if we are editing from the same
+        -- domain
         if hlp.string.starts(ngx.var.http_referer, conf.portal_url) then
             if hlp.string.ends(ngx.var.uri, conf["portal_path"].."password.html")
             or hlp.string.ends(ngx.var.uri, conf["portal_path"].."edit.html")
@@ -139,7 +151,13 @@ then
     end
 end
 
--- Redirected urls
+
+--
+-- 3. Redirected URLs
+--
+-- If the URL matches one of the `redirected_urls` in the configuration file,
+-- just redirect to the target URL/URI
+--
 
 function detect_redirection(redirect_url)
     if hlp.string.starts(redirect_url, "http://")
@@ -172,7 +190,16 @@ if conf["redirected_regex"] then
     end
 end
 
--- URL that must be protected
+
+--
+-- 4. Protected URLs
+--
+-- If the URL matches one of the `protected_urls` in the configuration file,
+-- we have to protect it even if the URL is also set in the `unprotected_urls`.
+-- It could be useful if you want to unprotect every URL except a few
+-- particular ones.
+--
+
 function is_protected()
     if not conf["protected_urls"] then
         conf["protected_urls"] = {}
@@ -197,8 +224,14 @@ function is_protected()
     return false
 end
 
--- Skipped urls
---  i.e. http://mydomain.org/no_protection/
+
+--
+-- 5. Skipped URLs
+--
+-- If the URL matches one of the `skipped_urls` in the configuration file,
+-- it means that the URL should not be protected by the SSO and no header
+-- has to be sent, even if the user is already authenticated.
+--
 
 if conf["skipped_urls"] then
     for _, url in ipairs(conf["skipped_urls"]) do
@@ -222,8 +255,17 @@ end
 
 
 
--- Unprotected urls
---  i.e. http://mydomain.org/no_protection+headers/
+--
+-- 6. Unprotected URLs
+--
+-- If the URL matches one of the `unprotected_urls` in the configuration file,
+-- it means that the URL should not be protected by the SSO *but* headers have
+-- to be sent if the user is already authenticated.
+--
+-- It means that you can let anyone access to an app, but if a user has already
+-- been authenticated on the portal, he can have its authentication headers
+-- passed to the app.
+--
 
 if conf["unprotected_urls"] then
     for _, url in ipairs(conf["unprotected_urls"]) do
@@ -251,7 +293,14 @@ if conf["unprotected_regex"] then
     end
 end
 
--- Cookie validation
+
+--
+-- 7. Specific files (used in YunoHost)
+--
+-- We want to serve specific portal assets right at the root of the domain.
+--
+-- For example: `https://mydomain.org/ynhpanel.js` will serve the
+-- `/yunohost/sso/assets/js/ynhpanel.js` file.
 --
 
 if hlp.is_logged_in() then
@@ -264,18 +313,32 @@ if hlp.is_logged_in() then
     if string.match(ngx.var.uri, "^/ynhpanel.json$") then
         hlp.serve("/yunohost/sso/assets/js/ynhpanel.json")
     end
+
+    -- If user has no access to this URL, redirect him to the portal
     if not hlp.has_access() then
         return hlp.redirect(conf.portal_url)
     end
+
+    -- If the user is authenticated and has access to the URL, sen the headers
+    -- and let it be
     hlp.set_headers()
     return hlp.pass()
 end
 
 
--- Login with HTTP Auth if credentials are brought
+--
+-- 8. Basic HTTP Authentication
+--
+-- If the `Authorization` header is set before reaching the SSO, we want to
+-- match user and password against the user database.
+--
+-- It allows you to bypass the cookie-based procedure with a per-request
+-- authentication. Very usefull when you are trying to reach a specific URL
+-- via cURL for example.
 --
 
 local auth_header = ngx.req.get_headers()["Authorization"]
+
 if auth_header then
     _, _, b64_cred = string.find(auth_header, "^Basic%s+(.+)$")
     _, _, user, password = string.find(ngx.decode_base64(b64_cred), "^(.+):(.+)$")
@@ -286,7 +349,12 @@ if auth_header then
     end
 end
 
--- Else redirect to portal
+
+--
+-- 9. Redirect to login
+--
+-- If no previous rule has matched, just redirect to the portal login.
+-- The default is to protect every URL by default.
 --
 
 hlp.flash("info", t("please_login"))
