@@ -49,7 +49,9 @@ end
 
 -- Set a cookie
 function cook (cookie_str)
-    table.insert(cookies, cookie_str)
+    if not is_in_table(cookies, cookie_str) then
+        table.insert(cookies, cookie_str)
+    end
 end
 
 
@@ -591,8 +593,9 @@ function edit_user ()
                  end
                  ldap:close()
 
-                 -- TODO: updates to support the new TLDs?
-                 local mail_pattern = "[A-Za-z0-9%.%%%+%-]+@[A-Za-z0-9%.%%%+%-]+%.%w%w%w?%w?"
+                 local rex = require "rex_pcre"
+                 local rex_flags = rex.flags()
+                 local mail_re = rex.new([[^[\w\.-+%]+@([^\W_A-Z]+([\-]*[^\W_A-Z]+)*\.)+([^\W\d_]{2,})$]], rex_flags.UTF8 + rex_flags.UCP)
 
                  local mails = {}
 
@@ -605,7 +608,7 @@ function edit_user ()
                  for k, mail in ipairs(mailalias) do
                      if mail ~= "" then
                          -- Check the mail pattern
-                         if not mail:match(mail_pattern) then
+                         if not mail_re:match(mail) then
                              flash("fail", t("invalid_mail")..": "..mail)
                              return redirect(conf.portal_url.."edit.html")
 
@@ -638,7 +641,7 @@ function edit_user ()
                  local drops = {}
                  for k, mail in ipairs(maildrop) do
                      if mail ~= "" then
-                         if not mail:match(mail_pattern) then
+                         if not mail_re:match(mail) then
                              flash("fail", t("invalid_mailforward")..": "..mail)
                              return redirect(conf.portal_url.."edit.html")
                          end
