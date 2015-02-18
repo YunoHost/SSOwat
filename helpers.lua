@@ -49,7 +49,9 @@ end
 
 -- Set a cookie
 function cook (cookie_str)
-    table.insert(cookies, cookie_str)
+    if not is_in_table(cookies, cookie_str) then
+        table.insert(cookies, cookie_str)
+    end
 end
 
 
