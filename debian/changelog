@@ -1,3 +1,16 @@
+ssowat (2.1.4) testing; urgency=low
+
+  [ Jérôme Lebleu ]
+  * [i18n] Update translations from Transifex
+
+  [ julienmalik ]
+  * [fix] escape minus character to avoid interpretation as range
+
+  [ kload ]
+  * [fix] Efficiently generate random strings
+
+ -- kload <kload@kload.fr>  Thu, 30 Apr 2015 12:03:57 +0000
+
 ssowat (2.1.3) testing; urgency=low
 
   [ kload ]
