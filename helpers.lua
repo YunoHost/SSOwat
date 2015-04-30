@@ -96,7 +96,7 @@ function set_auth_cookie (user, domain)
     local expire = ngx.req.start_time() + maxAge
     local session_key = cache:get("session_"..user)
     if not session_key then
-        session_key = tostring(math.random(1111111, 9999999))
+        session_key = random_string()
         cache:add("session_"..user, session_key, conf["session_max_timeout"])
     end
     local hash = ngx.md5(srvkey..

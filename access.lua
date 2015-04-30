@@ -12,8 +12,7 @@ cache = ngx.shared.cache
 -- Generate a unique token if it has not been generated yet
 srvkey = cache:get("srvkey")
 if not srvkey then
-    math.randomseed(os.time())
-    srvkey = tostring(math.random(1111111, 9999999))
+    srvkey = random_string()
     cache:add("srvkey", srvkey)
 end
 
@@ -99,7 +98,7 @@ then
             -- current one, create a redirection with a CDA key
             if  not string.match(back_url, "^http[s]?://"..ngx.var.host.."/")
             and not string.match(back_url, ".*"..conf.login_arg.."=%d+$") then
-                cda_key = tostring(math.random(1111111, 9999999))
+                cda_key = random_string()
                 login[cda_key] = ngx.var.cookie_SSOwAuthUser
                 if string.match(back_url, ".*?.*") then
                     back_url = back_url.."&"

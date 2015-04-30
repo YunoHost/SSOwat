@@ -20,12 +20,21 @@ lualdap = require "lualdap"
 math = require "math"
 hige = require "hige"
 lfs = require "lfs"
+socket = require "socket"
 
 -- Persistent shared table
 flashs = {}
 login = {}
 logout = {}
 i18n = {}
+
+-- Efficient function to get a random string
+function random_string ()
+    math.randomseed( tonumber(tostring(socket.gettime()*10000):reverse()) )
+    str = tostring(math.random()):sub(3)
+    socket.sleep(1e-400)
+    return str
+end
 
 -- Load translations in the "i18n" above table
 local locale_dir = script_path.."portal/locales/"
