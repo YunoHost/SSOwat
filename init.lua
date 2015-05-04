@@ -24,8 +24,6 @@ socket = require "socket"
 
 -- Persistent shared table
 flashs = {}
-login = {}
-logout = {}
 i18n = {}
 
 -- Efficient function to get a random string

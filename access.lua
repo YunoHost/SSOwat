@@ -43,12 +43,13 @@ if ngx.var.host ~= conf["portal_domain"] and ngx.var.request_method == "GET" the
     if uri_args[conf.login_arg] then
         cda_key = uri_args[conf.login_arg]
 
-        -- Use the `login` shared table where a username is associated with
+        -- Use the `cache` shared table where a username is associated with
         -- a CDA key
-        if login[cda_key] then
-            hlp.set_auth_cookie(login[cda_key], ngx.var.host)
-            ngx.log(ngx.NOTICE, "Cross-domain authentication: "..login[cda_key].." connected on "..ngx.var.host)
-            login[cda_key] = nil
+        user = cache:get(cda_key)
+        if user then
+            hlp.set_auth_cookie(user, ngx.var.host)
+            ngx.log(ngx.NOTICE, "Cross-domain authentication: "..user.." connected on "..ngx.var.host)
+            cache:delete(cda_key)
         end
 
         uri_args[conf.login_arg] = nil
@@ -99,7 +100,7 @@ then
             if  not string.match(back_url, "^http[s]?://"..ngx.var.host.."/")
             and not string.match(back_url, ".*"..conf.login_arg.."=%d+$") then
                 cda_key = random_string()
-                login[cda_key] = ngx.var.cookie_SSOwAuthUser
+                cache:set(cda_key, ngx.var.cookie_SSOwAuthUser, 10)
                 if string.match(back_url, ".*?.*") then
                     back_url = back_url.."&"
                 else
