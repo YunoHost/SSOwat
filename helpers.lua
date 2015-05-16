@@ -7,6 +7,11 @@
 
 module('helpers', package.seeall)
 
+local cache = ngx.shared.cache
+local conf = config.get_config()
+local cookies = {}
+
+
 -- Read a FS stored file
 function read_file(file)
     local f = io.open(file, "rb")
@@ -77,6 +82,14 @@ function uri_args_string (args)
         String = String..tostring(k).."="..tostring(v).."&"
     end
     return string.sub(String, 1, string.len(String) - 1)
+end
+
+
+-- Set the Cross-Domain-Authentication key for a specific user
+function set_cda_key ()
+    local cda_key = random_string()
+    cache:set(cda_key, ngx.var.cookie_SSOwAuthUser, 10)
+    return cda_key
 end
 
 

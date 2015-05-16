@@ -15,12 +15,13 @@ script_path = string.sub(debug.getinfo(1).source, 2, -9)
 package.path = package.path .. ";"..script_path.."?.lua"
 
 -- Load libraries
-json = require "json"
-lualdap = require "lualdap"
-math = require "math"
-hige = require "hige"
-lfs = require "lfs"
-socket = require "socket"
+local json = require "json"
+local lualdap = require "lualdap"
+local math = require "math"
+local hige = require "hige"
+local lfs = require "lfs"
+local socket = require "socket"
+local config = require "config"
 
 -- Persistent shared table
 flashs = {}

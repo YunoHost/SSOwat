@@ -7,7 +7,7 @@
 --
 
 -- Get the `cache` persistent shared table
-cache = ngx.shared.cache
+local cache = ngx.shared.cache
 
 -- Generate a unique token if it has not been generated yet
 srvkey = cache:get("srvkey")
@@ -17,14 +17,10 @@ if not srvkey then
 end
 
 -- Initialize and get configuration
-config = require "config"
-conf = config.get_config()
-
--- Initialize the non-persistent cookie table
-cookies = {}
+local conf = config.get_config()
 
 -- Import helpers
-hlp = require "helpers"
+local hlp = require "helpers"
 
 -- Just a note for the client to know that he passed through the SSO
 ngx.header["X-SSO-WAT"] = "You've just been SSOed"
@@ -99,8 +95,7 @@ then
             -- current one, create a redirection with a CDA key
             if  not string.match(back_url, "^http[s]?://"..ngx.var.host.."/")
             and not string.match(back_url, ".*"..conf.login_arg.."=%d+$") then
-                cda_key = random_string()
-                cache:set(cda_key, ngx.var.cookie_SSOwAuthUser, 10)
+                local cda_key = hlp.set_cda_key()
                 if string.match(back_url, ".*?.*") then
                     back_url = back_url.."&"
                 else
