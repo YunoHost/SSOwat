@@ -11,7 +11,6 @@ local cache = ngx.shared.cache
 local conf = config.get_config()
 local cookies = {}
 
-
 -- Read a FS stored file
 function read_file(file)
     local f = io.open(file, "rb")
@@ -88,7 +87,7 @@ end
 -- Set the Cross-Domain-Authentication key for a specific user
 function set_cda_key ()
     local cda_key = random_string()
-    cache:set(cda_key, ngx.var.cookie_SSOwAuthUser, 10)
+    cache:set(cda_key, authUser, 10)
     return cda_key
 end
 
@@ -155,23 +154,28 @@ end
 -- to match the session hash.
 --
 function is_logged_in ()
-    if  ngx.var.cookie_SSOwAuthExpire and ngx.var.cookie_SSOwAuthExpire ~= ""
-    and ngx.var.cookie_SSOwAuthHash   and ngx.var.cookie_SSOwAuthHash   ~= ""
-    and ngx.var.cookie_SSOwAuthUser   and ngx.var.cookie_SSOwAuthUser   ~= ""
+    local expireTime = ngx.var.cookie_SSOwAuthExpire
+    local user = ngx.var.cookie_SSOwAuthUser
+    local authHash = ngx.var.cookie_SSOwAuthHash
+
+    if expireTime and expireTime ~= ""
+    and authHash and authHash ~= ""
+    and user and user ~= ""
     then
         -- Check expire time
-        if (ngx.req.start_time() <= tonumber(ngx.var.cookie_SSOwAuthExpire)) then
+        if (ngx.req.start_time() <= tonumber(expireTime)) then
             -- Check hash
-            local session_key = cache:get("session_"..ngx.var.cookie_SSOwAuthUser)
+            local session_key = cache:get("session_"..user)
             if session_key and session_key ~= "" then
                 -- Check cache
-                if cache:get(ngx.var.cookie_SSOwAuthUser.."-password") then
+                if cache:get(user.."-password") then
+                    authUser = user
                     local hash = ngx.md5(srvkey..
                             "|"..ngx.var.remote_addr..
-                            "|"..ngx.var.cookie_SSOwAuthUser..
-                            "|"..ngx.var.cookie_SSOwAuthExpire..
+                            "|"..authUser..
+                            "|"..expireTime..
                             "|"..session_key)
-                    return hash == ngx.var.cookie_SSOwAuthHash
+                    return hash == authHash
                 end
             end
         end
@@ -184,7 +188,7 @@ end
 -- Check whether a user is allowed to access a URL using the `users` directive
 -- of the configuration file
 function has_access (user, url)
-    user = user or ngx.var.cookie_SSOwAuthUser
+    user = user or authUser
     url = url or ngx.var.host..ngx.var.uri
 
     -- If there are no `users` directive, or if the user has no ACL set, he can
@@ -270,7 +274,7 @@ function set_headers (user)
         return redirect("https://"..ngx.var.host..ngx.var.uri..uri_args_string())
     end
 
-    user = user or ngx.var.cookie_SSOwAuthUser
+    local user = user or authUser
 
     -- If the password is not in cache of if the cache has expired, ask for
     -- logging.
@@ -437,7 +441,7 @@ end
 -- The resulting data table typically contains the user information, the page
 -- title, the flash notifications' content and the translated strings.
 function get_data_for(view)
-    local user = ngx.var.cookie_SSOwAuthUser
+    local user = authUser
 
     -- For the login page we only need the page title
     if view == "login.html" then
@@ -513,7 +517,7 @@ function edit_user ()
 
         -- Set HTTP status to 201
         ngx.status = ngx.HTTP_CREATED
-        local user = ngx.var.cookie_SSOwAuthUser
+        local user = authUser
 
         -- In case of a password modification
         -- TODO: split this into a new function
@@ -739,7 +743,7 @@ function login ()
     local args = ngx.req.get_post_args()
     local uri_args = ngx.req.get_uri_args()
 
-    user = authenticate(args.user, args.password)
+    local user = authenticate(args.user, args.password)
     if user then
         ngx.status = ngx.HTTP_CREATED
         set_auth_cookie(user, ngx.var.host)
@@ -767,8 +771,8 @@ function logout()
     local args = ngx.req.get_uri_args()
 
     if is_logged_in() then
-        cache:delete("session_"..ngx.var.cookie_SSOwAuthUser)
-        cache:delete(ngx.var.cookie_SSOwAuthUser.."-"..conf["ldap_identifier"]) -- Ugly trick to reload cache
+        cache:delete("session_"..authUser)
+        cache:delete(authUser.."-"..conf["ldap_identifier"]) -- Ugly trick to reload cache
         flash("info", t("logged_out"))
         return redirect(conf.portal_url)
     end
@@ -778,7 +782,7 @@ end
 -- Set cookie and redirect (needed to properly set cookie)
 function redirect (url)
     ngx.header["Set-Cookie"] = cookies
-    ngx.log(ngx.INFO, "Redirect to: "..url)
+    ngx.log(ngx.NOTICE, "Redirect to: "..url)
     return ngx.redirect(url)
 end
 
