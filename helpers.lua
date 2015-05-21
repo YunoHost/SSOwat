@@ -9,7 +9,6 @@ module('helpers', package.seeall)
 
 local cache = ngx.shared.cache
 local conf = config.get_config()
-local cookies = {}
 
 -- Read a FS stored file
 function read_file(file)
@@ -48,14 +47,6 @@ function t (key)
    else
        return i18n[conf["default_language"]][key] or ""
    end
-end
-
-
--- Set a cookie
-function cook (cookie_str)
-    if not is_in_table(cookies, cookie_str) then
-        table.insert(cookies, cookie_str)
-    end
 end
 
 
@@ -119,9 +110,12 @@ function set_auth_cookie (user, domain)
     local cookie_str = "; Domain=."..domain..
                        "; Path=/"..
                        "; Max-Age="..maxAge
-    cook("SSOwAuthUser="..user..cookie_str)
-    cook("SSOwAuthHash="..hash..cookie_str)
-    cook("SSOwAuthExpire="..expire..cookie_str)
+    
+    ngx.header["Set-Cookie"] = {
+        "SSOwAuthUser="..user..cookie_str,
+        "SSOwAuthHash="..hash..cookie_str,
+        "SSOwAuthExpire="..expire..cookie_str
+    }
 end
 
 
@@ -132,9 +126,11 @@ function delete_cookie ()
         local cookie_str = "; Domain=."..domain..
                            "; Path=/"..
                            "; Max-Age="..expired_time
-        cook("SSOwAuthUser=;"    ..cookie_str)
-        cook("SSOwAuthHash=;"    ..cookie_str)
-        cook("SSOwAuthExpire=;"  ..cookie_str)
+        ngx.header["Set-Cookie"] = {
+            "SSOwAuthUser="..cookie_str,
+            "SSOwAuthHash="..cookie_str,
+            "SSOwAuthExpire="..cookie_str
+        }
     end
 end
 
@@ -144,7 +140,7 @@ function delete_redirect_cookie ()
     expired_time = "Thu, Jan 01 1970 00:00:00 UTC;"
     local cookie_str = "; Path="..conf["portal_path"]..
                        "; Max-Age="..expired_time
-    cook("SSOwAuthRedirect=;" ..cookie_str)
+    ngx.header["Set-Cookie"] = "SSOwAuthRedirect=;" ..cookie_str
 end
 
 
@@ -781,7 +777,6 @@ end
 
 -- Set cookie and redirect (needed to properly set cookie)
 function redirect (url)
-    ngx.header["Set-Cookie"] = cookies
     ngx.log(ngx.NOTICE, "Redirect to: "..url)
     return ngx.redirect(url)
 end
