@@ -790,7 +790,6 @@ end
 -- Set cookie and go on with the response (needed to properly set cookie)
 function pass ()
     delete_redirect_cookie()
-    ngx.req.set_header("Set-Cookie", cookies)
 
     -- When we are in the SSOwat portal, we need a default `content-type`
     if string.ends(ngx.var.uri, "/")
