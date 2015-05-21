@@ -1,3 +1,12 @@
+ssowat (2.2.1) stable; urgency=low
+
+  * [fix] Load libraries locally to avoid caching
+  * [fix] Do not declare cookies as global variables
+  * [fix] Finally caught this little nasty Cookie setter
+  * [fix] Get rid of Cookie cache
+
+ -- kload <kload@kload.fr>  Thu, 21 May 2015 16:23:13 +0200
+
 ssowat (2.2.0) stable; urgency=low
 
   * Bumping version to 2.2.0
