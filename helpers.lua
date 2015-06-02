@@ -121,6 +121,8 @@ end
 
 -- Expires the 3 session cookies
 function delete_cookie ()
+    conf = config.get_config()
+
     expired_time = "Thu, Jan 01 1970 00:00:00 UTC;"
     for _, domain in ipairs(conf["domains"]) do
         local cookie_str = "; Domain=."..domain..
@@ -187,6 +189,10 @@ function has_access (user, url)
     user = user or authUser
     url = url or ngx.var.host..ngx.var.uri
 
+    if not conf["users"][user] then
+        conf = config.get_config()
+    end
+
     -- If there are no `users` directive, or if the user has no ACL set, he can
     -- access the URL by default
     if not conf["users"] or not conf["users"][user] then
@@ -212,6 +218,7 @@ end
 -- address.
 -- Reminder: conf["ldap_identifier"] is "uid" by default
 function authenticate (user, password)
+    conf = config.get_config()
 
     -- Try to find the username from an email address by openning an anonymous
     -- LDAP connection and check if the email address exists
@@ -438,6 +445,7 @@ end
 -- title, the flash notifications' content and the translated strings.
 function get_data_for(view)
     local user = authUser
+    conf = config.get_config()
 
     -- For the login page we only need the page title
     if view == "login.html" then
@@ -501,6 +509,7 @@ end
 -- It has to update cached information and edit the LDAP user entry
 -- according to the changes detected.
 function edit_user ()
+    conf = config.get_config()
 
     -- We need these calls since we are in a POST request
     ngx.req.read_body()
@@ -595,7 +604,12 @@ function edit_user ()
                      -- Filter configuration's domain list to keep only
                      -- "allowed" domains
                      for _, domain in ipairs(conf["domains"]) do
-                         for k, mail in ipairs(attribs["mail"]) do
+                         if type(attribs["mail"] == "string") then
+                             mail_list = { attribs["mail"] }
+                         else
+                             mail_list = attribs["mail"]
+                         end
+                         for k, mail in ipairs(mail_list) do
                              if string.ends(mail, "@"..domain) then
                                  if not is_in_table(domains, domain) then
                                      table.insert(domains, domain)
@@ -738,6 +752,8 @@ function login ()
     ngx.req.read_body()
     local args = ngx.req.get_post_args()
     local uri_args = ngx.req.get_uri_args()
+
+    args.user = string.lower(args.user)
 
     local user = authenticate(args.user, args.password)
     if user then
