@@ -1,3 +1,9 @@
+ssowat (2.2.2) stable; urgency=low
+
+  * [fix] Ensure that configuration is loaded properly when we need it
+
+ -- kload <kload@kload.fr>  Tue, 02 Jun 2015 15:21:05 +0000
+
 ssowat (2.2.1) stable; urgency=low
 
   * [fix] Load libraries locally to avoid caching
