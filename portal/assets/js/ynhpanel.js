@@ -219,7 +219,7 @@ domReady(function(){
   document.body.insertBefore(overlay, null);
 
   //Color Application
-  var colors = ['bluebg','purplebg','redbg','orangebg','greenbg','darkbluebg','lightbluebg','yellowbg','lightpinkbg'];
+  var colors = ['redbg','purpledarkbg','darkbluebg','orangebg','greenbg','darkbluebg','purpledarkbg','yellowbg','lightpinkbg','pinkbg','turquoisebg','yellowbg','lightbluebg','purpledarkbg', 'bluebg'];
 
   // Get user's app
   var r = new XMLHttpRequest();
@@ -245,7 +245,8 @@ domReady(function(){
     // Add application links
     var links = [];
     Array.prototype.forEach.call(response.app, function(app, n){
-      links.push('<li><a class="'+colors[n%colors.length]+' disableAjax" href="//'+app.url+'"><span class="first-letter" data-first-letter="'+ app.name.substr(0,2) +'"></span><span class="name">'+app.name+'</span></a></li>');
+      randomColorNumber = parseInt(app.name, 36) % colors.length;
+      links.push('<li><a class="'+colors[randomColorNumber]+' disableAjax" href="//'+app.url+'"><span class="first-letter" data-first-letter="'+ app.name.substr(0,2) +'"></span><span class="name">'+app.name+'</span></a></li>');
     });
     overlay.innerHTML += '<div id="yuno-apps" class="wrapper apps"><ul class="listing-apps">'+ links.join("\n") +'</ul></div>';
 

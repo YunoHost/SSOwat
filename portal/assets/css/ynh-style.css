@@ -797,7 +797,6 @@ input.btn {
    6 = Colors
    ========================================================================== */
 
-.listing-apps li:nth-child(1) a,
 .bluebg {
     background: #3498DB!important;
 }
@@ -808,7 +807,6 @@ input.btn {
     background: #16527A!important;
 }
 
-.listing-apps li:nth-child(2) a,
 .purplebg {
     background: #9B59B6!important;
 }
@@ -819,7 +817,6 @@ input.btn {
     background: #532C64!important;
 }
 
-.listing-apps li:nth-child(3) a,
 .redbg {
     background: #E74C3C!important;
 }
@@ -830,7 +827,6 @@ input.btn {
     background: #921E12!important;
 }
 
-.listing-apps li:nth-child(4) a,
 .orangebg {
     background: #F39C12!important;
 }
@@ -841,7 +837,6 @@ input.btn {
     background: #7F5006!important;
 }
 
-.listing-apps li:nth-child(5) a,
 .greenbg {
     background: #2ECC71!important;
 }
@@ -852,7 +847,6 @@ input.btn {
     background: #176437!important;
 }
 
-.listing-apps li:nth-child(6) a,
 .darkbluebg {
     background: #34495E!important;
 }
@@ -863,7 +857,6 @@ input.btn {
     background: #07090C!important;
 }
 
-.listing-apps li:nth-child(7) a,
 .lightbluebg {
     background: #6A93D4!important;
 }
@@ -874,7 +867,6 @@ input.btn {
     background: #2B5394!important;
 }
 
-.listing-apps li:nth-child(8) a,
 .yellowbg {
     background: #F1C40F!important;
 }
@@ -886,7 +878,6 @@ input.btn {
 }
 
 
-.listing-apps li:nth-child(9) a,
 .lightpinkbg {
     background: #F76F87!important;
 }

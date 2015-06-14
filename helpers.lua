@@ -28,6 +28,14 @@ function is_in_table (t, v)
 end
 
 
+-- Get the index of a value in a table
+function index_of(t,val)
+    for k,v in ipairs(t) do 
+        if v == val then return k end
+    end
+end
+
+
 -- Test whether a string starts with another
 function string.starts (String, Start)
    return string.sub(String, 1, string.len(Start)) == Start
@@ -475,6 +483,8 @@ function get_data_for(view)
             app = {}
         }
 
+        local sorted_apps = {}
+
         -- Add user's accessible URLs using the ACLs.
         -- It is typically used to build the app list.
         for url, name in pairs(conf["users"][user]) do
@@ -482,7 +492,9 @@ function get_data_for(view)
             if ngx.var.host == conf["local_portal_domain"] then
                 url = string.gsub(url, conf["original_portal_domain"], conf["local_portal_domain"])
             end
-            table.insert(data["app"], { url = url, name = name })
+            table.insert(sorted_apps, name)
+            table.sort(sorted_apps)
+            table.insert(data["app"], index_of(sorted_apps, name), { url = url, name = name })
         end
     end
 
