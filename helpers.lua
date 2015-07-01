@@ -613,14 +613,18 @@ function edit_user ()
                      filter = "(uid="..user..")",
                      attrs = {"mail"}
                  } do
+                     -- Construct proper emails array
+                     local mail_list = {}
+                     local mail_attr = attribs["mail"]
+                     if type(mail_attr) == "string" then
+                         mail_list = { mail_attr }
+                     elseif type(mail_attr) == "table" then
+                         mail_list = mail_attr
+                     end
+
                      -- Filter configuration's domain list to keep only
                      -- "allowed" domains
                      for _, domain in ipairs(conf["domains"]) do
-                         if type(attribs["mail"] == "string") then
-                             mail_list = { attribs["mail"] }
-                         else
-                             mail_list = attribs["mail"]
-                         end
                          for k, mail in ipairs(mail_list) do
                              if string.ends(mail, "@"..domain) then
                                  if not is_in_table(domains, domain) then
@@ -705,10 +709,16 @@ function edit_user ()
                  } do
                      -- Another user with one of these emails has been found.
                      if attribs[conf["ldap_identifier"]] and attribs[conf["ldap_identifier"]] ~= user then
-                         if type(attribs["mail"]) == "string" then
-                             attribs["mail"] = {attribs["mail"]}
+                         -- Construct proper emails array
+                         local mail_list = {}
+                         local mail_attr = attribs["mail"]
+                         if type(mail_attr) == "string" then
+                             mail_list = { mail_attr }
+                         elseif type(mail_attr) == "table" then
+                             mail_list = mail_attr
                          end
-                         for _, mail in ipairs(attribs["mail"]) do
+
+                         for _, mail in ipairs(mail_list) do
                              if is_in_table(mails, mail) then
                                  flash("fail", t("mail_already_used").." "..mail)
                              end
