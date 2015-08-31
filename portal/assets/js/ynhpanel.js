@@ -213,7 +213,7 @@ domReady(function(){
 
   // Create overlay element
   var overlay = document.createElement("div");
-  overlay.setAttribute("id","ynhoverlay");
+  overlay.setAttribute("id","ynh-overlay");
   overlay.setAttribute("style","display:none");
 
   document.body.insertBefore(overlay, null);
@@ -260,7 +260,7 @@ domReady(function(){
 
     // Add overlay to DOM
     var btn = document.getElementById('logo'),
-        yunoverlay = document.getElementById('ynhoverlay'),
+        yunoverlay = document.getElementById('ynh-overlay'),
         user = document.getElementById('ynh-user'),
         apps = document.getElementById('ynh-apps');
 
