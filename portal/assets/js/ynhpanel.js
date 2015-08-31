@@ -232,7 +232,7 @@ domReady(function(){
     response = JSON.parse(r.responseText);
 
     // Add overlay header
-    overlay.innerHTML += '<div id="ynh-user" class="wrapper info">' +
+    overlay.innerHTML += '<div id="ynh-user" class="ynh-wrapper info">' +
                           '<ul class="ul-reset user-menu"><li><a class="icon icon-connexion disableAjax" href="'+ response.portal_url +'?action=logout">'+response.t_logout+'</a></li></ul>'+
                           '<a class="user-container user-container-info disableAjax" href="'+ response.portal_url +'edit.html">' +
                             '<h2 class="user-username">'+ response.uid +'</h2>' +
@@ -248,10 +248,10 @@ domReady(function(){
       randomColorNumber = parseInt(app.name, 36) % colors.length;
       links.push('<li><a class="'+colors[randomColorNumber]+' disableAjax" href="//'+app.url+'"><span class="first-letter" data-first-letter="'+ app.name.substr(0,2) +'"></span><span class="name">'+app.name+'</span></a></li>');
     });
-    overlay.innerHTML += '<div id="ynh-apps" class="wrapper apps"><ul class="listing-apps">'+ links.join("\n") +'</ul></div>';
+    overlay.innerHTML += '<div id="ynh-apps" class="ynh-wrapper apps"><ul class="listing-apps">'+ links.join("\n") +'</ul></div>';
 
     // Add footer links
-    overlay.innerHTML += '<div id="ynh-footer" class="wrapper footer"><nav>' + "\n" +
+    overlay.innerHTML += '<div id="ynh-footer" class="ynh-wrapper footer"><nav>' + "\n" +
                           '<a class="link-profile-edit" href="/yunohost/sso/edit.html">'+ response.t_footerlink_edit +'</a>' + "\n" +
                           '<a class="link-documentation" href="//yunohost.org/docs" target="_blank">'+ response.t_footerlink_documentation +'</a>' + "\n" +
                           '<a class="link-documentation" href="//yunohost.org/support" target="_blank">'+ response.t_footerlink_support +'</a>' + "\n" +

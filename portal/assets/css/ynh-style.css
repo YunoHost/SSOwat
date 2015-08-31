@@ -116,15 +116,15 @@ img {
   padding: 2%;
 }
 
-.wrapper {
+.ynh-wrapper {
   width: 90%;
   margin: 2% 5%;
   position: relative;
   z-index: 1;
 }
-.wrapper:before,
-.wrapper:after {content: " ";display: table;}
-.wrapper:after {clear: both;}
+.ynh-wrapper:before,
+.ynh-wrapper:after {content: " ";display: table;}
+.ynh-wrapper:after {clear: both;}
 
 
 
