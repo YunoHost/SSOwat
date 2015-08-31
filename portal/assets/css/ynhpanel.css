@@ -217,7 +217,7 @@ body {/*overflow-y: scroll;*/}
      -moz-transition: all 0.2s ease;
   -webkit-transition: all 0.2s ease;
 }
-#ynhoverlay.yuno-active {
+#ynhoverlay.ynh-active {
   display: block!important;
 }
 
@@ -475,9 +475,9 @@ body {/*overflow-y: scroll;*/}
 
   #ynhoverlay .user-menu { float: none; }
   #ynhoverlay .user-menu a { padding: 0 1em; }
-  #yuno-user { text-align: center; }
-  #yuno-user > * { display: block!important; }
-  #yuno-user * { }
+  #ynh-user { text-align: center; }
+  #ynh-user > * { display: block!important; }
+  #ynh-user * { }
   #ynhoverlay .user-info { margin-left: 0; }
 }
 
@@ -675,7 +675,7 @@ body {/*overflow-y: scroll;*/}
   100% {opacity: 1;}
 }
 
-.yuno-fadeIn {
+.ynh-fadeIn {
   -webkit-animation-name: fadeIn;
   animation-name: fadeIn;
   -webkit-animation-duration: 0.5s;
@@ -686,7 +686,7 @@ body {/*overflow-y: scroll;*/}
   animation-timing-function: cubic-bezier(0.165, 0.840, 0.440, 1.000);
 }
 /*
-.yuno-fadeIn.yuno-delay {
+.ynh-fadeIn.ynh-delay {
   animation-delay: 0.5s;
   -webkit-animation-delay: 0.5s;
 }
@@ -701,7 +701,7 @@ body {/*overflow-y: scroll;*/}
   0% {opacity: 1;}
   100% {opacity: 0;} 
 }
-.yuno-fadeOut {
+.ynh-fadeOut {
   -webkit-animation-name: fadeOut;
   animation-name: fadeOut;
   -webkit-animation-duration: 0.5s;
@@ -710,7 +710,7 @@ body {/*overflow-y: scroll;*/}
   animation-fill-mode: both;
 }
 /*
-.yuno-fadeOut.yuno-delay {
+.ynh-fadeOut.ynh-delay {
   animation-delay: 0.5s;
   -webkit-animation-delay: 0.5s;
 }
@@ -726,9 +726,9 @@ body {/*overflow-y: scroll;*/}
 
   #ynhoverlay .user-menu { float: none; }
   #ynhoverlay .user-menu a { padding: 0 1em; }
-  #yuno-user { text-align: center; }
-  #yuno-user > * { display: block!important; }
-  #yuno-user * { }
+  #ynh-user { text-align: center; }
+  #ynh-user > * { display: block!important; }
+  #ynh-user * { }
   #ynhoverlay .user-info { margin-left: 0; }
   #ynhportal {
     width: 80px;

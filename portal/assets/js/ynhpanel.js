@@ -232,7 +232,7 @@ domReady(function(){
     response = JSON.parse(r.responseText);
 
     // Add overlay header
-    overlay.innerHTML += '<div id="yuno-user" class="wrapper info">' +
+    overlay.innerHTML += '<div id="ynh-user" class="wrapper info">' +
                           '<ul class="ul-reset user-menu"><li><a class="icon icon-connexion disableAjax" href="'+ response.portal_url +'?action=logout">'+response.t_logout+'</a></li></ul>'+
                           '<a class="user-container user-container-info disableAjax" href="'+ response.portal_url +'edit.html">' +
                             '<h2 class="user-username">'+ response.uid +'</h2>' +
@@ -248,10 +248,10 @@ domReady(function(){
       randomColorNumber = parseInt(app.name, 36) % colors.length;
       links.push('<li><a class="'+colors[randomColorNumber]+' disableAjax" href="//'+app.url+'"><span class="first-letter" data-first-letter="'+ app.name.substr(0,2) +'"></span><span class="name">'+app.name+'</span></a></li>');
     });
-    overlay.innerHTML += '<div id="yuno-apps" class="wrapper apps"><ul class="listing-apps">'+ links.join("\n") +'</ul></div>';
+    overlay.innerHTML += '<div id="ynh-apps" class="wrapper apps"><ul class="listing-apps">'+ links.join("\n") +'</ul></div>';
 
     // Add footer links
-    overlay.innerHTML += '<div id="yuno-footer" class="wrapper footer"><nav>' + "\n" +
+    overlay.innerHTML += '<div id="ynh-footer" class="wrapper footer"><nav>' + "\n" +
                           '<a class="link-profile-edit" href="/yunohost/sso/edit.html">'+ response.t_footerlink_edit +'</a>' + "\n" +
                           '<a class="link-documentation" href="//yunohost.org/docs" target="_blank">'+ response.t_footerlink_documentation +'</a>' + "\n" +
                           '<a class="link-documentation" href="//yunohost.org/support" target="_blank">'+ response.t_footerlink_support +'</a>' + "\n" +
@@ -261,8 +261,8 @@ domReady(function(){
     // Add overlay to DOM
     var btn = document.getElementById('logo'),
         yunoverlay = document.getElementById('ynhoverlay'),
-        user = document.getElementById('yuno-user'),
-        apps = document.getElementById('yuno-apps');
+        user = document.getElementById('ynh-user'),
+        apps = document.getElementById('ynh-apps');
 
     var pfx = ["webkit", "moz", "MS", "o", ""];
     function PrefixedEvent(element, type, callback) {
@@ -282,18 +282,18 @@ domReady(function(){
       Element.toggleClass(document.querySelector('html'), 'ynh-panel-active');
 
 
-      if(yunoverlay.classList.contains('yuno-active')) {
+      if(yunoverlay.classList.contains('ynh-active')) {
           meta_viewport.setAttribute('content', meta_viewport_content);
-          yunoverlay.classList.add('yuno-fadeOut');
+          yunoverlay.classList.add('ynh-fadeOut');
           PrefixedEvent(yunoverlay, "AnimationEnd", function(){
-            if(yunoverlay.classList.contains('yuno-fadeOut')) {
-              yunoverlay.classList.remove('yuno-active');
+            if(yunoverlay.classList.contains('ynh-fadeOut')) {
+              yunoverlay.classList.remove('ynh-active');
             }
           });
         }else {
           meta_viewport.setAttribute('content', "width=device-width");
-          yunoverlay.classList.remove('yuno-fadeOut');
-          yunoverlay.classList.add('yuno-active');
+          yunoverlay.classList.remove('ynh-fadeOut');
+          yunoverlay.classList.add('ynh-active');
         }
     });
 
