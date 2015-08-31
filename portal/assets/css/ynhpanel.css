@@ -71,7 +71,7 @@ body {/*overflow-y: scroll;*/}
 
 }
 
-#ynhoverlay [class^="icon-"]:before, 
+#ynhoverlay [class^="icon-"]:before,
 #ynhoverlay [class*=" icon-"]:before {
   font-family: 'ynh_ssowat';
   speak: none;
@@ -261,7 +261,7 @@ body {/*overflow-y: scroll;*/}
 
 #ynhoverlay .listing-apps li {
   margin: 0 0 1em 1em;
-  box-shadow: 2px 2px 3px rgba(0, 0, 0, 0.4), 
+  box-shadow: 2px 2px 3px rgba(0, 0, 0, 0.4),
               -2px -2px 3px 0 rgba(0, 0, 0, 0.7) inset;
   display: inline-block;
   letter-spacing: normal;
@@ -298,7 +298,7 @@ body {/*overflow-y: scroll;*/}
     width: 10px;
   }
 
-  #ynhoverlay .listing-apps a:hover:after, 
+  #ynhoverlay .listing-apps a:hover:after,
   #ynhoverlay .listing-apps a:focus:after,
   #ynhoverlay .listing-apps a:hover:before,
   #ynhoverlay .listing-apps a:focus:before {
@@ -339,7 +339,7 @@ body {/*overflow-y: scroll;*/}
 #ynhoverlay .listing-apps span {
   display: block;
   margin: -1.2em 0 0 0.2em;
-}    
+}
 #ynhoverlay .listing-apps .first-letter:before {
   content: attr(data-first-letter);
   display: inline-block;
@@ -496,7 +496,7 @@ body {/*overflow-y: scroll;*/}
     border-top: 1px solid #666;
     font-size: 0.9em;
   }
-  
+
   #ynhoverlay .footer a {
     display: inline-block;
     vertical-align: top;
@@ -537,126 +537,126 @@ body {/*overflow-y: scroll;*/}
 #ynhoverlay .listing-apps .purplebg {
     background: #9B59B6!important;
 }
-#ynhoverlay .purplebg:hover:after, 
-#ynhoverlay .purplebg:focus:after, 
-#ynhoverlay .purplebg:hover:before, 
+#ynhoverlay .purplebg:hover:after,
+#ynhoverlay .purplebg:focus:after,
+#ynhoverlay .purplebg:hover:before,
 #ynhoverlay .purplebg:focus:before {
     background: #532C64!important;
 }
 #ynhoverlay .yellowbg {
     background: #F1C40F!important;
 }
-#ynhoverlay .yellowbg:hover:after, 
-#ynhoverlay .yellowbg:focus:after, 
-#ynhoverlay .yellowbg:hover:before, 
+#ynhoverlay .yellowbg:hover:after,
+#ynhoverlay .yellowbg:focus:after,
+#ynhoverlay .yellowbg:hover:before,
 #ynhoverlay .yellowbg:focus:before {
     background: #796307!important;
 }
 #ynhoverlay .pinkbg {
     background: #D66D92!important;
 }
-#ynhoverlay .pinkbg:hover:after, 
-#ynhoverlay .pinkbg:focus:after, 
-#ynhoverlay .pinkbg:hover:before, 
+#ynhoverlay .pinkbg:hover:after,
+#ynhoverlay .pinkbg:focus:after,
+#ynhoverlay .pinkbg:hover:before,
 #ynhoverlay .pinkbg:focus:before {
     background: #992B52!important;
 }
 #ynhoverlay .orangebg {
     background: #F39C12!important;
 }
-#ynhoverlay .orangebg:hover:after, 
-#ynhoverlay .orangebg:focus:after, 
-#ynhoverlay .orangebg:hover:before, 
+#ynhoverlay .orangebg:hover:after,
+#ynhoverlay .orangebg:focus:after,
+#ynhoverlay .orangebg:hover:before,
 #ynhoverlay .orangebg:focus:before {
     background: #7F5006!important;
 }
 #ynhoverlay .redbg {
     background: #E74C3C!important;
 }
-#ynhoverlay .redbg:hover:after, 
-#ynhoverlay .redbg:focus:after, 
-#ynhoverlay .redbg:hover:before, 
+#ynhoverlay .redbg:hover:after,
+#ynhoverlay .redbg:focus:after,
+#ynhoverlay .redbg:hover:before,
 #ynhoverlay .redbg:focus:before {
     background: #921E12!important;
 }
 #ynhoverlay .turquoisebg {
     background: #1ABC9C!important;
 }
-#ynhoverlay .turquoisebg:hover:after, 
-#ynhoverlay .turquoisebg:focus:after, 
-#ynhoverlay .turquoisebg:hover:before, 
+#ynhoverlay .turquoisebg:hover:after,
+#ynhoverlay .turquoisebg:focus:after,
+#ynhoverlay .turquoisebg:hover:before,
 #ynhoverlay .turquoisebg:focus:before {
     background: #0B4C3F!important;
 }
 #ynhoverlay .bluebg {
     background: #3498DB!important;
 }
-#ynhoverlay .bluebg:hover:after, 
-#ynhoverlay .bluebg:focus:after, 
-#ynhoverlay .bluebg:hover:before, 
+#ynhoverlay .bluebg:hover:after,
+#ynhoverlay .bluebg:focus:after,
+#ynhoverlay .bluebg:hover:before,
 #ynhoverlay .bluebg:focus:before {
     background: #16527A!important;
 }
 #ynhoverlay .greenbg {
     background: #2ECC71!important;
 }
-#ynhoverlay .greenbg:hover:after, 
-#ynhoverlay .greenbg:focus:after, 
-#ynhoverlay .greenbg:hover:before, 
+#ynhoverlay .greenbg:hover:after,
+#ynhoverlay .greenbg:focus:after,
+#ynhoverlay .greenbg:hover:before,
 #ynhoverlay .greenbg:focus:before {
     background: #176437!important;
 }
 #ynhoverlay .darkbluebg {
     background: #34495E!important;
 }
-#ynhoverlay .darkbluebg:hover:after, 
-#ynhoverlay .darkbluebg:focus:after, 
-#ynhoverlay .darkbluebg:hover:before, 
+#ynhoverlay .darkbluebg:hover:after,
+#ynhoverlay .darkbluebg:focus:after,
+#ynhoverlay .darkbluebg:hover:before,
 #ynhoverlay .darkbluebg:focus:before {
     background: #07090C!important;
 }
 #ynhoverlay .lightbluebg {
     background: #6A93D4!important;
 }
-#ynhoverlay .lightbluebg:hover:after, 
-#ynhoverlay .lightbluebg:focus:after, 
-#ynhoverlay .lightbluebg:hover:before, 
+#ynhoverlay .lightbluebg:hover:after,
+#ynhoverlay .lightbluebg:focus:after,
+#ynhoverlay .lightbluebg:hover:before,
 #ynhoverlay .lightbluebg:focus:before {
     background: #2B5394!important;
 }
 #ynhoverlay .lightpinkbg {
     background: #F76F87!important;
 }
-#ynhoverlay .lightpinkbg:hover:after, 
-#ynhoverlay .lightpinkbg:focus:after, 
-#ynhoverlay .lightpinkbg:hover:before, 
+#ynhoverlay .lightpinkbg:hover:after,
+#ynhoverlay .lightpinkbg:focus:after,
+#ynhoverlay .lightpinkbg:hover:before,
 #ynhoverlay .lightpinkbg:focus:before {
     background: #DA0C31!important;
 }
 #ynhoverlay .lightyellow {
     background: #FFC973!important;
 }
-#ynhoverlay .lightyellow:hover:after, 
-#ynhoverlay .lightyellow:focus:after, 
-#ynhoverlay .lightyellow:hover:before, 
+#ynhoverlay .lightyellow:hover:after,
+#ynhoverlay .lightyellow:focus:after,
+#ynhoverlay .lightyellow:hover:before,
 #ynhoverlay .lightyellow:focus:before {
     background: #F39500!important;
 }
 #ynhoverlay .lightgreen {
     background: #B5F36D!important;
 }
-#ynhoverlay .lightgreen:hover:after, 
-#ynhoverlay .lightgreen:focus:after, 
-#ynhoverlay .lightgreen:hover:before, 
+#ynhoverlay .lightgreen:hover:after,
+#ynhoverlay .lightgreen:focus:after,
+#ynhoverlay .lightgreen:hover:before,
 #ynhoverlay .lightgreen:focus:before {
     background: #77CF11!important;
 }
 #ynhoverlay .purpledarkbg {
     background: #8E44AD!important;
 }
-#ynhoverlay .purpledarkbg:hover:after, 
-#ynhoverlay .purpledarkbg:focus:after, 
-#ynhoverlay .purpledarkbg:hover:before, 
+#ynhoverlay .purpledarkbg:hover:after,
+#ynhoverlay .purpledarkbg:focus:after,
+#ynhoverlay .purpledarkbg:hover:before,
 #ynhoverlay .purpledarkbg:focus:before {
     background: #432051!important;
 }
@@ -699,7 +699,7 @@ body {/*overflow-y: scroll;*/}
 }
 @keyframes fadeOut {
   0% {opacity: 1;}
-  100% {opacity: 0;} 
+  100% {opacity: 0;}
 }
 .ynh-fadeOut {
   -webkit-animation-name: fadeOut;
