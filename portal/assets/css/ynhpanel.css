@@ -16,8 +16,8 @@ html.ynh-panel-active {
 
 body {/*overflow-y: scroll;*/}
 
-#ynhportal,
-#ynhportal *,
+#ynh-overlay-switch,
+#ynh-overlay-switch *,
 #ynh-overlay,
 #ynh-overlay * {
   -webkit-box-sizing: border-box;
@@ -152,7 +152,7 @@ body {/*overflow-y: scroll;*/}
 /* ******************************************************************
   Button
 ******************************************************************* */
-#ynhportal {
+#ynh-overlay-switch {
   display: block;
   position: fixed;
   z-index: 10000000;
@@ -170,14 +170,14 @@ body {/*overflow-y: scroll;*/}
   background-size: contain;
   opacity: 0.7;
 }
-/*#ynhportal.visible,*/
-#ynhportal:hover {
+/*#ynh-overlay-switch.visible,*/
+#ynh-overlay-switch:hover {
   background-color: #41444f;
   border-color: #41444f;
   background-color: #111;
   border-color: #111;
 }
-/*html.ynh-panel-active #ynhportal {right: 47px;}*/
+/*html.ynh-panel-active #ynh-overlay-switch {right: 47px;}*/
 
 @media screen and (max-width: 500px) {
   #ynh-overlay {
@@ -730,7 +730,7 @@ body {/*overflow-y: scroll;*/}
   #ynh-user > * { display: block!important; }
   #ynh-user * { }
   #ynh-overlay .user-info { margin-left: 0; }
-  #ynhportal {
+  #ynh-overlay-switch {
     width: 80px;
     height: 75px;
   }

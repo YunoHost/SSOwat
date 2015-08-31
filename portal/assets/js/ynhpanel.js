@@ -202,13 +202,13 @@ domReady(function(){
 
   // Create portal link
   var portal = document.createElement('a');
-  portal.setAttribute('id', 'ynhportal');
+  portal.setAttribute('id', '#ynh-overlay-switch');
   portal.setAttribute('href', '/yunohost/sso/');
   portal.setAttribute('class', 'disableAjax');
   document.body.insertBefore(portal, null);
 
   // Portal link is draggable, for user convenience
-  dragg('ynhportal');
+  dragg('ynh-overlay-switch');
 
 
   // Create overlay element
