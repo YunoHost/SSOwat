@@ -238,7 +238,7 @@ domReady(function(){
                             '<h2 class="user-username">'+ response.uid +'</h2>' +
                             '<small class="user-fullname">'+ response.givenName + ' ' + response.sn +'</small>' +
                             '<span class="user-mail">'+ response.mail +'</span>' +
-                          '</a>'
+                          '</a>' +
                         '</div>';
 
 
