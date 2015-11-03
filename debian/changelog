@@ -1,3 +1,15 @@
+ssowat (2.3.0) testing; urgency=low
+
+  [ bugfixes ]
+  * CSS fixes
+  * JS fixes
+  * Dependency fix
+
+  [ other ]
+  * Add AGPL license
+
+ -- kload <kload@kload.fr>  Tue, 03 Nov 2015 14:12:39 +0000
+
 ssowat (2.2.3) stable; urgency=low
 
   [ kload ]
