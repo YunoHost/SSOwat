@@ -1,16 +1,16 @@
 {
    "portal_scheme": "https",
-   "portal_domain": "mydomain.com",
+   "portal_domain": "example.com",
    "portal_path": "/ssowat/",
    "domains": [
-        "mydomain.com",
-        "myotherdomain.com"
+        "example.com",
+        "example.org"
     ],
    "skipped_urls": [
-       "mydomain.com/megusta",
-       "myotherdomain.com/somuchwin"
+       "example.com/megusta",
+       "example.org/somuchwin"
     ],
-   "unprotected_urls": ["mydomain.com/yunoprotect"],
+   "unprotected_urls": ["example.com/yunoprotect"],
    "additional_headers": {
        "Auth-User": "uid",
        "Remote-User": "uid",
@@ -19,12 +19,12 @@
    },
    "users": {
        "myuser": {
-          "mydomain.com/myapp": "My App",
-          "mydomain.com/myapp2": "My second App"
+          "example.com/myapp": "My App",
+          "example.com/myapp2": "My second App"
        },
        "myuser2": {
-          "myotherdomain.com/myapp": "My other domain App",
-          "mydomain.com/myapp2": "My second App"
+          "example.org/myapp": "My other domain App",
+          "example.com/myapp2": "My second App"
        }
    }
 }
