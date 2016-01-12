@@ -298,7 +298,11 @@ function set_headers (user)
     -- If the user information is not in cache, open an LDAP connection and
     -- fetch it.
     if not cache:get(user.."-"..conf["ldap_identifier"]) then
-        ldap = lualdap.open_simple(conf["ldap_host"])
+        ldap = lualdap.open_simple(
+		conf["ldap_host"],
+		conf["ldap_identifier"].."=".. user ..","..conf["ldap_group"],
+		cache:get(user.."-password")
+	)
         ngx.log(ngx.NOTICE, "Reloading LDAP values for: "..user)
         for dn, attribs in ldap:search {
             base = conf["ldap_identifier"].."=".. user ..","..conf["ldap_group"],
