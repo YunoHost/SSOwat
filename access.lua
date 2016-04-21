@@ -210,8 +210,8 @@ function is_protected()
         end
     end
     for _, regex in ipairs(conf["protected_regex"]) do
-        if string.match(ngx.var.host..ngx.var.uri, regex)
-        or string.match(ngx.var.uri, regex) then
+        if string.match(ngx.var.host..ngx.var.uri..hlp.uri_args_string(), regex)
+        or string.match(ngx.var.uri..hlp.uri_args_string(), regex) then
             return true
         end
     end
