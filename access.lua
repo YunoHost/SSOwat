@@ -22,6 +22,9 @@ local conf = config.get_config()
 -- Import helpers
 local hlp = require "helpers"
 
+-- Import Perl regular expressions library
+local rex = require "rex_pcre"
+
 -- Just a note for the client to know that he passed through the SSO
 ngx.header["X-SSO-WAT"] = "You've just been SSOed"
 
@@ -177,9 +180,9 @@ end
 
 if conf["redirected_regex"] then
     for regex, redirect_url in pairs(conf["redirected_regex"]) do
-        if string.match(ngx.var.host..ngx.var.uri..hlp.uri_args_string(), regex)
-        or string.match(ngx.var.scheme.."://"..ngx.var.host..ngx.var.uri..hlp.uri_args_string(), regex)
-        or string.match(ngx.var.uri..hlp.uri_args_string(), regex) then
+        if rex.match(ngx.var.host..ngx.var.uri..hlp.uri_args_string(), regex)
+        or rex.match(ngx.var.scheme.."://"..ngx.var.host..ngx.var.uri..hlp.uri_args_string(), regex)
+        or rex.match(ngx.var.uri..hlp.uri_args_string(), regex) then
             detect_redirection(redirect_url)
         end
     end
@@ -210,8 +213,8 @@ function is_protected()
         end
     end
     for _, regex in ipairs(conf["protected_regex"]) do
-        if string.match(ngx.var.host..ngx.var.uri, regex)
-        or string.match(ngx.var.uri, regex) then
+        if rex.match(ngx.var.host..ngx.var.uri, regex)
+        or rex.match(ngx.var.uri, regex) then
             return true
         end
     end
@@ -240,8 +243,8 @@ end
 
 if conf["skipped_regex"] then
     for _, regex in ipairs(conf["skipped_regex"]) do
-        if (string.match(ngx.var.host..ngx.var.uri..hlp.uri_args_string(), regex)
-        or  string.match(ngx.var.uri..hlp.uri_args_string(), regex))
+        if (rex.match(ngx.var.host..ngx.var.uri..hlp.uri_args_string(), regex)
+        or  rex.match(ngx.var.uri..hlp.uri_args_string(), regex))
         and not is_protected() then
             return hlp.pass()
         end
@@ -277,8 +280,8 @@ end
 
 if conf["unprotected_regex"] then
     for _, regex in ipairs(conf["unprotected_regex"]) do
-        if (string.match(ngx.var.host..ngx.var.uri..hlp.uri_args_string(), regex)
-        or  string.match(ngx.var.uri..hlp.uri_args_string(), regex))
+        if (rex.match(ngx.var.host..ngx.var.uri..hlp.uri_args_string(), regex)
+        or  rex.match(ngx.var.uri..hlp.uri_args_string(), regex))
         and not is_protected() then
             if hlp.is_logged_in() then
                 hlp.set_headers()
