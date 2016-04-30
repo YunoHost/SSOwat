@@ -204,14 +204,14 @@ function is_protected()
     end
 
     for _, url in ipairs(conf["protected_urls"]) do
-        if hlp.string.starts(ngx.var.host..ngx.var.uri, url)
-        or hlp.string.starts(ngx.var.uri, url) then
+        if hlp.string.starts(ngx.var.host..ngx.var.uri..hlp.uri_args_string(), url)
+        or hlp.string.starts(ngx.var.uri..hlp.uri_args_string(), url) then
             return true
         end
     end
     for _, regex in ipairs(conf["protected_regex"]) do
-        if string.match(ngx.var.host..ngx.var.uri, regex)
-        or string.match(ngx.var.uri, regex) then
+        if string.match(ngx.var.host..ngx.var.uri..hlp.uri_args_string(), regex)
+        or string.match(ngx.var.uri..hlp.uri_args_string(), regex) then
             return true
         end
     end

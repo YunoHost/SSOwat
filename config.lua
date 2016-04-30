@@ -6,7 +6,7 @@
 
 module('config', package.seeall)
 
-function get_config ()
+function get_config()
 
     -- Load the configuration file
     local conf_file = assert(io.open(conf_path, "r"), "Configuration file is missing")

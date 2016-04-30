@@ -28,7 +28,7 @@ flashs = {}
 i18n = {}
 
 -- Efficient function to get a random string
-function random_string ()
+function random_string()
     math.randomseed( tonumber(tostring(socket.gettime()*10000):reverse()) )
     str = tostring(math.random()):sub(3)
     socket.sleep(1e-400)
