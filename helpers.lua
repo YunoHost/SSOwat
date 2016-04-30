@@ -21,7 +21,7 @@ end
 
 
 -- Lua has no sugar :D
-function is_in_table (t, v)
+function is_in_table(t, v)
     for key, value in ipairs(t) do
         if value == v then return key end
     end
@@ -37,19 +37,19 @@ end
 
 
 -- Test whether a string starts with another
-function string.starts (String, Start)
+function string.starts(String, Start)
    return string.sub(String, 1, string.len(Start)) == Start
 end
 
 
 -- Test whether a string ends with another
-function string.ends (String, End)
+function string.ends(String, End)
    return End=='' or string.sub(String, -string.len(End)) == End
 end
 
 
 -- Find a string by its translate key in the right language
-function t (key)
+function t(key)
    if conf.lang and i18n[conf.lang] then
        return i18n[conf.lang][key] or ""
    else
@@ -60,7 +60,7 @@ end
 
 -- Store a message in the flash shared table in order to display it at the
 -- next response
-function flash (wat, message)
+function flash(wat, message)
     if wat == "fail"
     or wat == "win"
     or wat == "info"
@@ -71,7 +71,7 @@ end
 
 
 -- Convert a table of arguments to an URI string
-function uri_args_string (args)
+function uri_args_string(args)
     if not args then
         args = ngx.req.get_uri_args()
     end
@@ -84,7 +84,7 @@ end
 
 
 -- Set the Cross-Domain-Authentication key for a specific user
-function set_cda_key ()
+function set_cda_key()
     local cda_key = random_string()
     cache:set(cda_key, authUser, 10)
     return cda_key
@@ -102,7 +102,7 @@ end
 -- It enables the SSO to quickly retrieve the username and the session
 -- expiration time, and to prove their authenticity to avoid session hijacking.
 --
-function set_auth_cookie (user, domain)
+function set_auth_cookie(user, domain)
     local maxAge = conf["session_max_timeout"]
     local expire = ngx.req.start_time() + maxAge
     local session_key = cache:get("session_"..user)
@@ -128,7 +128,7 @@ end
 
 
 -- Expires the 3 session cookies
-function delete_cookie ()
+function delete_cookie()
     conf = config.get_config()
 
     expired_time = "Thu, Jan 01 1970 00:00:00 UTC;"
@@ -146,7 +146,7 @@ end
 
 
 -- Expires the redirection cookie
-function delete_redirect_cookie ()
+function delete_redirect_cookie()
     expired_time = "Thu, Jan 01 1970 00:00:00 UTC;"
     local cookie_str = "; Path="..conf["portal_path"]..
                        "; Max-Age="..expired_time
@@ -159,7 +159,7 @@ end
 -- Check if the session cookies are set, and rehash server + client information
 -- to match the session hash.
 --
-function is_logged_in ()
+function is_logged_in()
     local expireTime = ngx.var.cookie_SSOwAuthExpire
     local user = ngx.var.cookie_SSOwAuthUser
     local authHash = ngx.var.cookie_SSOwAuthHash
@@ -193,7 +193,7 @@ end
 
 -- Check whether a user is allowed to access a URL using the `users` directive
 -- of the configuration file
-function has_access (user, url)
+function has_access(user, url)
     user = user or authUser
     url = url or ngx.var.host..ngx.var.uri
 
@@ -225,7 +225,7 @@ end
 -- Authenticate a user against the LDAP database using a username or an email
 -- address.
 -- Reminder: conf["ldap_identifier"] is "uid" by default
-function authenticate (user, password)
+function authenticate(user, password)
     conf = config.get_config()
 
     -- Try to find the username from an email address by openning an anonymous
@@ -277,7 +277,7 @@ end
 
 -- Set the authentication headers in order to pass credentials to the
 -- application underneath.
-function set_headers (user)
+function set_headers(user)
 
     -- We definetly don't want to pass credential on a non-encrypted
     -- connection.
@@ -524,7 +524,7 @@ end
 -- Compute the user modification POST request
 -- It has to update cached information and edit the LDAP user entry
 -- according to the changes detected.
-function edit_user ()
+function edit_user()
     conf = config.get_config()
 
     -- We need these calls since we are in a POST request
@@ -772,7 +772,7 @@ end
 
 -- Compute the user login POST request
 -- It authenticates the user against the LDAP base then redirects to the portal
-function login ()
+function login()
 
     -- We need these calls since we are in a POST request
     ngx.req.read_body()
@@ -818,14 +818,14 @@ end
 
 
 -- Set cookie and redirect (needed to properly set cookie)
-function redirect (url)
+function redirect(url)
     ngx.log(ngx.NOTICE, "Redirect to: "..url)
     return ngx.redirect(url)
 end
 
 
 -- Set cookie and go on with the response (needed to properly set cookie)
-function pass ()
+function pass()
     delete_redirect_cookie()
 
     -- When we are in the SSOwat portal, we need a default `content-type`
