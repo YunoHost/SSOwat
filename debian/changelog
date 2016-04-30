@@ -1,3 +1,9 @@
+ssowat (2.3.1) stable; urgency=low
+
+  See 2.3.0 changelog
+
+ -- opi <opi@zeropi.net>  Sat, 30 Apr 2016 13:40:39 +0200
+
 ssowat (2.3.0) testing; urgency=low
 
   [ bugfixes ]
