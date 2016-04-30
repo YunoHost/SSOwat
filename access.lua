@@ -227,25 +227,30 @@ end
 -- it means that the URL should not be protected by the SSO and no header
 -- has to be sent, even if the user is already authenticated.
 --
-
-if conf["skipped_urls"] then
-    for _, url in ipairs(conf["skipped_urls"]) do
-        if (hlp.string.starts(ngx.var.host..ngx.var.uri..hlp.uri_args_string(), url)
-        or  hlp.string.starts(ngx.var.uri..hlp.uri_args_string(), url))
-        and not is_protected() then
-            return hlp.pass()
+function is_skipped()
+    if conf["skipped_urls"] then
+        for _, url in ipairs(conf["skipped_urls"]) do
+            if (hlp.string.starts(ngx.var.host..ngx.var.uri..hlp.uri_args_string(), url)
+            or  hlp.string.starts(ngx.var.uri..hlp.uri_args_string(), url))
+            and not is_protected() then
+                hlp.pass()
+                return true
+            end
         end
     end
-end
 
-if conf["skipped_regex"] then
-    for _, regex in ipairs(conf["skipped_regex"]) do
-        if (string.match(ngx.var.host..ngx.var.uri..hlp.uri_args_string(), regex)
-        or  string.match(ngx.var.uri..hlp.uri_args_string(), regex))
-        and not is_protected() then
-            return hlp.pass()
+    if conf["skipped_regex"] then
+        for _, regex in ipairs(conf["skipped_regex"]) do
+            if (string.match(ngx.var.host..ngx.var.uri..hlp.uri_args_string(), regex)
+            or  string.match(ngx.var.uri..hlp.uri_args_string(), regex))
+            and not is_protected() then
+                hlp.pass()
+                return true
+            end
         end
     end
+
+    return false
 end
 
 
@@ -298,7 +303,7 @@ end
 -- `/yunohost/sso/assets/js/ynhpanel.js` file.
 --
 
-if hlp.is_logged_in() then
+if hlp.is_logged_in() and not is_skipped() then
     if string.match(ngx.var.uri, "^/ynhpanel.js$") then
         hlp.serve("/yunohost/sso/assets/js/ynhpanel.js")
     end
@@ -344,7 +349,6 @@ if auth_header then
     end
 end
 
-
 --
 -- 9. Redirect to login
 --
@@ -352,6 +356,8 @@ end
 -- The default is to protect every URL by default.
 --
 
-hlp.flash("info", hlp.t("please_login"))
-local back_url = ngx.var.scheme .. "://" .. ngx.var.host .. ngx.var.uri .. hlp.uri_args_string()
-return hlp.redirect(conf.portal_url.."?r="..ngx.encode_base64(back_url))
+if not is_skipped() then
+    hlp.flash("info", hlp.t("please_login"))
+    local back_url = ngx.var.scheme .. "://" .. ngx.var.host .. ngx.var.uri .. hlp.uri_args_string()
+    return hlp.redirect(conf.portal_url.."?r="..ngx.encode_base64(back_url))
+end
