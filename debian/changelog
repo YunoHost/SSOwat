@@ -1,3 +1,24 @@
+ssowat (2.5.0) testing; urgency=low
+
+  [ Documentation ]
+  * [fix] Use example.com domain according to RFC 2606 and RFC 6761. Mydomain.com is a commercial registrar.
+
+  [ Translation ]
+  * [i18n] Update translations from Transifex belatedly
+  * [i18n] Sort json translation files by keys
+  * Translated using Weblate (Portuguese)
+  * Translated using Weblate (German)
+
+  [ Fixes ]
+  * adding credentials for non-anonymous bind
+  * [fix] match protected URIs against URL arguments
+  * [enh] Use consistent coding convention for function prototype.
+
+  Thanks to every contributors and translators (Dromer, Felix Bartels, Jérôme Lebleu
+  Maniack Crudelis, opi, P)
+
+ -- opi <opi@zeropi.net>  Sat, 30 Apr 2016 13:59:47 +0200
+
 ssowat (2.4.0) stable; urgency=low
 
   Release 2.3.0 testing version as stable.
