@@ -1,3 +1,9 @@
+ssowat (2.4.0) stable; urgency=low
+
+  Release 2.3.0 testing version as stable.
+
+ -- opi <opi@zeropi.net>  Sat, 30 Apr 2016 13:52:22 +0200
+
 ssowat (2.3.0) testing; urgency=low
 
   [ bugfixes ]
