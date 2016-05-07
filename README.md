@@ -49,6 +49,7 @@ SSOwat configuration
 --------------------
 
 ```
+mv /etc/ssowat/conf.json.example /etc/ssowat/conf.json
 nano /etc/ssowat/conf.json
 ```
 
