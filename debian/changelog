@@ -1,7 +1,8 @@
 ssowat (2.6.0) stable; urgency=low
 
-  [ Jérôme Lebleu ]
   * [deb] Rename conf.json installed file to conf.json.example
+
+ -- Jérôme Lebleu <jerome@yunohost.org>  Sun, 08 May 2016 01:24:12 +0200
 
 ssowat (2.5.0) testing; urgency=low
 
