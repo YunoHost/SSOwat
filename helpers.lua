@@ -208,8 +208,10 @@ function has_access(user, url)
     end
 
     -- Loop through user's ACLs and return if the URL is authorized.
-    for u, _ in pairs(conf["users"][user]) do
+    for _, app_id in pairs(conf["users"][user]) do
 
+        -- Get the url from the apps list
+        u = conf["apps"][app_id]["url"]
         -- Replace the original domain by a local one if you are connected from
         -- a non-global domain name.
         if ngx.var.host == conf["local_portal_domain"] then
@@ -491,14 +493,15 @@ function get_data_for(view)
 
         -- Add user's accessible URLs using the ACLs.
         -- It is typically used to build the app list.
-        for url, name in pairs(conf["users"][user]) do
+        for _, app_id in pairs(conf["users"][user]) do
+            app = conf["apps"][app_id]
 
             if ngx.var.host == conf["local_portal_domain"] then
-                url = string.gsub(url, conf["original_portal_domain"], conf["local_portal_domain"])
+                app["url"] = string.gsub(app["url"], conf["original_portal_domain"], conf["local_portal_domain"])
             end
-            table.insert(sorted_apps, name)
+            table.insert(sorted_apps, app_id)
             table.sort(sorted_apps)
-            table.insert(data["app"], index_of(sorted_apps, name), { url = url, name = name })
+            table.insert(data["app"], index_of(sorted_apps, app_id), app)
         end
     end
 

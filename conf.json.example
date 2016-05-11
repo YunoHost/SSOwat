@@ -17,14 +17,26 @@
        "Email": "mail",
        "Name": "cn"
    },
-   "users": {
-       "myuser": {
-          "example.com/myapp": "My App",
-          "example.com/myapp2": "My second App"
+   "apps": {
+       "app_id": {
+           "id": "app_id",
+           "name": "App Name",
+           "url": "example.com/app",
+           "description": "The app description"
        },
-       "myuser2": {
-          "example.org/myapp": "My other domain App",
-          "example.com/myapp2": "My second App"
+       "second_app": {
+           "id": "second_app",
+           "name": "Another App",
+           "url": "example.org/that"
        }
+   },
+   "users": {
+       "myuser": [
+          "app_id",
+          "second_app"
+       ],
+       "myuser2": [
+          "app_id"
+       ]
    }
 }
