@@ -347,6 +347,7 @@ textarea {
 .listing-apps a:active:before {
   height: 8px;
 }
+
 .listing-apps a:active:after {
   width: 8px;
 }
@@ -446,14 +447,17 @@ textarea {
   font-weight: normal;
   color: #b4b4b4;
   opacity: 0;
-  -webkit-transition: all .1s ease;
-          transition: all .1s ease;
+  -webkit-transition: .1s ease;
+          transition: .1s ease;
+  -webkit-transition-property: transform, opacity;
+          transition-property: transform, opacity;
 }
 
 .user-container-edit:hover:after,
 .user-container-password:hover:after {
-  left: -20px;
   opacity: 1;
+  -webkit-transform: translateX(-4px);
+          transform: translateX(-4px);
 }
 
 @media screen and (max-width: 480px) {
@@ -485,8 +489,8 @@ textarea {
   font-family: 'ynh_ssowat';
   text-align: center;
   color: #dedede;
-  -webkit-transition: all .1s ease;
-          transition: all .1s ease;
+  -webkit-transition: color .1s ease;
+          transition: color .1s ease;
 }
 
 .user-container:hover:before {
@@ -502,7 +506,7 @@ textarea {
   display: block;
   font-size: 1em;
   font-family: 'source_sans_proregular', Arial, sans-serif;
-  margin-top: -0.6em;
+  margin-top: -.6em;
 }
 
 .user-container-info .user-username:after {
@@ -513,11 +517,11 @@ textarea {
   vertical-align: text-top;
   margin-left: .5em;
   opacity: 0;
-  font-family: 'ynh_ssowat';
   font-size: .8em;
+  font-family: 'ynh_ssowat';
   color: #b4b4b4;
-  -webkit-transition: all .1s ease;
-          transition: all .1s ease;
+  -webkit-transition: opacity .1s ease;
+          transition: opacity .1s ease;
 }
 
 .user-container-info:hover .user-username:after {
@@ -548,8 +552,8 @@ textarea {
   z-index: 1;
   padding: 1.25em 1em;
   color: #999;
-  -webkit-transition: all .1s ease;
-          transition: all .1s ease;
+  -webkit-transition: color .2s ease;
+          transition: color .2s ease;
 }
 
 .user-menu a:hover,
@@ -644,12 +648,12 @@ label {
 label + .help-link {
   display: inline-block;
   padding: .3em 1em;
-  background: #41444f;
+  background: transparent;
   font-weight: bold;
   font-size: 1.2em;
   color: #fff;
-  -webkit-transition: all .1s ease;
-          transition: all .1s ease;
+  -webkit-transition: background .1s ease;
+          transition: background .1s ease;
 }
 
 label + .help-link:hover {
@@ -670,8 +674,8 @@ label + .help-link:hover {
   border: 0;
   background: #797b83;
   color: #fff;
-  -webkit-transition: all .1s ease;
-          transition: all .1s ease;
+  -webkit-transition: background .1s ease;
+          transition: background .1s ease;
 }
 
 .form-test:-moz-placeholder {
@@ -739,8 +743,8 @@ input:disabled {
   text-decoration: none;
   color: #FFF;
   cursor: pointer;
-  -webkit-transition: all .1s ease;
-          transition: all .1s ease;
+  -webkit-transition: background .1s ease;
+          transition: background .1s ease;
 }
 
 .large-btn {
