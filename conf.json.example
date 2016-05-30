@@ -26,5 +26,15 @@
           "example.org/myapp": "My other domain App",
           "example.com/myapp2": "My second App"
        }
+   },
+   "groups": {
+       "group1": {
+          "example.com/myapp": "My App",
+          "example.com/myapp2": "My second App",
+       },
+       "group2": {
+          "example.org/myapp": "My other domain App",
+          "example.com/myapp2": "My second App"
+       }
    }
 }

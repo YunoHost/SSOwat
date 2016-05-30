@@ -91,6 +91,16 @@ function set_cda_key()
 end
 
 
+-- Function to serialize a table to a delimited string
+function listvalues(s)
+    local t = { }
+    for k,v in ipairs(s) do
+        t[#t+1] = tostring(v)
+    end
+    return table.concat(t, " ")
+end
+
+
 -- Compute and set the authentication cookie
 --
 -- Sets 3 cookies containing:
@@ -321,6 +331,26 @@ function set_headers(user)
                 end
             end
         end
+        local grouplist = {}
+        for dn, groups in ldap:search {
+            base = conf["ldap_base"],
+            scope = "subtree",
+            filter = "(&(objectClass=posixGroup)(member="..conf["ldap_identifier"].."=".. user ..","..conf["ldap_group"].."))",
+            attrs = {conf["ldap_identifier"]}
+        } do
+            for k, v in pairs(groups) do
+                if k == conf["ldap_identifier"] then
+                    if type(v) == "table" then
+                        for k2,v2 in ipairs(v) do
+                            v2 = string.gsub(v2, " ", "_")
+                            grouplist[k2] = v2
+                        end
+                    end
+                end
+            end
+        end
+        local groupstring = listvalues(grouplist)
+        cache:set(user.."-groups", groupstring, conf["session_timeout"])
     else
         -- Else, just revalidate session for another day by default
         password = cache:get(user.."-password")
@@ -486,16 +516,34 @@ function get_data_for(view)
             maildrop   = mails["maildrop"],
             app = {}
         }
-
+		
+		local all_apps = {}
         local sorted_apps = {}
 
         -- Add user's accessible URLs using the ACLs.
         -- It is typically used to build the app list.
         for url, name in pairs(conf["users"][user]) do
-
             if ngx.var.host == conf["local_portal_domain"] then
                 url = string.gsub(url, conf["original_portal_domain"], conf["local_portal_domain"])
             end
+            all_apps[url] = name
+        end
+
+        -- Add accessible URLs from user's groups.
+        local getgroups = cache:get(user.."-groups")
+        for group in string.gmatch(getgroups, "%S+") do
+            if conf["groups"][group] then
+                for url, name in pairs(conf["groups"][group]) do
+                    if ngx.var.host == conf["local_portal_domain"] then
+                    	url = string.gsub(url, conf["original_portal_domain"], conf["local_portal_domain"])
+                    end
+                    all_apps[url] = name
+                end
+            end
+        end
+
+        -- Sort list of URLs and add to app list.
+        for url, name in pairs(all_apps) do
             table.insert(sorted_apps, name)
             table.sort(sorted_apps)
             table.insert(data["app"], index_of(sorted_apps, name), { url = url, name = name })

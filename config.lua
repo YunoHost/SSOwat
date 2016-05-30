@@ -48,6 +48,7 @@ function get_config()
         session_max_timeout       = 60 * 60 * 24 * 7, -- one week
         login_arg                 = "sso_login",
         ldap_host                 = "localhost",
+        ldap_base                 = "dc=yunohost,dc=org",
         ldap_group                = "ou=users,dc=yunohost,dc=org",
         ldap_identifier           = "uid",
         ldap_attributes           = {"uid", "givenname", "sn", "cn", "homedirectory", "mail", "maildrop"},
