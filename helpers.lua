@@ -517,7 +517,7 @@ function get_data_for(view)
             app = {}
         }
 		
-		local all_apps = {}
+        local all_apps = {}
         local sorted_apps = {}
 
         -- Add user's accessible URLs using the ACLs.
