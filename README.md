@@ -147,6 +147,10 @@ Array of URLs and/or URIs to redirect and their redirect URI/URL (**example**: `
 
 Array of regular expressions to be matched against URLS **and** URIs and their redirect URI/URL (**example**: `{ "example.org/megusta$": "example.org/subpath" }`)
 
+#### skin
+
+Skin used by default in views (**default**: `portal`)
+
 #### users
 
 2-level array containing usernames and their allowed URLs along with an App name (**example**: `{ "kload": { "kload.fr/myapp/": "My App" } }`)
