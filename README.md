@@ -149,7 +149,7 @@ Array of regular expressions to be matched against URLS **and** URIs and their r
 
 #### skin
 
-Skin used by default in views (**default**: `portal`)
+Skin used by default in views (**default**: `"portal"`)
 
 #### users
 

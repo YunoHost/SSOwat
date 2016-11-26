@@ -52,6 +52,7 @@ function get_config()
         ldap_identifier           = "uid",
         ldap_attributes           = {"uid", "givenname", "sn", "cn", "homedirectory", "mail", "maildrop"},
         allow_mail_authentication = true,
+        skin                      = "portal",
         default_language          = "en"
     }
 
