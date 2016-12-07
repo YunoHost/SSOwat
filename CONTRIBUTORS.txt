@@ -28,7 +28,7 @@ YunoHost Administration Contributors & Translators
 - Adrien 'Beudbeud' Beudin
 - Felix Bartels
 - Hnk Reno
-- Jean-Baptiste
+- Jean-Baptiste aka 'jibec'
 - Laurent 'Bram' Peuch
-- Loïc Damien
+- Loïc 'dzamlo' Damien
 - P
