@@ -14,7 +14,7 @@ Translation is made by a bunch of lovely people over the world.
 We would like to thank anyone who ever helped the YunoHost project, and especially the SSOwat project <3
 
 
-YunoHost Administration Contributors & Translators
+SSOwat Contributors & Translators
 --------------------------------------------------
 
 - Kload
