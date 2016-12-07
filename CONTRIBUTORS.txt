@@ -11,7 +11,7 @@ Most of code was written by Kload and opi, with help of numerous contributors.
 
 Translation is made by a bunch of lovely people over the world.
 
-We would like to thank anyone who ever helped the YunoHost project, and especially the web administration project <3
+We would like to thank anyone who ever helped the YunoHost project, and especially the SSOwat project <3
 
 
 YunoHost Administration Contributors & Translators
