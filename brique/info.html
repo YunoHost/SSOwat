@@ -1,0 +1,20 @@
+<div class="ynh-wrapper user">
+  <ul class="user-menu">
+    <li><a class="icon icon-connexion" href="?action=logout">{{t_logout}}</a></li>
+  </ul>
+
+  <a class="user-container user-container-info" href="edit.html">
+    <h2 class="user-username">{{{uid}}}</h2>
+    <small class="user-fullname">{{givenName}} {{sn}}</small>
+    <span class="user-mail">{{mail}}</span>
+  </a>
+
+</div>
+
+<div id="apps" class="wrapper apps">
+  <ul class="listing-apps">
+  {{#app}}
+  <li><a href="https://{{url}}"><span class="first-letter"></span><span class="name">{{name}}</span></a></li>
+  {{/app}}
+  </ul>
+</div>

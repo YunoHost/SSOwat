@@ -391,7 +391,7 @@ function serve(uri)
     end
 
     -- Try to get file content
-    local content = read_file(script_path.."portal"..rel_path)
+    local content = read_file(script_path..conf["skin"]..rel_path)
     if not content then
         return ngx.exit(ngx.HTTP_NOT_FOUND)
     end
@@ -477,6 +477,7 @@ function get_data_for(view)
         data = {
             connected  = true,
             portal_url = conf.portal_url,
+            skin       = conf.skin,
             uid        = user,
             cn         = cache:get(user.."-cn"),
             sn         = cache:get(user.."-sn"),
