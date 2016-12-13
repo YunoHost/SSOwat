@@ -32,7 +32,7 @@
     "password_changed_error": "Se produjo un error cambiando la contraseña",
     "password_not_match": "Las nuevas contraseñas no coinciden",
     "please_login": "Inicie sesión para acceder a este contenido",
-    "please_login_from_portal": "Por favor, inicia sesión desde el portal",
+    "please_login_from_portal": "Por favor, inicie sesión desde el portal",
     "portal": "Portal YunoHost",
     "user_saving_fail": "Se produjo un error al guardar los cambios del usuario",
     "username": "Nombre de usuario",
