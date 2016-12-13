@@ -14,21 +14,41 @@ Translation is made by a bunch of lovely people over the world.
 We would like to thank anyone who ever helped the YunoHost project, and especially the SSOwat project <3
 
 
-SSOwat Contributors & Translators
---------------------------------------------------
+SSOwat Contributors
+-------------------
 
 - Kload
 - opi
 - Jérôme Lebleu
 - Maniack Crudelis
 - Julien 'ju' Malik
-- Juanu
 - M5oul
 - Alexander Chalikiopoulos
 - Adrien 'Beudbeud' Beudin
-- Felix Bartels
 - Hnk Reno
-- Jean-Baptiste aka 'jibec'
 - Laurent 'Bram' Peuch
 - Loïc 'dzamlo' Damien
-- P
+
+
+SSOwat Translators
+------------------
+
+## French
+
+- Jean-Baptiste Holcroft
+
+## German
+
+- Felix Bartels
+
+## Hindi
+
+- Anmol
+
+## Portuguese
+
+- Deleted User
+
+## Spanish
+
+- Juanu
