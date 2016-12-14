@@ -1,3 +1,6 @@
+SSOwat contributors
+===================
+
 YunoHost is built and maintained by the YunoHost project community.
 Everyone is encouraged to submit issues and changes, and to contribute in other ways -- see https://yunohost.org/contribute to find out how.
 
@@ -33,22 +36,22 @@ SSOwat Contributors
 SSOwat Translators
 ------------------
 
-## French
+### French
 
 - Jean-Baptiste Holcroft
 
-## German
+### German
 
 - Felix Bartels
 
-## Hindi
+### Hindi
 
 - Anmol
 
-## Portuguese
+### Portuguese
 
 - Deleted User
 
-## Spanish
+### Spanish
 
 - Juanu
