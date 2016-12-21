@@ -187,7 +187,40 @@ end
 
 
 --
--- 4. Protected URLs
+-- 4. Specific files (used in YunoHost)
+--
+-- We want to serve specific portal assets right at the root of the domain.
+--
+-- For example: `https://mydomain.org/ynhpanel.js` will serve the
+-- `/yunohost/sso/assets/js/ynhpanel.js` file.
+--
+
+if hlp.is_logged_in() then
+    if string.match(ngx.var.uri, "^/ynhpanel.js$") then
+        hlp.serve("/yunohost/sso/assets/js/ynhpanel.js")
+    end
+    if string.match(ngx.var.uri, "^/ynhpanel.css$") then
+        hlp.serve("/yunohost/sso/assets/css/ynhpanel.css")
+    end
+    if string.match(ngx.var.uri, "^/ynhpanel.json$") then
+        hlp.serve("/yunohost/sso/assets/js/ynhpanel.json")
+    end
+
+    -- If user has no access to this URL, redirect him to the portal
+    if not hlp.has_access() then
+        return hlp.redirect(conf.portal_url)
+    end
+
+    -- If the user is authenticated and has access to the URL, set the headers
+    -- and let it be
+    hlp.set_headers()
+    return hlp.pass()
+end
+
+
+
+--
+-- 5. Protected URLs
 --
 -- If the URL matches one of the `protected_urls` in the configuration file,
 -- we have to protect it even if the URL is also set in the `unprotected_urls`.
@@ -221,7 +254,7 @@ end
 
 
 --
--- 5. Skipped URLs
+-- 6. Skipped URLs
 --
 -- If the URL matches one of the `skipped_urls` in the configuration file,
 -- it means that the URL should not be protected by the SSO and no header
@@ -251,14 +284,14 @@ end
 
 
 --
--- 6. Unprotected URLs
+-- 7. Unprotected URLs
 --
 -- If the URL matches one of the `unprotected_urls` in the configuration file,
 -- it means that the URL should not be protected by the SSO *but* headers have
 -- to be sent if the user is already authenticated.
 --
 -- It means that you can let anyone access to an app, but if a user has already
--- been authenticated on the portal, he can have its authentication headers
+-- been authenticated on the portal, he can have his authentication headers
 -- passed to the app.
 --
 
@@ -288,37 +321,6 @@ if conf["unprotected_regex"] then
     end
 end
 
-
---
--- 7. Specific files (used in YunoHost)
---
--- We want to serve specific portal assets right at the root of the domain.
---
--- For example: `https://mydomain.org/ynhpanel.js` will serve the
--- `/yunohost/sso/assets/js/ynhpanel.js` file.
---
-
-if hlp.is_logged_in() then
-    if string.match(ngx.var.uri, "^/ynhpanel.js$") then
-        hlp.serve("/yunohost/sso/assets/js/ynhpanel.js")
-    end
-    if string.match(ngx.var.uri, "^/ynhpanel.css$") then
-        hlp.serve("/yunohost/sso/assets/css/ynhpanel.css")
-    end
-    if string.match(ngx.var.uri, "^/ynhpanel.json$") then
-        hlp.serve("/yunohost/sso/assets/js/ynhpanel.json")
-    end
-
-    -- If user has no access to this URL, redirect him to the portal
-    if not hlp.has_access() then
-        return hlp.redirect(conf.portal_url)
-    end
-
-    -- If the user is authenticated and has access to the URL, sen the headers
-    -- and let it be
-    hlp.set_headers()
-    return hlp.pass()
-end
 
 
 --
