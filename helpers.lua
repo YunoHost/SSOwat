@@ -425,9 +425,9 @@ function serve(uri)
     -- Render as mustache
     if ext == "html" then
         local data = get_data_for(file)
-        local rendered = hige.render(read_file(script_path.."portal/header.ms"), data)
+        local rendered = hige.render(read_file(script_path..conf["skin"].."/header.ms"), data)
         rendered = rendered..hige.render(content, data)
-        content = rendered..hige.render(read_file(script_path.."portal/footer.ms"), data)
+        content = rendered..hige.render(read_file(script_path..conf["skin"].."/footer.ms"), data)
     elseif ext == "ms" then
         local data = get_data_for(file)
         content = hige.render(content, data)
