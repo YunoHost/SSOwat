@@ -24,6 +24,24 @@ Installation
 git clone https://github.com/Kloadut/SSOwat /etc/ssowat
 ```
 
+Testing
+-------
+
+* clone the repo :
+ ```bash
+  git clone https://github.com/Kloadut/SSOwat /etc/ssowat
+  ```
+* add a skin in /etc/ssowat/config.json.persistent
+```bash
+nano /etc/ssowat/config.json.persistent
+```
+
+```yaml
+{
+    "redirected_urls": {},
+    "skin":"agentcobra"
+}
+```
 
 Nginx configuration
 -------------------
