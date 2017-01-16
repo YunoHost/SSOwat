@@ -131,11 +131,11 @@ end
 function delete_cookie()
     conf = config.get_config()
 
-    expired_time = "Thu, Jan 01 1970 00:00:00 UTC;"
+    expired_time = "Thu, 01 Jan 1970 00:00:00 UTC;"
     for _, domain in ipairs(conf["domains"]) do
         local cookie_str = "; Domain=."..domain..
                            "; Path=/"..
-                           "; Max-Age="..expired_time
+                           "; Expires="..expired_time
         ngx.header["Set-Cookie"] = {
             "SSOwAuthUser="..cookie_str,
             "SSOwAuthHash="..cookie_str,
@@ -147,9 +147,9 @@ end
 
 -- Expires the redirection cookie
 function delete_redirect_cookie()
-    expired_time = "Thu, Jan 01 1970 00:00:00 UTC;"
+    expired_time = "Thu, 01 Jan 1970 00:00:00 UTC;"
     local cookie_str = "; Path="..conf["portal_path"]..
-                       "; Max-Age="..expired_time
+                       "; Expires="..expired_time
     ngx.header["Set-Cookie"] = "SSOwAuthRedirect=;" ..cookie_str
 end
 
