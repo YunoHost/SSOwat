@@ -3,6 +3,10 @@ SSOwat
 
 A simple LDAP SSO for nginx, written in Lua
 
+<a href="https://translate.yunohost.org/engage/yunohost/?utm_source=widget">
+<img src="https://translate.yunohost.org/widgets/yunohost/-/287x66-white.png" alt="Translation status" />
+</a>
+
 Requirements
 ------------
 
