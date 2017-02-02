@@ -1,3 +1,32 @@
+ssowat (2.6.1) stable; urgency=low
+
+  [ Alexander Chalikiopoulos ]
+  * relative path for edit.html
+
+  [ Juanu ]
+  * [i18n] Translated using Weblate (Spanish)
+
+  [ Jean-Baptiste ]
+  * [i18n] Translated using Weblate (French)
+
+  [ Laurent Peuch ]
+  * [enh] add empty file for hindie to enable it in weblate
+
+  [ Loïc Damien ]
+  * Add the autofocus attribute to the username field
+
+  [ Moul ]
+  * [enh] add empty file for esperanto to enable it on weblate
+  * [enh] readme: add translation badge status.
+
+  [ opi ]
+  * [enh][love] Create CONTRIBUTORS.md file. (#69)
+
+  [ Anmol ]
+  * [i18n] Translated using Weblate (Hindi)
+
+ -- opi <opi@zeropi.net>  Thu, 02 Feb 2017 12:04:30 +0100
+
 ssowat (2.6.0) stable; urgency=low
 
   * [deb] Rename conf.json installed file to conf.json.example
