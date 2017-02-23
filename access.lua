@@ -93,7 +93,8 @@ then
 
             -- In case the `back_url` is not on the same domain than the
             -- current one, create a redirection with a CDA key
-            if  not string.match(back_url, "^http[s]?://"..ngx.var.host.."/")
+            local ngx_host_escaped = ngx.var.host:gsub("-", "%%-") -- escape dash for pattern matching
+            if  not string.match(back_url, "^http[s]?://"..ngx_host_escaped.."/")
             and not string.match(back_url, ".*"..conf.login_arg.."=%d+$") then
                 local cda_key = hlp.set_cda_key()
                 if string.match(back_url, ".*?.*") then
