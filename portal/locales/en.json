@@ -34,6 +34,8 @@
    "logged_out": "Logged out",
    "please_login": "Please log in to access to this content",
    "please_login_from_portal": "Please log in from the portal",
+   "redirection_error_invalid_url": "Redirection error: Invalid url",
+   "redirection_error_unmanaged_domain": "Redirection error: Unmanaged domain",
    "footerlink_edit": "Edit my profile",
    "footerlink_documentation": "Documentation",
    "footerlink_support": "Support",

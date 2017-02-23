@@ -79,6 +79,7 @@ then
             return hlp.redirect(conf.portal_url)
         end
 
+        -- Get request arguments
         uri_args = ngx.req.get_uri_args()
 
         -- Logout is also called via a `GET` method
@@ -89,7 +90,37 @@ then
         -- If the `r` URI argument is set, it means that we want to
         -- be redirected (typically after a login phase)
         elseif hlp.is_logged_in() and uri_args.r then
+            -- Decode back url
             back_url = ngx.decode_base64(uri_args.r)
+
+            -- If `back_url` contains line break, someone is probably trying to
+            -- pass some additional headers
+            if string.match(back_url, "(.*)\n") then
+                hlp.flash("fail", hlp.t("redirection_error_invalid_url"))
+                ngx.log(ngx.ERR, "Redirection url is invalid")
+                return hlp.redirect(conf.portal_url)
+            end
+
+            -- Get managed domains
+            conf = config.get_config()
+            local managed_domain = false
+            for _, domain in ipairs(conf["domains"]) do
+                local escaped_domain = domain:gsub("-", "%%-") -- escape dash for pattern matching
+                if string.match(back_url, "^http[s]?://"..escaped_domain.."/") then
+                    ngx.log(ngx.INFO, "Redirection to a managed domain found")
+                    managed_domain = true
+                    break
+                end
+            end
+
+            -- If redirection does not match one of the managed domains
+            -- redirect to portal home page
+            if not managed_domain then
+                hlp.flash("fail", hlp.t("redirection_error_unmanaged_domain"))
+                ngx.log(ngx.ERR, "Redirection to an external domain aborted")
+                return hlp.redirect(conf.portal_url)
+            end
+
 
             -- In case the `back_url` is not on the same domain than the
             -- current one, create a redirection with a CDA key
