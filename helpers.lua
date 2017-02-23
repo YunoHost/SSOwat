@@ -808,12 +808,15 @@ function logout()
     -- We need this call since we are in a POST request
     local args = ngx.req.get_uri_args()
 
+    -- Delete user cookie if logged in (that should always be the case)
     if is_logged_in() then
         cache:delete("session_"..authUser)
         cache:delete(authUser.."-"..conf["ldap_identifier"]) -- Ugly trick to reload cache
         flash("info", t("logged_out"))
-        return redirect(conf.portal_url)
     end
+
+    -- Redirect to portal anyway
+    return redirect(conf.portal_url)
 end
 
 
