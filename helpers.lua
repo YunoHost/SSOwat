@@ -117,7 +117,7 @@ function set_auth_cookie(user, domain)
                "|"..session_key)
     local cookie_str = "; Domain=."..domain..
                        "; Path=/"..
-                       "; Max-Age="..maxAge
+                       "; Expires="..os.date("%a, %d %b %Y %X UTC;", expire)
     
     ngx.header["Set-Cookie"] = {
         "SSOwAuthUser="..user..cookie_str,
