@@ -132,7 +132,7 @@ end
 function delete_cookie()
     conf = config.get_config()
 
-    expired_time = "Thu, 01 Jan 1970 00:00:00 UTC;"
+    local expired_time = "Thu, 01 Jan 1970 00:00:00 UTC;"
     for _, domain in ipairs(conf["domains"]) do
         local cookie_str = "; Domain=."..domain..
                            "; Path=/"..
@@ -149,7 +149,7 @@ end
 
 -- Expires the redirection cookie
 function delete_redirect_cookie()
-    expired_time = "Thu, 01 Jan 1970 00:00:00 UTC;"
+    local expired_time = "Thu, 01 Jan 1970 00:00:00 UTC;"
     local cookie_str = "; Path="..conf["portal_path"]..
                        "; Expires="..expired_time..
                        "; Secure"
