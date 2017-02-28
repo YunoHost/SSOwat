@@ -274,12 +274,25 @@ function authenticate(user, password)
     end
 end
 
+function delete_user_info_cache(user)
+    cache:delete(user.."-"..conf["ldap_identifier"])
+    local i = 2
+    while cache:get(user.."-mail|"..i) do
+        cache:delete(user.."-mail|"..i)
+        i = i + 1
+    end
+    local i = 2
+    while cache:get(user.."-maildrop|"..i) do
+        cache:delete(user.."-maildrop|"..i)
+        i = i + 1
+    end
+end
 
 -- Set the authentication headers in order to pass credentials to the
 -- application underneath.
 function set_headers(user)
 
-    -- We definetly don't want to pass credential on a non-encrypted
+    -- We definitely don't want to pass credentials on a non-encrypted
     -- connection.
     if ngx.var.scheme ~= "https" then
         return redirect("https://"..ngx.var.host..ngx.var.uri..uri_args_string())
@@ -287,7 +300,7 @@ function set_headers(user)
 
     local user = user or authUser
 
-    -- If the password is not in cache of if the cache has expired, ask for
+    -- If the password is not in cache or if the cache has expired, ask for
     -- logging.
     if not cache:get(user.."-password") then
         flash("info", t("please_login"))
@@ -471,6 +484,16 @@ function get_data_for(view)
         or view == "edit.html"
         or view == "password.html"
         or view == "ynhpanel.json" then
+
+        -- Invalidate cache before loading these views.
+        -- Needed if the LDAP db is changed outside ssowat (from the cli for example).
+        -- Not doing it for ynhpanel.json only for performance reasons,
+        --   so the panel could show wrong first name, last name or main email address
+        if view ~= "ynhpanel.json" then
+            delete_user_info_cache(user)
+        end
+
+        -- Be sure cache is loaded
         set_headers(user)
 
         local mails = get_mails(user)
@@ -738,21 +761,7 @@ function edit_user()
                                           mail = mails,
                                           maildrop = drops })
                  then
-
-                     -- Then delete the cached information for the specific
-                     -- user.
-                     cache:delete(user.."-"..conf["ldap_identifier"])
-                     local i = 2
-                     while cache:get(user.."-mail|"..i) do
-                        cache:delete(user.."-mail|"..i)
-                        i = i + 1
-                     end
-                     local i = 2
-                     while cache:get(user.."-maildrop|"..i) do
-                        cache:delete(user.."-maildrop|"..i)
-                        i = i + 1
-                     end
-
+                     delete_user_info_cache(user)
                      -- Ugly trick to force cache reloading
                      set_headers(user)
                      flash("win", t("information_updated"))
