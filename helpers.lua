@@ -117,7 +117,8 @@ function set_auth_cookie(user, domain)
                "|"..session_key)
     local cookie_str = "; Domain=."..domain..
                        "; Path=/"..
-                       "; Expires="..os.date("%a, %d %b %Y %X UTC;", expire)
+                       "; Expires="..os.date("%a, %d %b %Y %X UTC;", expire)..
+                       "; Secure"
     
     ngx.header["Set-Cookie"] = {
         "SSOwAuthUser="..user..cookie_str,
@@ -135,7 +136,8 @@ function delete_cookie()
     for _, domain in ipairs(conf["domains"]) do
         local cookie_str = "; Domain=."..domain..
                            "; Path=/"..
-                           "; Expires="..expired_time
+                           "; Expires="..expired_time..
+                           "; Secure"
         ngx.header["Set-Cookie"] = {
             "SSOwAuthUser="..cookie_str,
             "SSOwAuthHash="..cookie_str,
@@ -149,7 +151,8 @@ end
 function delete_redirect_cookie()
     expired_time = "Thu, 01 Jan 1970 00:00:00 UTC;"
     local cookie_str = "; Path="..conf["portal_path"]..
-                       "; Expires="..expired_time
+                       "; Expires="..expired_time..
+                       "; Secure"
     ngx.header["Set-Cookie"] = "SSOwAuthRedirect=;" ..cookie_str
 end
 
