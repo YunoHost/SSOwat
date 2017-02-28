@@ -822,6 +822,7 @@ function logout()
 
     -- Delete user cookie if logged in (that should always be the case)
     if is_logged_in() then
+        delete_cookie()
         cache:delete("session_"..authUser)
         cache:delete(authUser.."-"..conf["ldap_identifier"]) -- Ugly trick to reload cache
         flash("info", t("logged_out"))
