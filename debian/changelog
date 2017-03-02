@@ -1,3 +1,25 @@
+ssowat (2.6.2) testing; urgency=low
+
+  [ opi ]
+  * [fix] Always redirect to portal when calling logout page.
+  * [fix] Escape dash in domain before matching.
+  * [fix] Use 'Expires' instead of 'Max-Age' for every cookie for consistency.
+  * [enh] Add 'Secure' flag in cookies.
+  * [fix] Delete cookies on logout.
+  * [fix] Use local variables for cookie's expired_time.
+  * [enh] Add Trollken to contributors list.
+
+  [ Julien Malik ]
+  * [fix] Refresh ldap info before loading page that requires it, fixes #633
+
+  [ JimboJoe ]
+  * Fix HTTP  cookie caching
+
+  [ Trollken ]
+  * [i18n] Translated using Weblate (Portuguese)
+
+ -- opi <opi@zeropi.net>  Thu, 02 Mar 2017 12:18:47 +0100
+
 ssowat (2.6.1) stable; urgency=low
 
   [ Alexander Chalikiopoulos ]
