@@ -51,6 +51,7 @@ SSOwat Translators
 ### Portuguese
 
 - Deleted User
+- Trollken
 
 ### Spanish
 
