@@ -1,3 +1,10 @@
+ssowat (2.6.3) testing; urgency=low
+
+  * [fix] Validate domain & url before redirection on login.
+  * [i18n] Translated using Weblate (French)
+
+ -- opi <opi@zeropi.net>  Wed, 08 Mar 2017 11:13:42 +0100
+
 ssowat (2.6.2) testing; urgency=low
 
   [ opi ]
