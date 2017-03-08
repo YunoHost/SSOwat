@@ -37,5 +37,7 @@
     "user_saving_fail": "Une erreur s'est produite lors de la modification des informations",
     "username": "Nom d'utilisateur",
     "wrong_current_password": "Le mot de passe actuel est incorrect",
-    "wrong_username_password": "Nom d'utilisateur ou mot de passe incorrect"
+    "wrong_username_password": "Nom d'utilisateur ou mot de passe incorrect",
+    "redirection_error_invalid_url": "Erreur de redirection : url invalide",
+    "redirection_error_unmanaged_domain": "Erreur de redirection : domaine non géré"
 }
