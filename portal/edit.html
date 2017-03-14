@@ -28,7 +28,6 @@
     <div class="form-section">
       <div class="form-group" id="form-add-mail-alias">
         <label for="mail" class="control-label">{{t_mail_addresses}}</label>
-        <a class="help-link" href="#">?</a>
         <input type="email" name="mail" class="form-text" value="{{mail}}" placeholder="{{t_new_mail}}" required>
         {{#mailalias}}
         <input type="email" name="mailalias[]" class="form-text" value="{{.}}">
@@ -39,7 +38,6 @@
 
       <div class="form-group" id="form-add-mail-drop">
         <label for="mailforward" class="control-label">{{t_mail_forward}}</label>
-        <a class="help-link" href="#">?</a>
         {{#maildrop}}
         <input type="email" name="maildrop[]" class="form-text" value="{{.}}">
         {{/maildrop}}
