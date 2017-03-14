@@ -1,3 +1,9 @@
+ssowat (2.6.4) stable; urgency=low
+
+  * [fix] Remove help-link in portal as they don't link to nothing. Fix #68
+
+ -- opi <opi@zeropi.net>  Tue, 14 Mar 2017 15:39:40 +0100
+
 ssowat (2.6.3) testing; urgency=low
 
   * [fix] Validate domain & url before redirection on login.
