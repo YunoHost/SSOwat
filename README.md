@@ -7,6 +7,11 @@ A simple LDAP SSO for nginx, written in Lua
 <img src="https://translate.yunohost.org/widgets/yunohost/-/287x66-white.png" alt="Translation status" />
 </a>
 
+Issues
+------
+
+- [Please report issues on YunoHost bugtracker](https://dev.yunohost.org/projects/yunohost/issues) (no registration needed).
+
 Requirements
 ------------
 
