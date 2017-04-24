@@ -1,3 +1,12 @@
+ssowat (2.6.5) testing; urgency=low
+
+  * [fix] Fix tile not displayed when app is installed on root (bug #285) (#71)
+  * Update translations for German and Dutch
+
+Thanks to all contributors and translators (JimboJoe, Fabian Gruber, Jeroen Keerl) !
+
+ -- Alexandre Aubin <alex.aubin@mailoo.org>  Mon, 24 Apr 2017 13:01:23 -0400
+
 ssowat (2.6.4) stable; urgency=low
 
   * [fix] Remove help-link in portal as they don't link to nothing. Fix #68
