@@ -1,3 +1,22 @@
+ssowat (2.6.6) stable; urgency=low
+
+  [ Laurent Peuch ]
+  * [fix] check users ACL on http basic auth
+
+  [ JimboJoe ]
+  * [fix] Fix tile not displayed when app is installed on root (bug #285) (#71)
+
+  [ Alexandre Aubin ]
+  * Adding link to bugtracker
+
+  [ Fabian Gruber ]
+  * [i18n] Translated using Weblate (German)
+
+  [ Jeroen Keerl ]
+  * [i18n] Translated using Weblate (Dutch)
+
+ -- opi <opi@zeropi.net>  Fri, 12 May 2017 22:50:20 +0200
+
 ssowat (2.6.5) testing; urgency=low
 
   * [fix] Fix tile not displayed when app is installed on root (bug #285) (#71)
