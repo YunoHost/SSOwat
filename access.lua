@@ -373,6 +373,12 @@ if auth_header then
     user = hlp.authenticate(user, password)
     if user then
         hlp.set_headers(user)
+
+        -- If user has no access to this URL, redirect him to the portal
+        if not hlp.has_access(user) then
+            return hlp.redirect(conf.portal_url)
+        end
+
         return hlp.pass()
     end
 end
