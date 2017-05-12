@@ -9,6 +9,12 @@ module('helpers', package.seeall)
 
 local cache = ngx.shared.cache
 local conf = config.get_config()
+local logger = require("log")
+logger.outfile = "/var/log/nginx/ssowat.log"
+
+function log(...)
+    logger.info(...)
+end
 
 -- Read a FS stored file
 function read_file(file)
@@ -111,7 +117,7 @@ function set_auth_cookie(user, domain)
         cache:add("session_"..user, session_key, conf["session_max_timeout"])
     end
     local hash = ngx.md5(srvkey..
-               "|" ..ngx.var.remote_addr..
+--               "|" ..ngx.var.remote_addr..
                "|"..user..
                "|"..expire..
                "|"..session_key)
@@ -125,6 +131,7 @@ function set_auth_cookie(user, domain)
         "SSOwAuthHash="..hash..cookie_str,
         "SSOwAuthExpire="..expire..cookie_str
     }
+    log("Hash "..hash.." generated for "..user.."@"..ngx.var.remote_addr)
 end
 
 
@@ -180,10 +187,13 @@ function is_logged_in()
                 if cache:get(user.."-password") then
                     authUser = user
                     local hash = ngx.md5(srvkey..
-                            "|"..ngx.var.remote_addr..
+--                            "|"..ngx.var.remote_addr..
                             "|"..authUser..
                             "|"..expireTime..
                             "|"..session_key)
+		    if hash ~= authHash then
+                        log("Hash "..authHash.." rejected for "..user.."@"..ngx.var.remote_addr)
+                    end
                     return hash == authHash
                 end
             end
@@ -191,6 +201,15 @@ function is_logged_in()
     end
 
     return false
+end
+
+function log_access(user, app)
+  local key = "ACC|"..user.."|"..app
+  local block = cache:get(key)
+  if block == nil then
+    logger.info("ACC "..app.." by "..user.."@"..ngx.var.remote_addr)
+    cache:set(key, "block", 60)
+  end
 end
 
 
@@ -211,7 +230,7 @@ function has_access(user, url)
     end
 
     -- Loop through user's ACLs and return if the URL is authorized.
-    for u, _ in pairs(conf["users"][user]) do
+    for u, app in pairs(conf["users"][user]) do
 
         -- Replace the original domain by a local one if you are connected from
         -- a non-global domain name.
@@ -219,7 +238,10 @@ function has_access(user, url)
             u = string.gsub(u, conf["original_portal_domain"], conf["local_portal_domain"])
         end
 
-        if string.starts(url, string.sub(u, 1, -2)) then return true end
+        if string.starts(url, string.sub(u, 1, -2)) then
+            log_access(user, app)
+            return true
+        end
     end
     return false
 end
@@ -268,11 +290,13 @@ function authenticate(user, password)
     if connected then
         cache:add(user.."-password", password, conf["session_timeout"])
         ngx.log(ngx.NOTICE, "Connected as: "..user)
+        logger.info("AUTHSUCC "..user.."@"..ngx.var.remote_addr)
         return user
 
     -- Else, the username/email or the password is wrong
     else
         ngx.log(ngx.ERR, "Connection failed for: "..user)
+        logger.info("AUTHFAIL "..user.."@"..ngx.var.remote_addr)
         return false
     end
 end
