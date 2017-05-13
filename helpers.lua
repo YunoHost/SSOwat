@@ -117,7 +117,7 @@ function set_auth_cookie(user, domain)
         cache:add("session_"..user, session_key, conf["session_max_timeout"])
     end
     local hash = ngx.md5(srvkey..
---               "|" ..ngx.var.remote_addr..
+               "|" ..ngx.var.remote_addr..
                "|"..user..
                "|"..expire..
                "|"..session_key)
@@ -187,11 +187,11 @@ function is_logged_in()
                 if cache:get(user.."-password") then
                     authUser = user
                     local hash = ngx.md5(srvkey..
---                            "|"..ngx.var.remote_addr..
+                            "|"..ngx.var.remote_addr..
                             "|"..authUser..
                             "|"..expireTime..
                             "|"..session_key)
-		    if hash ~= authHash then
+                    if hash ~= authHash then
                         log("Hash "..authHash.." rejected for "..user.."@"..ngx.var.remote_addr)
                     end
                     return hash == authHash
