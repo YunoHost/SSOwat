@@ -70,6 +70,22 @@ function flash(wat, message)
 end
 
 
+-- Hash a string using hmac_sha512, return a hexa string
+function hmac_sha512(key, message)
+    -- lua ecosystem is a disaster and it was not possible to find a good
+    -- easily multiplatform integrable code for this
+    -- Python has this buildin, so we call it directly
+    --
+    -- this is a bad and probably leak the key and the message in the process list
+    -- but if someone got there I guess we really have other problems
+    -- and also this is way better than the previous situation
+    local pipe = io.popen("python /usr/share/ssowat/hmac_sha512.py '" ..key.. "' '" ..message.. "'")
+    local hash = pipe:read()
+    pipe:close()
+    return hash
+end
+
+
 -- Convert a table of arguments to an URI string
 function uri_args_string(args)
     if not args then
@@ -110,8 +126,8 @@ function set_auth_cookie(user, domain)
         session_key = random_string()
         cache:add("session_"..user, session_key, conf["session_max_timeout"])
     end
-    local hash = ngx.md5(srvkey..
-               "|" ..ngx.var.remote_addr..
+    local hash = hmac_sha512(srvkey,
+               ngx.var.remote_addr..
                "|"..user..
                "|"..expire..
                "|"..session_key)
@@ -179,8 +195,8 @@ function is_logged_in()
                 -- Check cache
                 if cache:get(user.."-password") then
                     authUser = user
-                    local hash = ngx.md5(srvkey..
-                            "|"..ngx.var.remote_addr..
+                    local hash = hmac_sha512(srvkey,
+                            ngx.var.remote_addr..
                             "|"..authUser..
                             "|"..expireTime..
                             "|"..session_key)
