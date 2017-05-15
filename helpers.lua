@@ -79,8 +79,14 @@ function hmac_sha512(key, message)
     -- this is a bad and probably leak the key and the message in the process list
     -- but if someone got there I guess we really have other problems
     -- and also this is way better than the previous situation
-    local pipe = io.popen("python /usr/share/ssowat/hmac_sha512.py '" ..key.. "' '" ..message.. "'")
-    local hash = pipe:read()
+    local pipe = io.popen("echo -n '" ..message.. "' | openssl sha512 -hmac '" ..key.. "'")
+
+    -- openssl returns something like this:
+    -- root@yunohost:~# echo -n "qsd" | openssl sha512 -hmac "key"
+    -- (stdin)= f1c2b1658fe64c5a3d16459f2f4eea213e4181905c190235b060ab2a4e7d6a41c15ea2c246828537a1e32ae524b7a7ed309e6d296089194c3e3e3efb98c1fbe3
+    --
+    -- so we need to remove the "(stdin)= " at the beginning
+    local hash = pipe:read():sub(string.len("(stdin)= ") + 1)
     pipe:close()
     return hash
 end
