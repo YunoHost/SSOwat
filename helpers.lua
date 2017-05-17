@@ -86,7 +86,7 @@ end
 -- Set the Cross-Domain-Authentication key for a specific user
 function set_cda_key()
     local cda_key = random_string()
-    cache:set(cda_key, authUser, 10)
+    cache:set("CDA|"..cda_key, authUser, 10)
     return cda_key
 end
 
