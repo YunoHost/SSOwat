@@ -27,12 +27,17 @@ local config = require "config"
 flashs = {}
 i18n = {}
 
+-- convert a string to a hex
+function tohex(str)
+    return (str:gsub('.', function (c)
+        return string.format('%02X', string.byte(c))
+    end))
+end
+
 -- Efficient function to get a random string
 function random_string()
-    math.randomseed( tonumber(tostring(socket.gettime()*10000):reverse()) )
-    str = tostring(math.random()):sub(3)
-    socket.sleep(1e-400)
-    return str
+    local random_bytes = io.open("/dev/urandom"):read(64);
+    return tohex(random_bytes);
 end
 
 -- Load translations in the "i18n" above table
