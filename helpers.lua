@@ -133,8 +133,7 @@ function set_auth_cookie(user, domain)
         cache:add("session_"..user, session_key, conf["session_max_timeout"])
     end
     local hash = hmac_sha512(srvkey,
-               ngx.var.remote_addr..
-               "|"..user..
+               user..
                "|"..expire..
                "|"..session_key)
     local cookie_str = "; Domain=."..domain..
@@ -202,8 +201,7 @@ function is_logged_in()
                 if cache:get(user.."-password") then
                     authUser = user
                     local hash = hmac_sha512(srvkey,
-                            ngx.var.remote_addr..
-                            "|"..authUser..
+                            authUser..
                             "|"..expireTime..
                             "|"..session_key)
                     return hash == authHash
