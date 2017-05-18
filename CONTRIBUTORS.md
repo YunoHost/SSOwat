@@ -31,7 +31,7 @@ SSOwat Contributors
 - Hnk Reno
 - Laurent 'Bram' Peuch
 - Loïc 'dzamlo' Damien
-- siddy
+- sidddy
 
 
 SSOwat Translators
