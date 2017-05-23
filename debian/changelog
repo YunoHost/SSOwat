@@ -1,3 +1,10 @@
+ssowat (2.6.8) testing; urgency=low
+
+  [ Laurent Peuch ]
+  * [enh] uses caching for hash to avoid heavy recalculation and process spawning
+
+ -- opi <opi@zeropi.net>  Tue, 23 May 2017 21:45:42 +0200
+
 ssowat (2.6.7) stable; urgency=low
 
   [ Laurent Peuch ]
