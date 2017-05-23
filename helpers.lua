@@ -72,23 +72,31 @@ end
 
 -- Hash a string using hmac_sha512, return a hexa string
 function hmac_sha512(key, message)
-    -- lua ecosystem is a disaster and it was not possible to find a good
-    -- easily multiplatform integrable code for this
-    -- Python has this buildin, so we call it directly
-    --
-    -- this is a bad and probably leak the key and the message in the process list
-    -- but if someone got there I guess we really have other problems
-    -- and also this is way better than the previous situation
-    local pipe = io.popen("echo -n '" ..message.. "' | openssl sha512 -hmac '" ..key.. "'")
+    local cache_key = key..":"..message
 
-    -- openssl returns something like this:
-    -- root@yunohost:~# echo -n "qsd" | openssl sha512 -hmac "key"
-    -- (stdin)= f1c2b1658fe64c5a3d16459f2f4eea213e4181905c190235b060ab2a4e7d6a41c15ea2c246828537a1e32ae524b7a7ed309e6d296089194c3e3e3efb98c1fbe3
-    --
-    -- so we need to remove the "(stdin)= " at the beginning
-    local hash = pipe:read():sub(string.len("(stdin)= ") + 1)
-    pipe:close()
-    return hash
+    if not cache:get(cache_key) then
+        -- lua ecosystem is a disaster and it was not possible to find a good
+        -- easily multiplatform integrable code for this
+        -- Python has this buildin, so we call it directly
+        --
+        -- this is a bad and probably leak the key and the message in the process list
+        -- but if someone got there I guess we really have other problems
+        -- and also this is way better than the previous situation
+        local pipe = io.popen("echo -n '" ..message.. "' | openssl sha512 -hmac '" ..key.. "'")
+
+        -- openssl returns something like this:
+        -- root@yunohost:~# echo -n "qsd" | openssl sha512 -hmac "key"
+        -- (stdin)= f1c2b1658fe64c5a3d16459f2f4eea213e4181905c190235b060ab2a4e7d6a41c15ea2c246828537a1e32ae524b7a7ed309e6d296089194c3e3e3efb98c1fbe3
+        --
+        -- so we need to remove the "(stdin)= " at the beginning
+        local hash = pipe:read():sub(string.len("(stdin)= ") + 1)
+        pipe:close()
+
+        cache:set(cache_key, hash, conf["session_timeout"])
+        return hash
+    else
+        return cache:get(cache_key)
+    end
 end
 
 
