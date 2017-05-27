@@ -77,10 +77,9 @@ function hmac_sha512(key, message)
     if not cache:get(cache_key) then
         -- lua ecosystem is a disaster and it was not possible to find a good
         -- easily multiplatform integrable code for this
-        -- Python has this buildin, so we call it directly
         --
-        -- this is a bad and probably leak the key and the message in the process list
-        -- but if someone got there I guess we really have other problems
+        -- this is really dirty and probably leak the key and the message in the process list
+        -- but if someone got there I guess we really have other problems so this is acceptable
         -- and also this is way better than the previous situation
         local pipe = io.popen("echo -n '" ..message.. "' | openssl sha512 -hmac '" ..key.. "'")
 
