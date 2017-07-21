@@ -1,1 +1,7 @@
-{}
+{
+    "portal": "YunoHost Портал",
+    "information": "Ваша информация",
+    "username": "Имя пользователя",
+    "password": "Пароль",
+    "fullname": "Полное имя"
+}
