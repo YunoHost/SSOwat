@@ -30,7 +30,7 @@ end
 
 -- Get the index of a value in a table
 function index_of(t,val)
-    for k,v in ipairs(t) do 
+    for k,v in ipairs(t) do
         if v == val then return k end
     end
 end
@@ -50,8 +50,8 @@ end
 
 -- Find a string by its translate key in the right language
 function t(key)
-   if conf.lang and i18n[conf.lang] then
-       return i18n[conf.lang][key] or ""
+   if conf.lang and i18n[conf.lang] and i18n[conf.lang][key] then
+       return i18n[conf.lang][key]
    else
        return i18n[conf["default_language"]][key] or ""
    end
@@ -147,7 +147,7 @@ function set_auth_cookie(user, domain)
                        "; Path=/"..
                        "; Expires="..os.date("%a, %d %b %Y %X UTC;", expire)..
                        "; Secure"
-    
+
     ngx.header["Set-Cookie"] = {
         "SSOwAuthUser="..user..cookie_str,
         "SSOwAuthHash="..hash..cookie_str,
@@ -556,13 +556,8 @@ function get_data_for(view)
     end
 
     -- Pass all the translated strings to the view (to use with t_<key>)
-    if conf.lang and i18n[conf.lang] then
-        translate_table = i18n[conf.lang]
-    else
-        translate_table = i18n[conf["default_language"]]
-    end
-    for k, v in pairs(translate_table) do
-        data["t_"..k] = v
+    for k, v in pairs(i18n[conf["default_language"]]) do
+        data["t_"..k] = i18n[conf.lang][k] or v
     end
 
     -- Pass flash notification content
