@@ -607,7 +607,8 @@ function edit_user()
 
                     -- Open the LDAP connection
                     local ldap = lualdap.open_simple(conf["ldap_host"], dn, args.currentpassword)
-                    local password = "{SHA}"..ngx.encode_base64(ngx.sha1_bin(args.newpassword))
+
+                    local password = hash_password(args.newpassword)
 
                     -- Modify the LDAP information
                     if ldap:modify(dn, {'=', userPassword = password }) then
@@ -808,6 +809,16 @@ function edit_user()
     end
 end
 
+-- hash the user password using sha-512 and using {CRYPT} to uses linux auth system
+-- because ldap doesn't support anything stronger than sha1
+function hash_password(password)
+    -- TODO is the password checked by regex? we don't want to
+    -- allow shell injection
+    local mkpasswd  = io.popen("mkpasswd --method=sha-512 '" ..password.."'")
+    local hashed_password = "{CRYPT}"..mkpasswd:read()
+    mkpasswd:close()
+    return hashed_password
+end
 
 -- Compute the user login POST request
 -- It authenticates the user against the LDAP base then redirects to the portal
