@@ -293,6 +293,7 @@ function authenticate(user, password)
     -- cache shared table in order to eventually reuse it later when updating
     -- profile information or just passing credentials to an application.
     if connected then
+        ensure_user_password_uses_strong_hash(connected, user, password)
         cache:add(user.."-password", password, conf["session_timeout"])
         ngx.log(ngx.NOTICE, "Connected as: "..user)
         return user
@@ -573,6 +574,33 @@ function get_data_for(view)
     return data
 end
 
+-- this function is launched after a successful login
+-- it checked if the user password is stored using the most secure hashing
+-- algorithm available
+-- if it's not the case, it migrates the password to this new hash algorithm
+function ensure_user_password_uses_strong_hash(ldap, user, password)
+    local current_hashed_password = nil
+
+    for dn, attrs in ldap:search {
+        base = "ou=users,dc=yunohost,dc=org",
+        scope = "onelevel",
+        sizelimit = 1,
+        filter = "(uid="..user..")",
+        attrs = {"userPassword"}
+    } do
+        current_hashed_password = attrs["userPassword"]:sub(0, 10)
+    end
+
+    -- if the password is not hashed using sha-512, which is the strongest
+    -- available hash rehash it using that
+    -- Here "{CRYPT}" means "uses linux auth system"
+    -- "6" means "uses sha-512", any lower number mean a less strong algo (1 == md5)
+    if current_hashed_password:sub(0, 10) ~= "{CRYPT}$6$" then
+        local dn = conf["ldap_identifier"].."="..user..","..conf["ldap_group"]
+        local hashed_password = hash_password(password)
+        ldap:modify(dn, {'=', userPassword = hashed_password })
+    end
+end
 
 -- Compute the user modification POST request
 -- It has to update cached information and edit the LDAP user entry
