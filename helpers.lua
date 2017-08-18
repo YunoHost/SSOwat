@@ -81,7 +81,7 @@ function hmac_sha512(key, message)
         -- this is really dirty and probably leak the key and the message in the process list
         -- but if someone got there I guess we really have other problems so this is acceptable
         -- and also this is way better than the previous situation
-        local pipe = io.popen("echo -n '" ..message.. "' | openssl sha512 -hmac '" ..key.. "'")
+        local pipe = io.popen("echo -n '" ..message:gsub("'", "'\\''").. "' | openssl sha512 -hmac '" ..key:gsub("'", "'\\''").. "'")
 
         -- openssl returns something like this:
         -- root@yunohost:~# echo -n "qsd" | openssl sha512 -hmac "key"
@@ -293,6 +293,7 @@ function authenticate(user, password)
     -- cache shared table in order to eventually reuse it later when updating
     -- profile information or just passing credentials to an application.
     if connected then
+        ensure_user_password_uses_strong_hash(connected, user, password)
         cache:add(user.."-password", password, conf["session_timeout"])
         ngx.log(ngx.NOTICE, "Connected as: "..user)
         return user
@@ -568,6 +569,33 @@ function get_data_for(view)
     return data
 end
 
+-- this function is launched after a successful login
+-- it checked if the user password is stored using the most secure hashing
+-- algorithm available
+-- if it's not the case, it migrates the password to this new hash algorithm
+function ensure_user_password_uses_strong_hash(ldap, user, password)
+    local current_hashed_password = nil
+
+    for dn, attrs in ldap:search {
+        base = "ou=users,dc=yunohost,dc=org",
+        scope = "onelevel",
+        sizelimit = 1,
+        filter = "(uid="..user..")",
+        attrs = {"userPassword"}
+    } do
+        current_hashed_password = attrs["userPassword"]:sub(0, 10)
+    end
+
+    -- if the password is not hashed using sha-512, which is the strongest
+    -- available hash rehash it using that
+    -- Here "{CRYPT}" means "uses linux auth system"
+    -- "6" means "uses sha-512", any lower number mean a less strong algo (1 == md5)
+    if current_hashed_password:sub(0, 10) ~= "{CRYPT}$6$" then
+        local dn = conf["ldap_identifier"].."="..user..","..conf["ldap_group"]
+        local hashed_password = hash_password(password)
+        ldap:modify(dn, {'=', userPassword = hashed_password })
+    end
+end
 
 -- Compute the user modification POST request
 -- It has to update cached information and edit the LDAP user entry
@@ -602,7 +630,8 @@ function edit_user()
 
                     -- Open the LDAP connection
                     local ldap = lualdap.open_simple(conf["ldap_host"], dn, args.currentpassword)
-                    local password = "{SHA}"..ngx.encode_base64(ngx.sha1_bin(args.newpassword))
+
+                    local password = hash_password(args.newpassword)
 
                     -- Modify the LDAP information
                     if ldap:modify(dn, {'=', userPassword = password }) then
@@ -803,6 +832,16 @@ function edit_user()
     end
 end
 
+-- hash the user password using sha-512 and using {CRYPT} to uses linux auth system
+-- because ldap doesn't support anything stronger than sha1
+function hash_password(password)
+    -- TODO is the password checked by regex? we don't want to
+    -- allow shell injection
+    local mkpasswd  = io.popen("mkpasswd --method=sha-512 '" ..password:gsub("'", "'\\''").."'")
+    local hashed_password = "{CRYPT}"..mkpasswd:read()
+    mkpasswd:close()
+    return hashed_password
+end
 
 -- Compute the user login POST request
 -- It authenticates the user against the LDAP base then redirects to the portal
