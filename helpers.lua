@@ -81,7 +81,7 @@ function hmac_sha512(key, message)
         -- this is really dirty and probably leak the key and the message in the process list
         -- but if someone got there I guess we really have other problems so this is acceptable
         -- and also this is way better than the previous situation
-        local pipe = io.popen("echo -n '" ..message.. "' | openssl sha512 -hmac '" ..key.. "'")
+        local pipe = io.popen("echo -n '" ..message:gsub("'", "'\\''").. "' | openssl sha512 -hmac '" ..key:gsub("'", "'\\''").. "'")
 
         -- openssl returns something like this:
         -- root@yunohost:~# echo -n "qsd" | openssl sha512 -hmac "key"
