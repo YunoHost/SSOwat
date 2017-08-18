@@ -842,7 +842,7 @@ end
 function hash_password(password)
     -- TODO is the password checked by regex? we don't want to
     -- allow shell injection
-    local mkpasswd  = io.popen("mkpasswd --method=sha-512 '" ..password.."'")
+    local mkpasswd  = io.popen("mkpasswd --method=sha-512 '" ..password:gsub("'", "'\\''").."'")
     local hashed_password = "{CRYPT}"..mkpasswd:read()
     mkpasswd:close()
     return hashed_password
