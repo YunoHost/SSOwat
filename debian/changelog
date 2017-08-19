@@ -1,3 +1,14 @@
+ssowat (2.7.0) testing; urgency=low
+
+  * [mod] comment didn't matched reality
+  * [i18n] Started russian translation (#85)
+
+Thanks to all contributors (Bram, Ozhiganov) ! <3
+
+  [ Alexandre Aubin ]
+
+ -- Alexandre Aubin <alex.aubin@mailoo.org>  Mon, 07 Aug 2017 12:58:39 -0400
+
 ssowat (2.6.8) testing; urgency=low
 
   [ Laurent Peuch ]
