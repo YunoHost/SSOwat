@@ -1,1 +1,13 @@
-{}
+{
+    "password": "Pasvorto",
+    "username": "Uzantnomo",
+    "mail_addresses": "Retpoŝtadresoj",
+    "information": "Via informoj",
+    "new_password": "Nova pasvorto",
+    "current_password": "Nuna pasvorto",
+    "login": "Ensaluti",
+    "logout": "Elsaluti",
+    "change_password": "Ŝanĝi pasvorton",
+    "edit": "Redakti",
+    "cancel": "Nuligi"
+}
