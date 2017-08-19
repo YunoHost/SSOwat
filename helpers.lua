@@ -558,7 +558,7 @@ function get_data_for(view)
 
     -- Pass all the translated strings to the view (to use with t_<key>)
     for k, v in pairs(i18n[conf["default_language"]]) do
-        data["t_"..k] = i18n[conf.lang][k] or v
+        data["t_"..k] = (i18n[conf.lang] and i18n[conf.lang][k]) or v
     end
 
     -- Pass flash notification content
