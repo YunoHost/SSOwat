@@ -1,3 +1,21 @@
+ssowat (2.7.1) testing; urgency=low
+
+  [ Security: move to sha-512 for password storing + auto hash upgrade ]
+  * [enh] encode password using sha512 on user modification of password (Laurent Peuch)
+  * [enh] auto rehash in sha-512 users passwords on login (Laurent Peuch)
+  * [fix] prevent shell injections (Laurent Peuch)
+  * [fix] be paranoid and prevent shell injections here also while input is supposed to be safe (Laurent Peuch)
+  * [fix] attempt to fix https://github.com/YunoHost/SSOwat/pull/86#issuecomment-323417926 (Laurent Peuch)
+
+  [ Translations (new translation and bugfix) ]
+  * Fixed support for incomplete translations (fallback to default language for missing strings) (Côme Chillie)
+  * [i18n] Translated using Weblate (Russian) (Evgeniy Ozhiganov)
+  * [i18n] Translated using Weblate (Esperanto) (MCMic)
+
+Thanks to all contributors (Bram, Evgeniy Ozhiganov, Côme Chilli, MCMice) ! <3
+
+ -- Laurent Peuch <cortex@worlddomination.be>  Sat, 19 Aug 2017 21:51:47 +0000
+
 ssowat (2.7.0) testing; urgency=low
 
   * [mod] comment didn't matched reality
