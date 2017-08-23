@@ -1,3 +1,9 @@
+ssowat (2.7.2) stable; urgency=low
+
+Releasing as stable
+
+ -- Alexandre Aubin <alex.aubin@mailoo.org>  Tue, 22 Aug 2017 21:17:33 -0400
+
 ssowat (2.7.1) testing; urgency=low
 
   [ Security: move to sha-512 for password storing + auto hash upgrade ]
