@@ -66,7 +66,7 @@ If you use YunoHost, you may want to edit the `/etc/ssowat/conf.json.persistent`
 
 ## Available parameters
 
-These are the SSOwat's configuration parameters. Only the first one is required, but it is recommended to know the others to fully understand what you can do with SSOwat.
+These are the SSOwat's configuration parameters. Only `portal_domain` and `skipped_urls` are required, but it is recommended to know the others to fully understand what you can do with SSOwat.
 
 #### portal_domain
 
@@ -134,7 +134,7 @@ List of regular expressions to be matched against URLs **and** URIs to protect t
 
 #### skipped_urls
 
-List of URLs and/or URIs that will not be affected by SSOwat
+List of URLs and/or URIs that will not be affected by SSOwat. This must be a JSON array, and SSOwat automatically adds itself to this array.
 
 #### skipped_regex
 
