@@ -33,7 +33,7 @@ function get_config()
             -- Else just take the persistent rule's value
             else
                conf[k] = v
-        end
+            end
         end
     end
 
@@ -41,7 +41,7 @@ function get_config()
     -- Default configuration values
     default_conf = {
         portal_scheme             = "https",
-        portal_path               = "/ssowat",
+        portal_path               = "/ssowat/",
         local_portal_domain       = "yunohost.local",
         domains                   = { conf["portal_domain"], "yunohost.local" },
         session_timeout           = 60 * 60 * 24,     -- one day
