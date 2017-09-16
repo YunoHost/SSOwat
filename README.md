@@ -66,7 +66,7 @@ If you use YunoHost, you may want to edit the `/etc/ssowat/conf.json.persistent`
 
 ## Available parameters
 
-These are the SSOwat's configuration parameters. Only `portal_domain` and `skipped_urls` are required, but it is recommended to know the others to fully understand what you can do with SSOwat.
+These are the SSOwat's configuration parameters. Only `portal_domain` is required, but it is recommended to know the others to fully understand what you can do with SSOwat.
 
 #### portal_domain
 
@@ -103,6 +103,10 @@ LDAP user identifier (**default**: `uid`)
 #### ldap_attributes
 
 User's attributes to fetch from LDAP (**default**: `["uid", "givenname", "sn", "cn", "homedirectory", "mail", "maildrop"]`)
+
+#### ldap_enforce_crypt
+
+Let SSOwat re-encrypt weakly-encrypted LDAP passwords into the safer sha-512 (crypt) (**default**: `true`)
 
 #### allow_mail_authentication
 
