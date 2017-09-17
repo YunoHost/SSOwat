@@ -71,11 +71,13 @@ then
 
         -- Force portal scheme
         if ngx.var.scheme ~= conf["portal_scheme"] then
+            ngx.log(ngx.DEBUG, "REDIRECT SCHEME ~= PORTAL_SCHEME: "..ngx.var.scheme)
             return hlp.redirect(conf.portal_url)
         end
 
         -- Add a trailing `/` if not present
         if ngx.var.uri.."/" == conf["portal_path"] then
+            ngx.log(ngx.DEBUG, "REDIRECT MISSING /")
             return hlp.redirect(conf.portal_url)
         end
 
@@ -98,6 +100,7 @@ then
             if string.match(back_url, "(.*)\n") then
                 hlp.flash("fail", hlp.t("redirection_error_invalid_url"))
                 ngx.log(ngx.ERR, "Redirection url is invalid")
+                ngx.log(ngx.DEBUG, "REDIRECT \\N FOUND")
                 return hlp.redirect(conf.portal_url)
             end
 
@@ -136,6 +139,7 @@ then
                 back_url = back_url.."sso_login="..cda_key
             end
 
+            ngx.log(ngx.DEBUG, "REDIRECT BACK URL REQUESTED")
             return hlp.redirect(back_url)
 
 
@@ -153,6 +157,7 @@ then
         -- If all the previous cases have failed, redirect to portal
         else
             hlp.flash("info", hlp.t("please_login"))
+            ngx.log(ngx.DEBUG, "REDIRECT GET CATCHALL…")
             return hlp.redirect(conf.portal_url)
         end
 
@@ -173,6 +178,7 @@ then
         else
             -- Redirect to portal
             hlp.flash("fail", hlp.t("please_login_from_portal"))
+            ngx.log(ngx.DEBUG, "REDIRECT POST CATCHALL…")
             return hlp.redirect(conf.portal_url)
         end
     end
@@ -303,6 +309,7 @@ if hlp.is_logged_in() then
 
     -- If user has no access to this URL, redirect him to the portal
     if not hlp.has_access() then
+        ngx.log(ngx.DEBUG, "REDIRECT ACCESS DENIED")
         return hlp.redirect(conf.portal_url)
     end
 
@@ -376,6 +383,7 @@ if auth_header then
 
         -- If user has no access to this URL, redirect him to the portal
         if not hlp.has_access(user) then
+            ngx.log(ngx.DEBUG, "REDIRECT BASIC AUTH OK")
             return hlp.redirect(conf.portal_url)
         end
 
@@ -393,4 +401,5 @@ end
 
 hlp.flash("info", hlp.t("please_login"))
 local back_url = ngx.var.scheme .. "://" .. ngx.var.host .. ngx.var.uri .. hlp.uri_args_string()
+ngx.log(ngx.DEBUG, "REDIRECT BY DEFAULT")
 return hlp.redirect(conf.portal_url.."?r="..ngx.encode_base64(back_url))
