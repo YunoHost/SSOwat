@@ -69,12 +69,6 @@ then
     -- `GET` method will serve a portal file
     if ngx.var.request_method == "GET" then
 
-        -- Force portal scheme
-        if ngx.var.scheme ~= conf["portal_scheme"] then
-            ngx.log(ngx.DEBUG, "REDIRECT SCHEME ~= PORTAL_SCHEME: "..ngx.var.scheme)
-            return hlp.redirect(conf.portal_url)
-        end
-
         -- Add a trailing `/` if not present
         if ngx.var.uri.."/" == conf["portal_path"] then
             ngx.log(ngx.DEBUG, "REDIRECT MISSING /")

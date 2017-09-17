@@ -324,13 +324,6 @@ end
 -- Set the authentication headers in order to pass credentials to the
 -- application underneath.
 function set_headers(user)
-
-    -- We definitely don't want to pass credentials on a non-encrypted
-    -- connection.
-    if ngx.var.scheme ~= "https" then
-        return redirect("https://"..ngx.var.host..ngx.var.uri..uri_args_string())
-    end
-
     local user = user or authUser
 
     -- If the password is not in cache or if the cache has expired, ask for
