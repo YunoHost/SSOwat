@@ -54,6 +54,7 @@ function get_config()
         skipped_urls              = {},
         users                     = {},
         ldap_attributes           = {"uid", "givenname", "sn", "cn", "homedirectory", "mail", "maildrop"},
+        additional_headers        = {["Remote-User"] = "uid"},
         allow_mail_authentication = true,
         default_language          = "en"
     }
