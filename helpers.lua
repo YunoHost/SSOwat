@@ -330,7 +330,12 @@ function set_headers(user)
     -- logging.
     if not cache:get(user.."-password") then
         flash("info", t("please_login"))
-        local back_url = ngx.var.scheme .. "://" .. ngx.var.host .. ngx.var.uri .. uri_args_string()
+        local https = ngx.var.proxy_https or ngx.var.https
+        local scheme = "http"
+        if https and https ~= "" then
+            scheme = "https"
+        end
+        local back_url = scheme .. "://" .. ngx.var.host .. ngx.var.uri .. uri_args_string()
         return redirect(conf.portal_url.."?r="..ngx.encode_base64(back_url))
     end
 

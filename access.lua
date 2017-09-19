@@ -185,22 +185,27 @@ end
 -- If the URL matches one of the `redirected_urls` in the configuration file,
 -- just redirect to the target URL/URI
 --
+local https = ngx.var.proxy_https or ngx.var.https
+local scheme = "http"
+if https and https ~= "" then
+    scheme = "https"
+end
 
 function detect_redirection(redirect_url)
     if hlp.string.starts(redirect_url, "http://")
     or hlp.string.starts(redirect_url, "https://") then
         return hlp.redirect(redirect_url)
     elseif hlp.string.starts(redirect_url, "/") then
-        return hlp.redirect(ngx.var.scheme.."://"..ngx.var.host..redirect_url)
+        return hlp.redirect(scheme.."://"..ngx.var.host..redirect_url)
     else
-        return hlp.redirect(ngx.var.scheme.."://"..redirect_url)
+        return hlp.redirect(scheme.."://"..redirect_url)
     end
 end
 
 if conf["redirected_urls"] then
     for url, redirect_url in pairs(conf["redirected_urls"]) do
         if url == ngx.var.host..ngx.var.uri..hlp.uri_args_string()
-        or url == ngx.var.scheme.."://"..ngx.var.host..ngx.var.uri..hlp.uri_args_string()
+        or url == scheme.."://"..ngx.var.host..ngx.var.uri..hlp.uri_args_string()
         or url == ngx.var.uri..hlp.uri_args_string() then
             detect_redirection(redirect_url)
         end
@@ -210,7 +215,7 @@ end
 if conf["redirected_regex"] then
     for regex, redirect_url in pairs(conf["redirected_regex"]) do
         if string.match(ngx.var.host..ngx.var.uri..hlp.uri_args_string(), regex)
-        or string.match(ngx.var.scheme.."://"..ngx.var.host..ngx.var.uri..hlp.uri_args_string(), regex)
+        or string.match(scheme.."://"..ngx.var.host..ngx.var.uri..hlp.uri_args_string(), regex)
         or string.match(ngx.var.uri..hlp.uri_args_string(), regex) then
             detect_redirection(redirect_url)
         end
@@ -394,6 +399,6 @@ end
 --
 
 hlp.flash("info", hlp.t("please_login"))
-local back_url = ngx.var.scheme .. "://" .. ngx.var.host .. ngx.var.uri .. hlp.uri_args_string()
+local back_url = scheme .. "://" .. ngx.var.host .. ngx.var.uri .. hlp.uri_args_string()
 ngx.log(ngx.DEBUG, "REDIRECT BY DEFAULT")
 return hlp.redirect(conf.portal_url.."?r="..ngx.encode_base64(back_url))
