@@ -6,6 +6,28 @@
 -- request is handled: redirected, forbidden, bypassed or served.
 --
 
+-- Initialize and get configuration
+local conf = config.get_config()
+
+-- Import helpers
+local hlp = require "helpers"
+
+-- Store the request data
+req_data = {
+    request_uri    = ngx.var.request_uri,
+    uri            = ngx.var.uri,
+    https          = ngx.var.proxy_https or ngx.var.https,
+    host           = ngx.var.host,
+    request_method = ngx.var.request_method,
+    http_referer   = ngx.var.http_referer
+}
+if req_data["https"] and req_data["https"] ~= "" then
+    req_data["scheme"] = "https"
+else
+    req_data["scheme"] = "http"
+end
+hlp.set_req_data(req_data)
+
 -- Get the `cache` persistent shared table
 local cache = ngx.shared.cache
 
@@ -15,12 +37,6 @@ if not srvkey then
     srvkey = random_string()
     cache:add("srvkey", srvkey)
 end
-
--- Initialize and get configuration
-local conf = config.get_config()
-
--- Import helpers
-local hlp = require "helpers"
 
 -- Just a note for the client to know that he passed through the SSO
 ngx.header["X-SSO-WAT"] = "You've just been SSOed"
@@ -34,7 +50,7 @@ ngx.header["X-SSO-WAT"] = "You've just been SSOed"
 -- If the `sso_login` URI argument is set, try a cross-domain authentication
 -- with the token passed as argument
 --
-if ngx.var.host ~= conf["portal_domain"] and ngx.var.request_method == "GET" then
+if req_data["host"] ~= conf["portal_domain"] and req_data["request_method"] == "GET" then
     uri_args = ngx.req.get_uri_args()
     if uri_args[conf.login_arg] then
         cda_key = uri_args[conf.login_arg]
@@ -43,13 +59,13 @@ if ngx.var.host ~= conf["portal_domain"] and ngx.var.request_method == "GET" the
         -- a CDA key
         user = cache:get("CDA|"..cda_key)
         if user then
-            hlp.set_auth_cookie(user, ngx.var.host)
-            ngx.log(ngx.NOTICE, "Cross-domain authentication: "..user.." connected on "..ngx.var.host)
+            hlp.set_auth_cookie(user, req_data["host"])
+            ngx.log(ngx.NOTICE, "Cross-domain authentication: "..user.." connected on "..req_data["host"])
             cache:delete("CDA|"..cda_key)
         end
 
         uri_args[conf.login_arg] = nil
-        return hlp.redirect(ngx.var.uri..hlp.uri_args_string(uri_args))
+        return hlp.redirect(req_data['request_uri'])
     end
 end
 
@@ -62,15 +78,15 @@ end
 -- If the URL matches the portal URL, serve a portal file or proceed to a
 -- portal operation
 --
-if ngx.var.host == conf["portal_domain"]
-   and hlp.string.starts(ngx.var.uri, string.sub(conf["portal_path"], 1, -2))
+if req_data["host"] == conf["portal_domain"]
+   and hlp.string.starts(req_data['request_uri'], string.sub(conf["portal_path"], 1, -2))
 then
 
     -- `GET` method will serve a portal file
-    if ngx.var.request_method == "GET" then
+    if req_data["request_method"] == "GET" then
 
         -- Add a trailing `/` if not present
-        if ngx.var.uri.."/" == conf["portal_path"] then
+        if req_data['request_uri'].."/" == conf["portal_path"] then
             ngx.log(ngx.DEBUG, "REDIRECT MISSING /")
             return hlp.redirect(conf.portal_url)
         end
@@ -121,7 +137,7 @@ then
 
             -- In case the `back_url` is not on the same domain than the
             -- current one, create a redirection with a CDA key
-            local ngx_host_escaped = ngx.var.host:gsub("-", "%%-") -- escape dash for pattern matching
+            local ngx_host_escaped = req_data["host"]:gsub("-", "%%-") -- escape dash for pattern matching
             if  not string.match(back_url, "^http[s]?://"..ngx_host_escaped.."/")
             and not string.match(back_url, ".*"..conf.login_arg.."=%d+$") then
                 local cda_key = hlp.set_cda_key()
@@ -140,12 +156,18 @@ then
         -- In case we want to serve portal login or assets for portal, just
         -- serve it
         elseif hlp.is_logged_in()
-            or ngx.var.uri == conf["portal_path"]
-            or (hlp.string.starts(ngx.var.uri, conf["portal_path"].."assets")
-               and (not ngx.var.http_referer
-                    or hlp.string.starts(ngx.var.http_referer, conf.portal_url)))
+            or req_data['request_uri'] == conf["portal_path"]
+            or hlp.string.starts(req_data['request_uri'], conf["portal_path"].."?")
+            or (hlp.string.starts(req_data['request_uri'], conf["portal_path"].."assets")
+               and (not req_data["http_referer"]
+                    or hlp.string.starts(req_data["http_referer"], conf.portal_url)))
         then
-            return hlp.serve(ngx.var.uri)
+            local uri = req_data['request_uri']
+            local i, _ = string.find(uri, '?')
+            if i then
+                uri = string.sub(uri, 1, i-1)
+            end
+            return hlp.serve(uri)
 
 
         -- If all the previous cases have failed, redirect to portal
@@ -157,13 +179,13 @@ then
 
 
     -- `POST` method is basically use to achieve editing operations
-    elseif ngx.var.request_method == "POST" then
+    elseif req_data["request_method"] == "POST" then
 
         -- CSRF protection, only proceed if we are editing from the same
         -- domain
-        if hlp.string.starts(ngx.var.http_referer, conf.portal_url) then
-            if hlp.string.ends(ngx.var.uri, conf["portal_path"].."password.html")
-            or hlp.string.ends(ngx.var.uri, conf["portal_path"].."edit.html")
+        if hlp.string.starts(req_data["http_referer"], conf.portal_url) then
+            if hlp.string.ends(req_data["uri"], conf["portal_path"].."password.html")
+            or hlp.string.ends(req_data["uri"], conf["portal_path"].."edit.html")
             then
                return hlp.edit_user()
             else
@@ -185,28 +207,23 @@ end
 -- If the URL matches one of the `redirected_urls` in the configuration file,
 -- just redirect to the target URL/URI
 --
-local https = ngx.var.proxy_https or ngx.var.https
-local scheme = "http"
-if https and https ~= "" then
-    scheme = "https"
-end
 
 function detect_redirection(redirect_url)
     if hlp.string.starts(redirect_url, "http://")
     or hlp.string.starts(redirect_url, "https://") then
         return hlp.redirect(redirect_url)
     elseif hlp.string.starts(redirect_url, "/") then
-        return hlp.redirect(scheme.."://"..ngx.var.host..redirect_url)
+        return hlp.redirect(req_data["scheme"].."://"..req_data["host"]..redirect_url)
     else
-        return hlp.redirect(scheme.."://"..redirect_url)
+        return hlp.redirect(req_data["scheme"].."://"..redirect_url)
     end
 end
 
 if conf["redirected_urls"] then
     for url, redirect_url in pairs(conf["redirected_urls"]) do
-        if url == ngx.var.host..ngx.var.uri..hlp.uri_args_string()
-        or url == scheme.."://"..ngx.var.host..ngx.var.uri..hlp.uri_args_string()
-        or url == ngx.var.uri..hlp.uri_args_string() then
+        if url == req_data["host"]..req_data['request_uri']
+        or url == req_data["scheme"].."://"..req_data["host"]..req_data['request_uri']
+        or url == req_data['request_uri'] then
             detect_redirection(redirect_url)
         end
     end
@@ -214,9 +231,9 @@ end
 
 if conf["redirected_regex"] then
     for regex, redirect_url in pairs(conf["redirected_regex"]) do
-        if string.match(ngx.var.host..ngx.var.uri..hlp.uri_args_string(), regex)
-        or string.match(scheme.."://"..ngx.var.host..ngx.var.uri..hlp.uri_args_string(), regex)
-        or string.match(ngx.var.uri..hlp.uri_args_string(), regex) then
+        if string.match(req_data["host"]..req_data['request_uri'], regex)
+        or string.match(req_data["scheme"].."://"..req_data["host"]..req_data['request_uri'], regex)
+        or string.match(req_data['request_uri'], regex) then
             detect_redirection(redirect_url)
         end
     end
@@ -241,14 +258,14 @@ function is_protected()
     end
 
     for _, url in ipairs(conf["protected_urls"]) do
-        if hlp.string.starts(ngx.var.host..ngx.var.uri..hlp.uri_args_string(), url)
-        or hlp.string.starts(ngx.var.uri..hlp.uri_args_string(), url) then
+        if hlp.string.starts(req_data["host"]..req_data['request_uri'], url)
+        or hlp.string.starts(req_data['request_uri'], url) then
             return true
         end
     end
     for _, regex in ipairs(conf["protected_regex"]) do
-        if string.match(ngx.var.host..ngx.var.uri..hlp.uri_args_string(), regex)
-        or string.match(ngx.var.uri..hlp.uri_args_string(), regex) then
+        if string.match(req_data["host"]..req_data['request_uri'], regex)
+        or string.match(req_data['request_uri'], regex) then
             return true
         end
     end
@@ -267,8 +284,8 @@ end
 
 if conf["skipped_urls"] then
     for _, url in ipairs(conf["skipped_urls"]) do
-        if (hlp.string.starts(ngx.var.host..ngx.var.uri..hlp.uri_args_string(), url)
-        or  hlp.string.starts(ngx.var.uri..hlp.uri_args_string(), url))
+        if (hlp.string.starts(req_data["host"]..req_data['request_uri'], url)
+        or  hlp.string.starts(req_data['request_uri'], url))
         and not is_protected() then
             return hlp.pass()
         end
@@ -277,8 +294,8 @@ end
 
 if conf["skipped_regex"] then
     for _, regex in ipairs(conf["skipped_regex"]) do
-        if (string.match(ngx.var.host..ngx.var.uri..hlp.uri_args_string(), regex)
-        or  string.match(ngx.var.uri..hlp.uri_args_string(), regex))
+        if (string.match(req_data["host"]..req_data['request_uri'], regex)
+        or  string.match(req_data['request_uri'], regex))
         and not is_protected() then
             return hlp.pass()
         end
@@ -296,13 +313,13 @@ end
 --
 
 if hlp.is_logged_in() then
-    if string.match(ngx.var.uri, "^/ynhpanel.js$") then
+    if string.match(req_data['request_uri'], "^/ynhpanel.js$") then
         hlp.serve("/yunohost/sso/assets/js/ynhpanel.js")
     end
-    if string.match(ngx.var.uri, "^/ynhpanel.css$") then
+    if string.match(req_data['request_uri'], "^/ynhpanel.css$") then
         hlp.serve("/yunohost/sso/assets/css/ynhpanel.css")
     end
-    if string.match(ngx.var.uri, "^/ynhpanel.json$") then
+    if string.match(req_data['request_uri'], "^/ynhpanel.json$") then
         hlp.serve("/yunohost/sso/assets/js/ynhpanel.json")
     end
 
@@ -334,8 +351,8 @@ end
 
 if conf["unprotected_urls"] then
     for _, url in ipairs(conf["unprotected_urls"]) do
-        if (hlp.string.starts(ngx.var.host..ngx.var.uri..hlp.uri_args_string(), url)
-        or  hlp.string.starts(ngx.var.uri..hlp.uri_args_string(), url))
+        if (hlp.string.starts(req_data["host"]..req_data['request_uri'], url)
+        or  hlp.string.starts(req_data['request_uri'], url))
         and not is_protected() then
             if hlp.is_logged_in() then
                 hlp.set_headers()
@@ -347,8 +364,8 @@ end
 
 if conf["unprotected_regex"] then
     for _, regex in ipairs(conf["unprotected_regex"]) do
-        if (string.match(ngx.var.host..ngx.var.uri..hlp.uri_args_string(), regex)
-        or  string.match(ngx.var.uri..hlp.uri_args_string(), regex))
+        if (string.match(req_data["host"]..req_data['request_uri'], regex)
+        or  string.match(req_data['request_uri'], regex))
         and not is_protected() then
             if hlp.is_logged_in() then
                 hlp.set_headers()
@@ -399,6 +416,6 @@ end
 --
 
 hlp.flash("info", hlp.t("please_login"))
-local back_url = scheme .. "://" .. ngx.var.host .. ngx.var.uri .. hlp.uri_args_string()
+local back_url = req_data["scheme"] .. "://" .. req_data["host"] .. req_data['request_uri']
 ngx.log(ngx.DEBUG, "REDIRECT BY DEFAULT")
 return hlp.redirect(conf.portal_url.."?r="..ngx.encode_base64(back_url))

@@ -9,6 +9,14 @@ module('helpers', package.seeall)
 
 local cache = ngx.shared.cache
 local conf = config.get_config()
+local req_data
+
+-- Local store for the request data, because:
+-- - some data is cleared along the process but is still needed (eg. request_uri)
+-- - repeatedly reading ngx.var or ngx.ctx is bad for memory usage and performance
+function set_req_data(data)
+    req_data = data
+end
 
 -- Read a FS stored file
 function read_file(file)
@@ -225,7 +233,7 @@ end
 -- of the configuration file
 function has_access(user, url)
     user = user or authUser
-    url = url or ngx.var.host..ngx.var.uri
+    url = url or req_data["host"]..req_data['request_uri']
 
     if not conf["users"][user] then
         conf = config.get_config()
@@ -242,7 +250,7 @@ function has_access(user, url)
 
         -- Replace the original domain by a local one if you are connected from
         -- a non-global domain name.
-        if ngx.var.host == conf["local_portal_domain"] then
+        if req_data["host"] == conf["local_portal_domain"] then
             u = string.gsub(u, conf["original_portal_domain"], conf["local_portal_domain"])
         end
 
@@ -330,12 +338,7 @@ function set_headers(user)
     -- logging.
     if not cache:get(user.."-password") then
         flash("info", t("please_login"))
-        local https = ngx.var.proxy_https or ngx.var.https
-        local scheme = "http"
-        if https and https ~= "" then
-            scheme = "https"
-        end
-        local back_url = scheme .. "://" .. ngx.var.host .. ngx.var.uri .. uri_args_string()
+        local back_url = req_data["scheme"] .. "://" .. req_data["host"] .. req_data['request_uri']
         return redirect(conf.portal_url.."?r="..ngx.encode_base64(back_url))
     end
 
@@ -548,7 +551,7 @@ function get_data_for(view)
         if conf["users"][user] then
             for url, name in pairs(conf["users"][user]) do
 
-                if ngx.var.host == conf["local_portal_domain"] then
+                if req_data["host"] == conf["local_portal_domain"] then
                     url = string.gsub(url, conf["original_portal_domain"], conf["local_portal_domain"])
                 end
                 table.insert(sorted_apps, name)
@@ -621,7 +624,7 @@ function edit_user()
 
         -- In case of a password modification
         -- TODO: split this into a new function
-        if string.ends(ngx.var.uri, "password.html") then
+        if string.ends(req_data["uri"], "password.html") then
 
             -- Check current password against the cached one
             if args.currentpassword
@@ -657,7 +660,7 @@ function edit_user()
 
          -- In case of profile modification
          -- TODO: split this into a new function
-         elseif string.ends(ngx.var.uri, "edit.html") then
+         elseif string.ends(req_data["uri"], "edit.html") then
 
              -- Check that needed arguments exist
              if args.givenName and args.sn and args.mail then
@@ -860,7 +863,7 @@ function login()
     local user = authenticate(args.user, args.password)
     if user then
         ngx.status = ngx.HTTP_CREATED
-        set_auth_cookie(user, ngx.var.host)
+        set_auth_cookie(user, req_data["host"])
     else
         ngx.status = ngx.HTTP_UNAUTHORIZED
         flash("fail", t("wrong_username_password"))
@@ -909,9 +912,9 @@ function pass()
     delete_redirect_cookie()
 
     -- When we are in the SSOwat portal, we need a default `content-type`
-    if string.ends(ngx.var.uri, "/")
-    or string.ends(ngx.var.uri, ".html")
-    or string.ends(ngx.var.uri, ".htm")
+    if string.ends(req_data["uri"], "/")
+    or string.ends(req_data["uri"], ".html")
+    or string.ends(req_data["uri"], ".htm")
     then
         ngx.header["Content-Type"] = "text/html"
     end
