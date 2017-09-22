@@ -33,7 +33,7 @@ function get_config()
             -- Else just take the persistent rule's value
             else
                conf[k] = v
-        end
+            end
         end
     end
 
@@ -41,16 +41,21 @@ function get_config()
     -- Default configuration values
     default_conf = {
         portal_scheme             = "https",
-        portal_path               = "/ssowat",
+        portal_path               = "/ssowat/",
         local_portal_domain       = "yunohost.local",
-        domains                   = { conf["portal_domain"], "yunohost.local" },
+        domains                   = { "yunohost.local", conf["portal_domain"] },
         session_timeout           = 60 * 60 * 24,     -- one day
         session_max_timeout       = 60 * 60 * 24 * 7, -- one week
         login_arg                 = "sso_login",
         ldap_host                 = "localhost",
         ldap_group                = "ou=users,dc=yunohost,dc=org",
         ldap_identifier           = "uid",
+        ldap_enforce_crypt        = true,
+        skipped_urls              = {},
+        users                     = {},
+        logout                    = {},
         ldap_attributes           = {"uid", "givenname", "sn", "cn", "homedirectory", "mail", "maildrop"},
+        additional_headers        = {["Remote-User"] = "uid"},
         allow_mail_authentication = true,
         default_language          = "en"
     }

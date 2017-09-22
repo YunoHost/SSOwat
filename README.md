@@ -66,7 +66,7 @@ If you use YunoHost, you may want to edit the `/etc/ssowat/conf.json.persistent`
 
 ## Available parameters
 
-These are the SSOwat's configuration parameters. Only `portal_domain` and `skipped_urls` are required, but it is recommended to know the others to fully understand what you can do with SSOwat.
+These are the SSOwat's configuration parameters. Only `portal_domain` is required, but it is recommended to know the others to fully understand what you can do with SSOwat.
 
 #### portal_domain
 
@@ -74,11 +74,11 @@ Domain of the authentication portal. It has to be a domain, IP addresses will no
 
 #### portal_path
 
-URI of the authentication portal (**default**: `/ssowat`)
+URI of the authentication portal (**default**: `/ssowat/`). This path **must** end with “`/`”.
 
 #### portal_port
 
-Web port of the authentication portal (**default**: `443`)
+Web port of the authentication portal (**default**: `443` for `https`, `80` for `http`)
 
 #### portal_scheme
 
@@ -86,7 +86,7 @@ Whether authentication should use secure connection or not (**default**: `https`
 
 #### domains
 
-List of handle domains (**default**: similar to `portal_domain`)
+List of handled domains (**default**: similar to `portal_domain`)
 
 #### ldap_host
 
@@ -103,6 +103,10 @@ LDAP user identifier (**default**: `uid`)
 #### ldap_attributes
 
 User's attributes to fetch from LDAP (**default**: `["uid", "givenname", "sn", "cn", "homedirectory", "mail", "maildrop"]`)
+
+#### ldap_enforce_crypt
+
+Let SSOwat re-encrypt weakly-encrypted LDAP passwords into the safer sha-512 (crypt) (**default**: `true`)
 
 #### allow_mail_authentication
 
@@ -159,6 +163,10 @@ Array of regular expressions to be matched against URLS **and** URIs and their r
 #### users
 
 2-level array containing usernames and their allowed URLs along with an App name (**example**: `{ "kload": { "kload.fr/myapp/": "My App" } }`)
+
+#### logout
+
+Associative array; when logging out of SSOwat, any existing cookie that is found as a key of this array triggers the associated logout URL. This only works on `http[s]://[*.]portal_domaini/`, though. (**example**: `{ "dcxd": "https://example.org/dotclear/admin/index.php?logout=1" }`)
 
 #### default_language
 

@@ -9,6 +9,14 @@ module('helpers', package.seeall)
 
 local cache = ngx.shared.cache
 local conf = config.get_config()
+local req_data
+
+-- Local store for the request data, because:
+-- - some data is cleared along the process but is still needed (eg. request_uri)
+-- - repeatedly reading ngx.var or ngx.ctx is bad for memory usage and performance
+function set_req_data(data)
+    req_data = data
+end
 
 -- Read a FS stored file
 function read_file(file)
@@ -47,6 +55,10 @@ function string.ends(String, End)
    return End=='' or string.sub(String, -string.len(End)) == End
 end
 
+-- Escape special characters in a string
+function string.pcre_escape(String)
+   return ngx.re.gsub(String, '([]({+?\\*.})[])', '\\$1')
+end
 
 -- Find a string by its translate key in the right language
 function t(key)
@@ -169,7 +181,8 @@ function delete_cookie()
         ngx.header["Set-Cookie"] = {
             "SSOwAuthUser="..cookie_str,
             "SSOwAuthHash="..cookie_str,
-            "SSOwAuthExpire="..cookie_str
+            "SSOwAuthExpire="..cookie_str,
+            "SSOwFullLogout="..cookie_str
         }
     end
 end
@@ -225,7 +238,7 @@ end
 -- of the configuration file
 function has_access(user, url)
     user = user or authUser
-    url = url or ngx.var.host..ngx.var.uri
+    url = url or req_data["host"]..req_data['request_uri']
 
     if not conf["users"][user] then
         conf = config.get_config()
@@ -242,7 +255,7 @@ function has_access(user, url)
 
         -- Replace the original domain by a local one if you are connected from
         -- a non-global domain name.
-        if ngx.var.host == conf["local_portal_domain"] then
+        if req_data["host"] == conf["local_portal_domain"] then
             u = string.gsub(u, conf["original_portal_domain"], conf["local_portal_domain"])
         end
 
@@ -293,7 +306,9 @@ function authenticate(user, password)
     -- cache shared table in order to eventually reuse it later when updating
     -- profile information or just passing credentials to an application.
     if connected then
-        ensure_user_password_uses_strong_hash(connected, user, password)
+        if conf['ldap_enforce_crypt'] then
+            ensure_user_password_uses_strong_hash(connected, user, password)
+        end
         cache:add(user.."-password", password, conf["session_timeout"])
         ngx.log(ngx.NOTICE, "Connected as: "..user)
         return user
@@ -322,20 +337,13 @@ end
 -- Set the authentication headers in order to pass credentials to the
 -- application underneath.
 function set_headers(user)
-
-    -- We definitely don't want to pass credentials on a non-encrypted
-    -- connection.
-    if ngx.var.scheme ~= "https" then
-        return redirect("https://"..ngx.var.host..ngx.var.uri..uri_args_string())
-    end
-
     local user = user or authUser
 
     -- If the password is not in cache or if the cache has expired, ask for
     -- logging.
     if not cache:get(user.."-password") then
         flash("info", t("please_login"))
-        local back_url = ngx.var.scheme .. "://" .. ngx.var.host .. ngx.var.uri .. uri_args_string()
+        local back_url = req_data["scheme"] .. "://" .. req_data["host"] .. req_data['request_uri']
         return redirect(conf.portal_url.."?r="..ngx.encode_base64(back_url))
     end
 
@@ -545,14 +553,16 @@ function get_data_for(view)
 
         -- Add user's accessible URLs using the ACLs.
         -- It is typically used to build the app list.
-        for url, name in pairs(conf["users"][user]) do
+        if conf["users"][user] then
+            for url, name in pairs(conf["users"][user]) do
 
-            if ngx.var.host == conf["local_portal_domain"] then
-                url = string.gsub(url, conf["original_portal_domain"], conf["local_portal_domain"])
+                if req_data["host"] == conf["local_portal_domain"] then
+                    url = string.gsub(url, conf["original_portal_domain"], conf["local_portal_domain"])
+                end
+                table.insert(sorted_apps, name)
+                table.sort(sorted_apps)
+                table.insert(data["app"], index_of(sorted_apps, name), { url = url, name = name })
             end
-            table.insert(sorted_apps, name)
-            table.sort(sorted_apps)
-            table.insert(data["app"], index_of(sorted_apps, name), { url = url, name = name })
         end
     end
 
@@ -575,12 +585,13 @@ end
 -- if it's not the case, it migrates the password to this new hash algorithm
 function ensure_user_password_uses_strong_hash(ldap, user, password)
     local current_hashed_password = nil
+    conf = config.get_config()
 
     for dn, attrs in ldap:search {
-        base = "ou=users,dc=yunohost,dc=org",
+        base = conf['ldap_group'],
         scope = "onelevel",
         sizelimit = 1,
-        filter = "(uid="..user..")",
+        filter = "("..conf['ldap_identifier'].."="..user..")",
         attrs = {"userPassword"}
     } do
         current_hashed_password = attrs["userPassword"]:sub(0, 10)
@@ -618,7 +629,7 @@ function edit_user()
 
         -- In case of a password modification
         -- TODO: split this into a new function
-        if string.ends(ngx.var.uri, "password.html") then
+        if string.ends(req_data["uri"], "password.html") then
 
             -- Check current password against the cached one
             if args.currentpassword
@@ -654,7 +665,7 @@ function edit_user()
 
          -- In case of profile modification
          -- TODO: split this into a new function
-         elseif string.ends(ngx.var.uri, "edit.html") then
+         elseif string.ends(req_data["uri"], "edit.html") then
 
              -- Check that needed arguments exist
              if args.givenName and args.sn and args.mail then
@@ -857,7 +868,7 @@ function login()
     local user = authenticate(args.user, args.password)
     if user then
         ngx.status = ngx.HTTP_CREATED
-        set_auth_cookie(user, ngx.var.host)
+        set_auth_cookie(user, req_data["host"])
     else
         ngx.status = ngx.HTTP_UNAUTHORIZED
         flash("fail", t("wrong_username_password"))
@@ -877,17 +888,75 @@ end
 -- It deletes session cached information to invalidate client side cookie
 -- information.
 function logout()
+    conf = config.get_config()
 
     -- We need this call since we are in a POST request
     local args = ngx.req.get_uri_args()
 
-    -- Delete user cookie if logged in (that should always be the case)
-    if is_logged_in() then
-        delete_cookie()
-        cache:delete("session_"..authUser)
-        cache:delete(authUser.."-"..conf["ldap_identifier"]) -- Ugly trick to reload cache
-        flash("info", t("logged_out"))
+    -- Login if not logged in (that should always be the case)
+    if not is_logged_in() then
+        return redirect(conf.portal_url)
     end
+
+    -- Loop over session cookies.
+    -- For now, this will only work for domains under that of SSOwat.
+    -- The SSOwFullLogout cookie always contains the next cookie to check.
+    local cur_logout_step = ngx.var.cookie_SSOwFullLogout or '*'
+    local url_re = "^(?:https?://(?:[^/]+\\.)?"..string.pcre_escape(conf['portal_domain'])..")?/"
+    local sess_ck
+    local sess_ck_val
+    local logout_url
+    local read_next_and_proceed = false
+    local cookie_str = "; Domain=."..conf['portal_domain']..
+                       "; Path=/"..
+                       "; Expires="..os.date("%a, %d %b %Y %X UTC;", ngx.req.start_time() + 60)
+    for sess_ck, logout_url in pairs(conf['logout']) do
+        ngx.log(ngx.DEBUG, "LOGOUT step="..cur_logout_step..", evaluate="..sess_ck)
+
+        -- Run a logout URL, but point to the next, to avoid a loop
+        if read_next_and_proceed then
+            ngx.ctx.SSOwFullLogout = "SSOwFullLogout="..sess_ck..cookie_str..'|'..conf.portal_url
+            ngx.log(ngx.DEBUG, "LOGOUT pass: "..req_data['request_uri'])
+            return pass()
+
+        -- A cookie must be checked; do so
+        elseif cur_logout_step == '*' or cur_logout_step == sess_ck then
+            if ngx.re.match(logout_url, url_re) then
+
+                -- Not the right URI for this cookie; redirect
+                if string.gsub(logout_url, '^https?://[^/]+/', '/') ~= req_data['request_uri'] then
+                    ngx.header["Set-Cookie"] = {"SSOwFullLogout="..sess_ck..cookie_str}
+                    ngx.log(ngx.DEBUG, "LOGOUT visit: "..logout_url)
+                    return redirect(logout_url)
+                end
+                sess_ck_val = ngx.var["cookie_"..sess_ck]
+
+                -- The cookie must be deleted
+                if sess_ck_val and sess_ck_val ~= "" then
+                    read_next_and_proceed = true
+
+                -- No cookie; check next
+                else
+                    ngx.log(ngx.DEBUG, "LOGOUT skip")
+                    cur_logout_step = '*'
+                end
+            else
+                -- This URL is not handled :-(
+                ngx.log(ngx.DEBUG, "LOGOUT unhandled")
+                cur_logout_step = '*'
+            end
+        end
+    end
+    if read_next_and_proceed then
+        ngx.ctx.SSOwFullLogout = "SSOwFullLogout=0"..cookie_str..'|'..conf.portal_url
+        ngx.log(ngx.DEBUG, "LOGOUT pass: "..req_data['request_uri'])
+        return pass()
+    end
+
+    delete_cookie()
+    cache:delete("session_"..authUser)
+    cache:delete(authUser.."-"..conf["ldap_identifier"]) -- Ugly trick to reload cache
+    flash("info", t("logged_out"))
 
     -- Redirect to portal anyway
     return redirect(conf.portal_url)
@@ -906,9 +975,9 @@ function pass()
     delete_redirect_cookie()
 
     -- When we are in the SSOwat portal, we need a default `content-type`
-    if string.ends(ngx.var.uri, "/")
-    or string.ends(ngx.var.uri, ".html")
-    or string.ends(ngx.var.uri, ".htm")
+    if string.ends(req_data["uri"], "/")
+    or string.ends(req_data["uri"], ".html")
+    or string.ends(req_data["uri"], ".htm")
     then
         ngx.header["Content-Type"] = "text/html"
     end
