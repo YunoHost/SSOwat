@@ -55,6 +55,10 @@ function string.ends(String, End)
    return End=='' or string.sub(String, -string.len(End)) == End
 end
 
+-- Escape special characters in a string
+function string.pcre_escape(String)
+   return ngx.re.gsub(String, '([]({+?\\*.})[])', '\\$1')
+end
 
 -- Find a string by its translate key in the right language
 function t(key)
@@ -177,7 +181,8 @@ function delete_cookie()
         ngx.header["Set-Cookie"] = {
             "SSOwAuthUser="..cookie_str,
             "SSOwAuthHash="..cookie_str,
-            "SSOwAuthExpire="..cookie_str
+            "SSOwAuthExpire="..cookie_str,
+            "SSOwFullLogout="..cookie_str
         }
     end
 end
@@ -883,17 +888,75 @@ end
 -- It deletes session cached information to invalidate client side cookie
 -- information.
 function logout()
+    conf = config.get_config()
 
     -- We need this call since we are in a POST request
     local args = ngx.req.get_uri_args()
 
-    -- Delete user cookie if logged in (that should always be the case)
-    if is_logged_in() then
-        delete_cookie()
-        cache:delete("session_"..authUser)
-        cache:delete(authUser.."-"..conf["ldap_identifier"]) -- Ugly trick to reload cache
-        flash("info", t("logged_out"))
+    -- Login if not logged in (that should always be the case)
+    if not is_logged_in() then
+        return redirect(conf.portal_url)
     end
+
+    -- Loop over session cookies.
+    -- For now, this will only work for domains under that of SSOwat.
+    -- The SSOwFullLogout cookie always contains the next cookie to check.
+    local cur_logout_step = ngx.var.cookie_SSOwFullLogout or '*'
+    local url_re = "^(?:https?://(?:[^/]+\\.)?"..string.pcre_escape(conf['portal_domain'])..")?/"
+    local sess_ck
+    local sess_ck_val
+    local logout_url
+    local read_next_and_proceed = false
+    local cookie_str = "; Domain=."..conf['portal_domain']..
+                       "; Path=/"..
+                       "; Expires="..os.date("%a, %d %b %Y %X UTC;", ngx.req.start_time() + 60)
+    for sess_ck, logout_url in pairs(conf['logout']) do
+        ngx.log(ngx.DEBUG, "LOGOUT step="..cur_logout_step..", evaluate="..sess_ck)
+
+        -- Run a logout URL, but point to the next, to avoid a loop
+        if read_next_and_proceed then
+            ngx.ctx.SSOwFullLogout = "SSOwFullLogout="..sess_ck..cookie_str..'|'..conf.portal_url
+            ngx.log(ngx.DEBUG, "LOGOUT pass: "..req_data['request_uri'])
+            return pass()
+
+        -- A cookie must be checked; do so
+        elseif cur_logout_step == '*' or cur_logout_step == sess_ck then
+            if ngx.re.match(logout_url, url_re) then
+
+                -- Not the right URI for this cookie; redirect
+                if string.gsub(logout_url, '^https?://[^/]+/', '/') ~= req_data['request_uri'] then
+                    ngx.header["Set-Cookie"] = {"SSOwFullLogout="..sess_ck..cookie_str}
+                    ngx.log(ngx.DEBUG, "LOGOUT visit: "..logout_url)
+                    return redirect(logout_url)
+                end
+                sess_ck_val = ngx.var["cookie_"..sess_ck]
+
+                -- The cookie must be deleted
+                if sess_ck_val and sess_ck_val ~= "" then
+                    read_next_and_proceed = true
+
+                -- No cookie; check next
+                else
+                    ngx.log(ngx.DEBUG, "LOGOUT skip")
+                    cur_logout_step = '*'
+                end
+            else
+                -- This URL is not handled :-(
+                ngx.log(ngx.DEBUG, "LOGOUT unhandled")
+                cur_logout_step = '*'
+            end
+        end
+    end
+    if read_next_and_proceed then
+        ngx.ctx.SSOwFullLogout = "SSOwFullLogout=0"..cookie_str..'|'..conf.portal_url
+        ngx.log(ngx.DEBUG, "LOGOUT pass: "..req_data['request_uri'])
+        return pass()
+    end
+
+    delete_cookie()
+    cache:delete("session_"..authUser)
+    cache:delete(authUser.."-"..conf["ldap_identifier"]) -- Ugly trick to reload cache
+    flash("info", t("logged_out"))
 
     -- Redirect to portal anyway
     return redirect(conf.portal_url)

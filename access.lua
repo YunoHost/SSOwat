@@ -43,6 +43,15 @@ ngx.header["X-SSO-WAT"] = "You've just been SSOed"
 
 
 --
+-- 0. LOGOUT if requested, but only if logged in
+--
+local logout_ck = ngx.var.cookie_SSOwFullLogout
+if logout_ck and logout_ck ~= "" and hlp.is_logged_in() then
+    return hlp.logout()
+end
+
+
+--
 -- 1. LOGIN
 --
 -- example: https://mydomain.org/?sso_login=a6e5320f

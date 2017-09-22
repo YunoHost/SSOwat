@@ -26,5 +26,8 @@
           "example.org/myapp": "My other domain App",
           "example.com/myapp2": "My second App"
        }
+   },
+   "logout": {
+       "dcxd": "https://example.org/dotclear/admin/index.php?logout=1"
    }
 }

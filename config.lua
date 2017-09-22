@@ -43,7 +43,7 @@ function get_config()
         portal_scheme             = "https",
         portal_path               = "/ssowat/",
         local_portal_domain       = "yunohost.local",
-        domains                   = { conf["portal_domain"], "yunohost.local" },
+        domains                   = { "yunohost.local", conf["portal_domain"] },
         session_timeout           = 60 * 60 * 24,     -- one day
         session_max_timeout       = 60 * 60 * 24 * 7, -- one week
         login_arg                 = "sso_login",
@@ -53,6 +53,7 @@ function get_config()
         ldap_enforce_crypt        = true,
         skipped_urls              = {},
         users                     = {},
+        logout                    = {},
         ldap_attributes           = {"uid", "givenname", "sn", "cn", "homedirectory", "mail", "maildrop"},
         additional_headers        = {["Remote-User"] = "uid"},
         allow_mail_authentication = true,

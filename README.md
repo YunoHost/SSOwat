@@ -164,6 +164,10 @@ Array of regular expressions to be matched against URLS **and** URIs and their r
 
 2-level array containing usernames and their allowed URLs along with an App name (**example**: `{ "kload": { "kload.fr/myapp/": "My App" } }`)
 
+#### logout
+
+Associative array; when logging out of SSOwat, any existing cookie that is found as a key of this array triggers the associated logout URL. This only works on `http[s]://[*.]portal_domaini/`, though. (**example**: `{ "dcxd": "https://example.org/dotclear/admin/index.php?logout=1" }`)
+
 #### default_language
 
 Language code used by default in views (**default**: `en`)
