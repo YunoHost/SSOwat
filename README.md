@@ -74,11 +74,11 @@ Domain of the authentication portal. It has to be a domain, IP addresses will no
 
 #### portal_path
 
-URI of the authentication portal (**default**: `/ssowat`)
+URI of the authentication portal (**default**: `/ssowat/`). This path **must** end with “`/`”.
 
 #### portal_port
 
-Web port of the authentication portal (**default**: `443`)
+Web port of the authentication portal (**default**: `443` for `https`, `80` for `http`)
 
 #### portal_scheme
 
@@ -86,7 +86,7 @@ Whether authentication should use secure connection or not (**default**: `https`
 
 #### domains
 
-List of handle domains (**default**: similar to `portal_domain`)
+List of handled domains (**default**: similar to `portal_domain`)
 
 #### ldap_host
 
