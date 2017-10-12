@@ -1,3 +1,10 @@
+ssowat (2.7.3) testing; urgency=low
+
+  * [fix] Fix default conf and doc (portal_path must end with /) (#91)
+  * [fix] Fix the damn infinite redirection loop (#93)
+
+ -- Alexandre Aubin <alex.aubin@mailoo.org>  Thu, 12 Oct 2017 17:02:06 -0400
+
 ssowat (2.7.2) stable; urgency=low
 
 Releasing as stable
