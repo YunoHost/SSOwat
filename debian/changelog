@@ -1,3 +1,9 @@
+ssowat (2.7.5) stable; urgency=low
+
+  (Bumping version for stable release)
+
+ -- Alexandre Aubin <alex.aubin@mailoo.org>  Sat, 02 Dec 2017 12:22:51 -0500
+
 ssowat (2.7.4) testing; urgency=low
 
   * [fix] Add whois as dependency (#95)
