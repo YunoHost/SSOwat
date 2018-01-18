@@ -1,3 +1,9 @@
+ssowat (2.7.7) stable; urgency=low
+
+  (Bumping version for stable release)
+
+ -- Alexandre Aubin <alex.aubin@mailoo.org>  Thu, 18 Jan 2018 17:37:08 -0500
+
 ssowat (2.7.6) testing; urgency=low
 
   * [fix] Link for support in SSOwat portal
