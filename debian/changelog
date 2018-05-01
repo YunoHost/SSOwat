@@ -1,3 +1,12 @@
+ssowat (2.7.11) testing; urgency=low
+
+  * [i18n] Improve translations for Arabic, Dutch, Spanish
+  * [a11y] Use role=button, to have those links handled as buttons by screen readers (#97)
+
+  Thanks to all contributors (irina11y, ButterflyOfFire, Matthieu, bjarkan) <3 !
+
+ -- Alexandre Aubin <alex.aubin@mailoo.org>  Tue, 01 May 2018 23:29:10 +0000
+
 ssowat (2.7.7) stable; urgency=low
 
   (Bumping version for stable release)
