@@ -37,5 +37,7 @@
     "user_saving_fail": "Se produjo un error al guardar los cambios del usuario",
     "username": "Nombre de usuario",
     "wrong_current_password": "La contraseña actual es incorrecta",
-    "wrong_username_password": "Nombre de usuario o contraseña incorrectos"
+    "wrong_username_password": "Nombre de usuario o contraseña incorrectos",
+    "redirection_error_invalid_url": "Error de redirección: url inválido",
+    "redirection_error_unmanaged_domain": "Error de redirección: Dominio no gestionado"
 }
