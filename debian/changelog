@@ -1,3 +1,9 @@
+ssowat (2.7.12) stable; urgency=low
+
+  * Bumping version number for stable release
+
+ -- Alexandre Aubin <alex.aubin@mailoo.org>  Sun, 06 May 2018 16:53:24 +0000
+
 ssowat (2.7.11) testing; urgency=low
 
   * [i18n] Improve translations for Arabic, Dutch, Spanish
