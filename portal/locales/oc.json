@@ -1,1 +1,25 @@
-{}
+{
+    "portal": "Portal YunoHost",
+    "information": "Vòstras informacions",
+    "username": "Nom d’utilizaire",
+    "password": "Senhal",
+    "fullname": "Nom complèt",
+    "mail_addresses": "Adreça de corrièl",
+    "mail_forward": "Adreças de transferiment",
+    "new_mail": "novela_adreça@domeni.org",
+    "new_forward": "novel_transferiment@domenialonhat.org",
+    "add_mail": "Ajustar una adreça de corrièl",
+    "add_forward": "Ajustar una adreça de transferiment",
+    "ok": "OK",
+    "cancel": "Anullar",
+    "change_password": "Cambiar lo senhal",
+    "edit": "Editar",
+    "current_password": "Senhal actual",
+    "new_password": "Nòu senhal",
+    "confirm": "Confirmar",
+    "login": "Connexion",
+    "logout": "Desconnexion",
+    "password_changed": "Senhal modificat",
+    "password_changed_error": "Una error s'es producha en cambiar lo senhal",
+    "password_not_match": "Los senhals correspondon pas"
+}
