@@ -11,7 +11,7 @@
     "footerlink_edit": "Editar o meu perfil",
     "footerlink_support": "Suporte",
     "fullname": "Nome completo",
-    "information": "Informação pessoal",
+    "information": "Suas informações",
     "information_updated": "Informação atualizada",
     "invalid_domain": "Domínio inválido em",
     "invalid_mail": "Endereço de correio inválido",
@@ -37,5 +37,7 @@
     "user_saving_fail": "Um erro ocorreu ao guardar as modificações do utilizador",
     "username": "Nome de utilizador",
     "wrong_current_password": "Senha atual está errada",
-    "wrong_username_password": "Nome de utilizador e senha errados"
+    "wrong_username_password": "Nome de utilizador e senha errados",
+    "redirection_error_invalid_url": "Erro de redirecionamento: url inválida",
+    "redirection_error_unmanaged_domain": "Erro de redirecionamento: Dominio não gerenciado"
 }
