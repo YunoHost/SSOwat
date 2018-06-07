@@ -18,10 +18,10 @@ package.path = package.path .. ";"..script_path.."?.lua"
 local json = require "json"
 local lualdap = require "lualdap"
 local math = require "math"
-local lustache = require "lustache"
 local lfs = require "lfs"
 local socket = require "socket"
 local config = require "config"
+lustache = require "lustache"
 
 -- Persistent shared table
 flashs = {}
