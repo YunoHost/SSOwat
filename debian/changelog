@@ -1,8 +1,16 @@
+ssowat (3.0.0) stable; urgency=low
+
+  Merging with jessie's branches
+  Releasing as stable
+
+ -- Alexandre Aubin <alex.aubin@mailoo.org> Sun, 17 Jun 2018 03:57:00 +0000
+
 ssowat (3.0.0~beta1) testing; urgency=low
 
   Beta release for Stretch
 
  -- Alexandre Aubin <alex.aubin@mailoo.org> Thu, 03 May 2018 03:04:45 +0000
+
 ssowat (2.7.14) stable; urgency=low
 
   * Make tile dragging work on mobile devices
