@@ -1,3 +1,11 @@
+ssowat (2.7.14) stable; urgency=low
+
+  * Make tile dragging work on mobile devices
+  * Improve Occitan and Portuguese translations
+  * Releasing as stable
+
+ -- Alexandre Aubin <alex.aubin@mailoo.org>  Sun, 17 Jun 2018 01:53:11 +0000
+
 ssowat (2.7.12) stable; urgency=low
 
   * Bumping version number for stable release
