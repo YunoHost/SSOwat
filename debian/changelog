@@ -3,6 +3,19 @@ ssowat (3.0.0~beta1) testing; urgency=low
   Beta release for Stretch
 
  -- Alexandre Aubin <alex.aubin@mailoo.org> Thu, 03 May 2018 03:04:45 +0000
+ssowat (2.7.14) stable; urgency=low
+
+  * Make tile dragging work on mobile devices
+  * Improve Occitan and Portuguese translations
+  * Releasing as stable
+
+ -- Alexandre Aubin <alex.aubin@mailoo.org>  Sun, 17 Jun 2018 01:53:11 +0000
+
+ssowat (2.7.12) stable; urgency=low
+
+  * Bumping version number for stable release
+
+ -- Alexandre Aubin <alex.aubin@mailoo.org>  Sun, 06 May 2018 16:53:24 +0000
 
 ssowat (2.7.11) testing; urgency=low
 

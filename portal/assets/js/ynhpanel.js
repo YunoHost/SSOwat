@@ -122,33 +122,53 @@ var dragg = function(id) {
   this.x_pos = 0, this.y_pos = 0, // Stores x & y coordinates of the mouse pointer
   this.x_elem = 0, this.y_elem = 0; // Stores top, left values (edge) of the element
 
-  // Start dragging
-  window.addEvent(elem, 'mousedown', function(e){
+  var _initDrag = function(e){
     // Prevent firefox native D'n'D behavior
     window.eventPreventDefault(e);
+
+    if (e.type === "touchstart"){
+      x_pos = e.touches[0].clientX;
+      y_pos = e.touches[0].clientY;
+    }
 
     selected = elem;
     x_elem = x_pos - selected.offsetLeft;
     y_elem = y_pos - selected.offsetTop;
-  });
+  };
 
-  // Will be called when user dragging an element
-  window.addEvent(window, 'mousemove', function(e){
+  var _shutDrag = function(e){
+      selected = null;
+  };
+
+  var _onMove = function(e){
     // Get position
-    x_pos = document.all ? window.event.clientX : e.pageX;
-    y_pos = document.all ? window.event.clientY : e.pageY;
+    x_pos = document.all ? window.event: e.pageX;
+    y_pos = document.all ? window.event : e.pageY;
+
+    if (e.type === "touchmove"){
+        x_pos = e.touches[0].clientX;
+        y_pos = e.touches[0].clientY;
+    }
 
     if (selected !== null) {
       dragged = true;
       selected.style.left = (x_pos - x_elem) + 'px';
       selected.style.top = (y_pos - y_elem) + 'px';
     }
-  });
+  };
+
+  // Start dragging
+  window.addEvent(elem, 'mousedown', _initDrag);
+  window.addEvent(elem, 'touchstart', _initDrag);
+
+  // Will be called when user dragging an element
+  window.addEvent(window, 'mousemove', _onMove);
+  window.addEvent(window, 'touchmove', _onMove);
 
   // Destroy the object when we are done
-  window.addEvent(window, 'mouseup', function(e){
-      selected = null;
-  });
+  window.addEvent(window, 'mouseup', _shutDrag);
+  window.addEvent(window, 'touchend', _shutDrag);
+  window.addEvent(window, 'touchcancel', _shutDrag);
 
   // Handle click event
   window.addEvent(elem, 'click', function(e){
