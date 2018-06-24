@@ -188,6 +188,8 @@ end
 -- If the URL matches one of the `redirected_urls` in the configuration file,
 -- just redirect to the target URL/URI
 --
+-- A match function to support PCRE and lua pattern
+-- lua pattern will be deprecated in YunoHost
 function match(s, regex)
     if rex.match(s, regex) or string.match(s,regex) then
         return true
