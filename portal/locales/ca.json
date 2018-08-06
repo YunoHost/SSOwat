@@ -1,1 +1,15 @@
-{}
+{
+    "portal": "Portal YunoHost",
+    "information": "La teva informació",
+    "username": "Nom d'usuari",
+    "password": "Contrassenya",
+    "fullname": "Nom complet",
+    "mail_addresses": "Correu electrònic",
+    "new_mail": "nou_correu@domini.org",
+    "add_mail": "Afegir un àlies de correu electrònic",
+    "ok": "OK",
+    "cancel": "Cancel·lar",
+    "change_password": "Canvia la contrassenya",
+    "edit": "Editar",
+    "current_password": "Contrasenya actual"
+}
