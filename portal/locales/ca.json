@@ -15,7 +15,7 @@
     "new_password": "Nova contrasenya",
     "confirm": "Confirmar",
     "login": "Iniciar sessió",
-    "logout": "Tanca la sessió",
+    "logout": "Tancar sessió",
     "password_changed": "Contrasenya canviada correctament",
     "password_changed_error": "S'ha produit un error al canviar la contrasenya",
     "password_not_match": "Les noves contrasenyes no coincideixen",
