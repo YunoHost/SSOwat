@@ -1,3 +1,9 @@
+ssowat (3.1.0) stable; urgency=low
+
+  Bumping version number for 3.1
+
+ -- Alexandre Aubin <alex.aubin@mailoo.org> Wed, 15 Aug 2018 21:56:00 +0000
+
 ssowat (3.0.0) stable; urgency=low
 
   Merging with jessie's branches
