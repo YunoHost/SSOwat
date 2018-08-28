@@ -626,22 +626,36 @@ function edit_user()
             then
                 -- and the new password against the confirmation field's content
                 if args.newpassword == args.confirm then
-                    local dn = conf["ldap_identifier"].."="..user..","..conf["ldap_group"]
+                    -- Check password validity
+                    local validatepw = io.popen("python /usr/lib/moulinette/yunohost/utils/password.py '" ..args.newpassword:gsub("'", "'\\''").."' 2>&1  || echo ::ERROR::", 'r')
+                    local validation = validatepw:read()
+                    local validation_error = validatepw:read()
+                    validatepw:close()
+                    if validation_error == nil then
 
-                    -- Open the LDAP connection
-                    local ldap = lualdap.open_simple(conf["ldap_host"], dn, args.currentpassword)
+                        local dn = conf["ldap_identifier"].."="..user..","..conf["ldap_group"]
 
-                    local password = hash_password(args.newpassword)
+                        -- Open the LDAP connection
+                        local ldap = lualdap.open_simple(conf["ldap_host"], dn, args.currentpassword)
+                        
+                        local password = hash_password(args.newpassword)
 
-                    -- Modify the LDAP information
-                    if ldap:modify(dn, {'=', userPassword = password }) then
-                        flash("win", t("password_changed"))
+                        -- Modify the LDAP information
+                        if ldap:modify(dn, {'=', userPassword = password }) then
+                            if validation == nil then
+                                flash("win", t("password_changed"))
+                            else
+                                flash("win", t(validation))
+                            end
 
-                        -- Reset the password cache
-                        cache:set(user.."-password", args.newpassword, conf["session_timeout"])
-                        return redirect(conf.portal_url.."info.html")
+                            -- Reset the password cache
+                            cache:set(user.."-password", args.newpassword, conf["session_timeout"])
+                            return redirect(conf.portal_url.."info.html")
+                        else
+                            flash("fail", t("password_changed_error"))
+                        end
                     else
-                        flash("fail", t("password_changed_error"))
+                        flash("fail", t(validation))
                     end
                 else
                     flash("fail", t("password_not_match"))
