@@ -598,7 +598,7 @@ function ensure_user_password_uses_strong_hash(ldap, user, password)
 end
 
 -- Read result of a command after given it securely the password
-function secure_cmd_password(cmd, password)
+function secure_cmd_password(cmd, password, start)
     -- Check password validity
     math.randomseed( os.time() )
     local tmp_file = "/tmp/ssowat_"..math.random()
@@ -611,9 +611,12 @@ function secure_cmd_password(cmd, password)
     local text = ""
     for line in io.lines(tmp_file) do
         i = i + 1
-        if i > 4 then
+        if i > start then
             text = text..line.."\n"
         end
+    end
+    if i > start then 
+        text = text:sub(1, -2)
     end
     r_pwd:close()
     os.remove(tmp_file)
@@ -651,7 +654,7 @@ function edit_user()
                 -- and the new password against the confirmation field's content
                 if args.newpassword == args.confirm then
                     -- Check password validity
-                    local valid_result = secure_cmd_password("( python /usr/lib/moulinette/yunohost/utils/password.py 2>&1 || echo ::ERROR:: ) | tee -a %s", args.newpassword)
+                    local valid_result = secure_cmd_password("( python /usr/lib/moulinette/yunohost/utils/password.py 2>&1 || echo ::ERROR:: ) | tee -a %s", args.newpassword, 4)
                     -- We remove 4 lines due to a Warning message
                     local i = 0
                     local validation_error = nil
@@ -883,11 +886,9 @@ end
 -- hash the user password using sha-512 and using {CRYPT} to uses linux auth system
 -- because ldap doesn't support anything stronger than sha1
 function hash_password(password)
-    -- TODO is the password checked by regex? we don't want to
-    -- allow shell injection
-    local mkpasswd  = io.popen("mkpasswd --method=sha-512 '" ..password:gsub("'", "'\\''").."'")
-    local hashed_password = "{CRYPT}"..mkpasswd:read()
-    mkpasswd:close()
+    local hashed_password = secure_cmd_password("mkpasswd --method=sha-512 | tee -a %s", password, 0)
+    ngx.log(ngx.STDERR, hashed_password)
+    hashed_password = "{CRYPT}"..hashed_password
     return hashed_password
 end
 
@@ -901,7 +902,7 @@ function login()
     local uri_args = ngx.req.get_uri_args()
 
     args.user = string.lower(args.user)
-
+    
     local user = authenticate(args.user, args.password)
     if user then
         ngx.status = ngx.HTTP_CREATED
