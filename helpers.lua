@@ -602,8 +602,10 @@ function secure_cmd_password(cmd, password, start)
     -- Check password validity
     math.randomseed( os.time() )
     local tmp_file = "/tmp/ssowat_"..math.random()
-    local w_pwd = io.popen(string.format(cmd, tmp_file), 'w')
+    local w_pwd = io.popen("("..cmd..") tee -a "..tmp_file, 'w')
     w_pwd:write(password)
+    -- This second write is just to validate the password question
+    -- Do not remove
     w_pwd:write("")
     w_pwd:close()
     local r_pwd = io.open(tmp_file, 'r')
@@ -654,7 +656,7 @@ function edit_user()
                 -- and the new password against the confirmation field's content
                 if args.newpassword == args.confirm then
                     -- Check password validity
-                    local valid_result = secure_cmd_password("( python /usr/lib/moulinette/yunohost/utils/password.py 2>&1 || echo ::ERROR:: ) | tee -a %s", args.newpassword, 4)
+                    local valid_result = secure_cmd_password("python /usr/lib/moulinette/yunohost/utils/password.py 2>&1 || echo ::ERROR::", args.newpassword, 4)
                     -- We remove 4 lines due to a Warning message
                     local i = 0
                     local validation_error = nil
@@ -886,7 +888,7 @@ end
 -- hash the user password using sha-512 and using {CRYPT} to uses linux auth system
 -- because ldap doesn't support anything stronger than sha1
 function hash_password(password)
-    local hashed_password = secure_cmd_password("mkpasswd --method=sha-512 | tee -a %s", password, 0)
+    local hashed_password = secure_cmd_password("mkpasswd --method=sha-512", password, 0)
     hashed_password = "{CRYPT}"..hashed_password
     return hashed_password
 end
