@@ -597,6 +597,30 @@ function ensure_user_password_uses_strong_hash(ldap, user, password)
     end
 end
 
+-- Read result of a command after given it securely the password
+function secure_cmd_password(cmd, password)
+    -- Check password validity
+    math.randomseed( os.time() )
+    local tmp_file = "/tmp/ssowat_"..math.random()
+    local w_pwd = io.popen(string.format(cmd, tmp_file), 'w')
+    w_pwd:write(password)
+    w_pwd:write("")
+    w_pwd:close()
+    local r_pwd = io.open(tmp_file, 'r')
+    local i = 0
+    local text = ""
+    for line in io.lines(tmp_file) do
+        i = i + 1
+        if i > 4 then
+            text = text..line.."\n"
+        end
+    end
+    r_pwd:close()
+    os.remove(tmp_file)
+    ngx.log(ngx.STDERR, text)
+    return text
+end
+
 -- Compute the user modification POST request
 -- It has to update cached information and edit the LDAP user entry
 -- according to the changes detected.
@@ -627,10 +651,20 @@ function edit_user()
                 -- and the new password against the confirmation field's content
                 if args.newpassword == args.confirm then
                     -- Check password validity
-                    local validatepw = io.popen("python /usr/lib/moulinette/yunohost/utils/password.py '" ..args.newpassword:gsub("'", "'\\''").."' 2>&1  || echo ::ERROR::", 'r')
-                    local validation = validatepw:read()
-                    local validation_error = validatepw:read()
-                    validatepw:close()
+                    local valid_result = secure_cmd_password("( python /usr/lib/moulinette/yunohost/utils/password.py 2>&1 || echo ::ERROR:: ) | tee -a %s", args.newpassword)
+                    -- We remove 4 lines due to a Warning message
+                    local i = 0
+                    local validation_error = nil
+                    local result_msg = nil
+
+                    for line in string.gmatch(valid_result, "[^\n]+") do
+                        if i == 0 then 
+                            result_msg = line 
+                        else
+                            validation_error = line
+                        end
+                        i = i + 1
+                    end
                     if validation_error == nil then
 
                         local dn = conf["ldap_identifier"].."="..user..","..conf["ldap_group"]
@@ -645,7 +679,7 @@ function edit_user()
                             if validation == nil then
                                 flash("win", t("password_changed"))
                             else
-                                flash("win", t(validation))
+                                flash("win", t(result_msg))
                             end
 
                             -- Reset the password cache
@@ -655,7 +689,7 @@ function edit_user()
                             flash("fail", t("password_changed_error"))
                         end
                     else
-                        flash("fail", t(validation))
+                        flash("fail", t(result_msg))
                     end
                 else
                     flash("fail", t("password_not_match"))
