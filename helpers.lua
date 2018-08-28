@@ -887,7 +887,6 @@ end
 -- because ldap doesn't support anything stronger than sha1
 function hash_password(password)
     local hashed_password = secure_cmd_password("mkpasswd --method=sha-512 | tee -a %s", password, 0)
-    ngx.log(ngx.STDERR, hashed_password)
     hashed_password = "{CRYPT}"..hashed_password
     return hashed_password
 end
