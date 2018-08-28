@@ -609,20 +609,9 @@ function secure_cmd_password(cmd, password, start)
     w_pwd:write("")
     w_pwd:close()
     local r_pwd = io.open(tmp_file, 'r')
-    local i = 0
-    local text = ""
-    for line in io.lines(tmp_file) do
-        i = i + 1
-        if i > start then
-            text = text..line.."\n"
-        end
-    end
-    if i > start then 
-        text = text:sub(1, -2)
-    end
+    text = r_pwd:read "*a"
     r_pwd:close()
     os.remove(tmp_file)
-    ngx.log(ngx.STDERR, text)
     return text
 end
 
@@ -656,19 +645,11 @@ function edit_user()
                 -- and the new password against the confirmation field's content
                 if args.newpassword == args.confirm then
                     -- Check password validity
-                    local valid_result = secure_cmd_password("python /usr/lib/moulinette/yunohost/utils/password.py 2>&1 || echo ::ERROR::", args.newpassword, 4)
-                    -- We remove 4 lines due to a Warning message
-                    local i = 0
-                    local validation_error = nil
-                    local result_msg = nil
+                    local result_msg = secure_cmd_password("python /usr/lib/moulinette/yunohost/utils/password.py", args.newpassword)
+                    validation_error = true
 
-                    for line in string.gmatch(valid_result, "[^\n]+") do
-                        if i == 0 then 
-                            result_msg = line 
-                        else
-                            validation_error = line
-                        end
-                        i = i + 1
+                    if result_msg == 'password_advice' or result_msg == nil or result_msg == "" then
+                        validation_error = nil
                     end
                     if validation_error == nil then
 
@@ -888,7 +869,7 @@ end
 -- hash the user password using sha-512 and using {CRYPT} to uses linux auth system
 -- because ldap doesn't support anything stronger than sha1
 function hash_password(password)
-    local hashed_password = secure_cmd_password("mkpasswd --method=sha-512", password, 0)
+    local hashed_password = secure_cmd_password("mkpasswd --method=sha-512", password)
     hashed_password = "{CRYPT}"..hashed_password
     return hashed_password
 end
