@@ -602,7 +602,7 @@ function secure_cmd_password(cmd, password, start)
     -- Check password validity
     math.randomseed( os.time() )
     local tmp_file = "/tmp/ssowat_"..math.random()
-    local w_pwd = io.popen("("..cmd..") tee -a "..tmp_file, 'w')
+    local w_pwd = io.popen("("..cmd..") | tee -a "..tmp_file, 'w')
     w_pwd:write(password)
     -- This second write is just to validate the password question
     -- Do not remove
@@ -610,6 +610,9 @@ function secure_cmd_password(cmd, password, start)
     w_pwd:close()
     local r_pwd = io.open(tmp_file, 'r')
     text = r_pwd:read "*a"
+    if text:sub(-1, -1) == "\n" then
+        text = text:sub(1, -2)
+    end
     r_pwd:close()
     os.remove(tmp_file)
     return text
@@ -647,7 +650,7 @@ function edit_user()
                     -- Check password validity
                     local result_msg = secure_cmd_password("python /usr/lib/moulinette/yunohost/utils/password.py", args.newpassword)
                     validation_error = true
-
+                    ngx.log(ngx.STDERR, result_msg)
                     if result_msg == 'password_advice' or result_msg == nil or result_msg == "" then
                         validation_error = nil
                     end
