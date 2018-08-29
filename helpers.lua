@@ -610,6 +610,8 @@ function secure_cmd_password(cmd, password, start)
     w_pwd:close()
     local r_pwd = io.open(tmp_file, 'r')
     text = r_pwd:read "*a"
+
+    -- Remove the extra end line
     if text:sub(-1, -1) == "\n" then
         text = text:sub(1, -2)
     end
