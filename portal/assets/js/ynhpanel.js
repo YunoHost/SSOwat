@@ -123,9 +123,6 @@ var dragg = function(id) {
   this.x_elem = 0, this.y_elem = 0; // Stores top, left values (edge) of the element
 
   var _initDrag = function(e){
-    // Prevent firefox native D'n'D behavior
-    window.eventPreventDefault(e);
-
     if (e.type === "touchstart"){
       x_pos = e.touches[0].clientX;
       y_pos = e.touches[0].clientY;
@@ -157,6 +154,11 @@ var dragg = function(id) {
     }
   };
 
+  // Prevent native D'n'D behavior
+  window.addEvent(elem, 'dragstart', function(e){
+    window.eventPreventDefault(e);
+  });
+
   // Start dragging
   window.addEvent(elem, 'mousedown', _initDrag);
   window.addEvent(elem, 'touchstart', _initDrag);
@@ -175,7 +177,7 @@ var dragg = function(id) {
       // Prevent default event
       window.eventPreventDefault(e);
 
-      // Do not prapagate to other click event if dragged out
+      // Do not propagate to other click event if dragged out
       if (dragged) {
         e.stopImmediatePropagation();
       }
