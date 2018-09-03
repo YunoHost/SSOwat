@@ -90,9 +90,14 @@ Element.toggleClass = function(element, className) {
 /* Add Event
   https://github.com/Darklg/JavaScriptUtilities/blob/master/assets/js/vanilla-js/libs/vanilla-events.js
 -------------------------- */
-window.addEvent = function(el, eventName, callback) {
+window.addEvent = function(el, eventName, callback, options) {
     if (el.addEventListener) {
-        el.addEventListener(eventName, callback, false);
+        if (!options || typeof(options) !== "object") {
+            options = {};
+        }
+
+        options.capture = false;
+        el.addEventListener(eventName, callback, options);
     }
     else if (el.attachEvent) {
         el.attachEvent("on" + eventName, function(e) {
@@ -142,12 +147,15 @@ var dragg = function(id) {
     x_pos = document.all ? window.event: e.pageX;
     y_pos = document.all ? window.event : e.pageY;
 
-    if (e.type === "touchmove"){
+    if (e.type === "touchmove") {
         x_pos = e.touches[0].clientX;
         y_pos = e.touches[0].clientY;
     }
 
     if (selected !== null) {
+      if (e.type === "touchmove"){
+        event.preventDefault();
+      }
       dragged = true;
       selected.style.left = (x_pos - x_elem) + 'px';
       selected.style.top = (y_pos - y_elem) + 'px';
@@ -165,7 +173,7 @@ var dragg = function(id) {
 
   // Will be called when user dragging an element
   window.addEvent(window, 'mousemove', _onMove);
-  window.addEvent(window, 'touchmove', _onMove);
+  window.addEvent(window, 'touchmove', _onMove, {passive: false});
 
   // Destroy the object when we are done
   window.addEvent(window, 'mouseup', _shutDrag);
