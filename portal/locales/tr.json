@@ -20,7 +20,7 @@
     "login": "Giriş yap",
     "logout": "Çıkış yap",
     "mail_addresses": "E-posta adresleri",
-    "mail_already_used": "Mail adresi zaten kullanılıyor",
+    "mail_already_used": "Mail adresi zaten kullanılıyor :",
     "mail_forward": "E-posta yönlendirme",
     "missing_required_fields": "Gerekli alanlar eksik",
     "new_forward": "newforward@myforeigndomain.org",
