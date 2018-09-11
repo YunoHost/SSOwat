@@ -1,3 +1,14 @@
+ssowat (3.2.0) stable; urgency=low
+
+  * Replace Hige with Lustache (#100)
+  * Fix overlay on mobile (#106)
+  * Prevent mobile browsers to refresh the page when moving the overlay (#107)
+  * Update Catalan, Turkish and Dutch translations
+
+  Thanks to all contributors (nicofrand, Xaloc, BoF, Eynix) <3 !
+
+ -- Alexandre Aubin <alex.aubin@mailoo.org> Tue, 11 Sep 2018 17:23:00 +0000
+
 ssowat (3.1.0) stable; urgency=low
 
   Bumping version number for 3.1
