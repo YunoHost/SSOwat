@@ -889,8 +889,12 @@ function logout()
         flash("info", t("logged_out"))
     end
 
-    -- Redirect to portal anyway
-    return redirect(conf.portal_url)
+    -- Redirect with the `r` URI argument if it exists or redirect to portal
+    if args.r then
+        return redirect(ngx.decode_base64(args.r))
+    else
+        return redirect(conf.portal_url)
+    end
 end
 
 
