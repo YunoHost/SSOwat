@@ -31,6 +31,7 @@
    "password_listed_3": "This password is in a well known list. Please make it unique. Password needs to be at least 8 characters long and contains digit, upper, lower and special characters",
    "password_listed_4": "This password is in a well known list. Please make it unique. Password needs to be at least 12 characters long and contains digit, upper, lower and special characters",
    "password_advice": "Password successfully changed. Note: to improve your password make it with at least 8 characters and put digits, upper, lower and special characters",
+   "good_practices_about_user_password": "You are now about to define a new user password. The password should be at least 8 characters - though it is good practice to use longer password (i.e. a passphrase) and/or to use various kind of characters (uppercase, lowercase, digits and special characters).",
    "wrong_current_password": "Current password is wrong",
    "invalid_mail": "Invalid mail address",
    "invalid_domain": "Invalid domain in",
