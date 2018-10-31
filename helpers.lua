@@ -652,7 +652,7 @@ function edit_user()
                     -- Check password validity
                     local result_msg = secure_cmd_password("python /usr/lib/moulinette/yunohost/utils/password.py", args.newpassword)
                     validation_error = true
-                    if result_msg == 'password_advice' or result_msg == nil or result_msg == "" then
+                    if result_msg == nil or result_msg == "" then
                         validation_error = nil
                     end
                     if validation_error == nil then
