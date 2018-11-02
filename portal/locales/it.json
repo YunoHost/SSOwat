@@ -13,10 +13,10 @@
     "fullname": "Nome completo",
     "information": "Le tue informazioni",
     "information_updated": "Informazioni aggiornate",
-    "invalid_domain": "Dominio non valido",
+    "invalid_domain": "Dominio non valido in",
     "invalid_mail": "Indirizzo email non valido",
     "invalid_mailforward": "Indirizzo di inoltro email non valido",
-    "logged_out": "Uscita effettuata",
+    "logged_out": "Disconnesso",
     "login": "Accedi",
     "logout": "Esci",
     "mail_addresses": "Indirizzo email",
@@ -37,5 +37,7 @@
     "user_saving_fail": "Si è verificato un errore durante il salvataggio delle modifiche dell'utente",
     "username": "Nome utente",
     "wrong_current_password": "La password attuale è sbagliata",
-    "wrong_username_password": "Nome utente o password sbagliati"
+    "wrong_username_password": "Nome utente o password sbagliati",
+    "redirection_error_invalid_url": "Errore di redirezionamento: URL non valido",
+    "redirection_error_unmanaged_domain": "Errore di redirezionamento: dominio non gestito"
 }
