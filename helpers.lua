@@ -597,6 +597,29 @@ function ensure_user_password_uses_strong_hash(ldap, user, password)
     end
 end
 
+-- Read result of a command after given it securely the password
+function secure_cmd_password(cmd, password, start)
+    -- Check password validity
+    math.randomseed( os.time() )
+    local tmp_file = "/tmp/ssowat_"..math.random()
+    local w_pwd = io.popen("("..cmd..") | tee -a "..tmp_file, 'w')
+    w_pwd:write(password)
+    -- This second write is just to validate the password question
+    -- Do not remove
+    w_pwd:write("")
+    w_pwd:close()
+    local r_pwd = io.open(tmp_file, 'r')
+    text = r_pwd:read "*a"
+
+    -- Remove the extra end line
+    if text:sub(-1, -1) == "\n" then
+        text = text:sub(1, -2)
+    end
+    r_pwd:close()
+    os.remove(tmp_file)
+    return text
+end
+
 -- Compute the user modification POST request
 -- It has to update cached information and edit the LDAP user entry
 -- according to the changes detected.
@@ -626,22 +649,37 @@ function edit_user()
             then
                 -- and the new password against the confirmation field's content
                 if args.newpassword == args.confirm then
-                    local dn = conf["ldap_identifier"].."="..user..","..conf["ldap_group"]
+                    -- Check password validity
+                    local result_msg = secure_cmd_password("python /usr/lib/moulinette/yunohost/utils/password.py", args.newpassword)
+                    validation_error = true
+                    if result_msg == nil or result_msg == "" then
+                        validation_error = nil
+                    end
+                    if validation_error == nil then
 
-                    -- Open the LDAP connection
-                    local ldap = lualdap.open_simple(conf["ldap_host"], dn, args.currentpassword)
+                        local dn = conf["ldap_identifier"].."="..user..","..conf["ldap_group"]
 
-                    local password = hash_password(args.newpassword)
+                        -- Open the LDAP connection
+                        local ldap = lualdap.open_simple(conf["ldap_host"], dn, args.currentpassword)
+                        
+                        local password = hash_password(args.newpassword)
 
-                    -- Modify the LDAP information
-                    if ldap:modify(dn, {'=', userPassword = password }) then
-                        flash("win", t("password_changed"))
+                        -- Modify the LDAP information
+                        if ldap:modify(dn, {'=', userPassword = password }) then
+                            if validation == nil then
+                                flash("win", t("password_changed"))
+                            else
+                                flash("win", t(result_msg))
+                            end
 
-                        -- Reset the password cache
-                        cache:set(user.."-password", args.newpassword, conf["session_timeout"])
-                        return redirect(conf.portal_url.."info.html")
+                            -- Reset the password cache
+                            cache:set(user.."-password", args.newpassword, conf["session_timeout"])
+                            return redirect(conf.portal_url.."info.html")
+                        else
+                            flash("fail", t("password_changed_error"))
+                        end
                     else
-                        flash("fail", t("password_changed_error"))
+                        flash("fail", t(result_msg))
                     end
                 else
                     flash("fail", t("password_not_match"))
@@ -835,11 +873,8 @@ end
 -- hash the user password using sha-512 and using {CRYPT} to uses linux auth system
 -- because ldap doesn't support anything stronger than sha1
 function hash_password(password)
-    -- TODO is the password checked by regex? we don't want to
-    -- allow shell injection
-    local mkpasswd  = io.popen("mkpasswd --method=sha-512 '" ..password:gsub("'", "'\\''").."'")
-    local hashed_password = "{CRYPT}"..mkpasswd:read()
-    mkpasswd:close()
+    local hashed_password = secure_cmd_password("mkpasswd --method=sha-512", password)
+    hashed_password = "{CRYPT}"..hashed_password
     return hashed_password
 end
 
@@ -853,7 +888,7 @@ function login()
     local uri_args = ngx.req.get_uri_args()
 
     args.user = string.lower(args.user)
-
+    
     local user = authenticate(args.user, args.password)
     if user then
         ngx.status = ngx.HTTP_CREATED
