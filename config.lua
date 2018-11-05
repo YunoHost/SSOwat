@@ -50,6 +50,8 @@ function get_config()
         ldap_host                 = "localhost",
         ldap_group                = "ou=users,dc=yunohost,dc=org",
         ldap_identifier           = "uid",
+        ldap_enforce_crypt        = true,
+        skipped_urls              = {},
         ldap_attributes           = {"uid", "givenname", "sn", "cn", "homedirectory", "mail", "maildrop"},
         allow_mail_authentication = true,
         default_language          = "en"

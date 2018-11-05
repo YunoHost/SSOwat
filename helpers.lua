@@ -299,7 +299,9 @@ function authenticate(user, password)
     -- cache shared table in order to eventually reuse it later when updating
     -- profile information or just passing credentials to an application.
     if connected then
-        ensure_user_password_uses_strong_hash(connected, user, password)
+        if conf['ldap_enforce_crypt'] then
+            ensure_user_password_uses_strong_hash(connected, user, password)
+        end
         cache:add(user.."-password", password, conf["session_timeout"])
         ngx.log(ngx.NOTICE, "Connected as: "..user)
         return user
@@ -581,12 +583,13 @@ end
 -- if it's not the case, it migrates the password to this new hash algorithm
 function ensure_user_password_uses_strong_hash(ldap, user, password)
     local current_hashed_password = nil
+    conf = config.get_config()
 
     for dn, attrs in ldap:search {
-        base = "ou=users,dc=yunohost,dc=org",
+        base = conf['ldap_group'],
         scope = "onelevel",
         sizelimit = 1,
-        filter = "(uid="..user..")",
+        filter = "("..conf['ldap_identifier'].."="..user..")",
         attrs = {"userPassword"}
     } do
         current_hashed_password = attrs["userPassword"]:sub(0, 10)
