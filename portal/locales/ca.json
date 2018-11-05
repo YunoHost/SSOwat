@@ -35,5 +35,9 @@
     "footerlink_edit": "Editar el meu perfil",
     "footerlink_documentation": "Documentació",
     "footerlink_support": "Ajuda",
-    "footerlink_administration": "Administració"
+    "footerlink_administration": "Administració",
+    "mail_forward": "E-mail de reenviament",
+    "new_forward": "noureenviament@dominiextern.org",
+    "add_forward": "Afegir un E-mail de reenviament",
+    "invalid_mailforward": "E-mail de reenviament invàlid"
 }
