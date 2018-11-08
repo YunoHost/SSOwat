@@ -1,3 +1,15 @@
+ssowat (3.3.0) testing; urgency=low
+
+  * Misc fixes / improvements (#91, #92)
+  * [enh] Improve cookie security (#103)
+  * [enh] Redirect after logout if `r` URI argument exists (#109)
+  * [enh] Add advices about password choices + password check (#104)
+  * [i18n] Improve Catalan, French, Italian, Polish translations
+
+  Thanks to all contributors (tYYGH, frju365, ljf, tituspijean, Aleks, xaloc33, goofy-mdn, silkevicious, Krzysztof Dmowski) <3 !
+
+ -- Alexandre Aubin <alex.aubin@mailoo.org> Thu, 08 Nov 2018 18:08:00 +0000
+
 ssowat (3.2.0) stable; urgency=low
 
   * Replace Hige with Lustache (#100)
