@@ -1,3 +1,12 @@
+ssowat (3.3.1) stable; urgency=low
+
+  * [fix] Use SameSite=Lax in cookies (follow-up of #103)
+  * [i18n] Improve French translations
+
+  Thanks to all contributors (Aleks, Jibec) <3 !
+
+ -- Alexandre Aubin <alex.aubin@mailoo.org> Fri, 23 Nov 2018 15:11:00 +0000
+
 ssowat (3.3.0) testing; urgency=low
 
   * Misc fixes / improvements (#91, #92)
