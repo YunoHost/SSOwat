@@ -910,6 +910,14 @@ function login()
     -- Forward the `r` URI argument if it exists to redirect
     -- the user properly after a successful login.
     if uri_args.r then
+        -- If `uri_args.r` contains line break, someone is probably trying to
+        -- pass some additional headers
+        if string.match(uri_args.r, "(.*)\n") then
+            flash("fail", t("redirection_error_invalid_url"))
+            ngx.log(ngx.ERR, "Redirection url is invalid")
+            return redirect(conf.portal_url)
+        end
+
         return redirect(conf.portal_url.."?r="..uri_args.r)
     else
         return redirect(conf.portal_url)
