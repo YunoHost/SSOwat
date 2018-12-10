@@ -1,3 +1,9 @@
+ssowat (3.3.2) stable; urgency=low
+
+  * [fix] CVE-2018-11347 http header injection (thanks to Bram for the fix !)
+
+ -- Alexandre Aubin <alex.aubin@mailoo.org> Mon, 10 Dev 2018 21:33:00 +0000
+
 ssowat (3.3.1) stable; urgency=low
 
   * [fix] Use SameSite=Lax in cookies (follow-up of #103)
