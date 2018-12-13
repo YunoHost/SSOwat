@@ -191,7 +191,11 @@ end
 -- A match function to support PCRE and lua pattern
 -- lua pattern will be deprecated in YunoHost
 function match(s, regex)
-    if rex.match(s, regex) or string.match(s,regex) then
+    if not string.find(regex, '%%%.') then
+        if rex.match(s, regex) then
+            return true
+        end
+    elseif string.match(s,regex)  then
         return true
     end
     return false
