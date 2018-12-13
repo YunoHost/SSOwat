@@ -188,14 +188,14 @@ end
 -- If the URL matches one of the `redirected_urls` in the configuration file,
 -- just redirect to the target URL/URI
 --
--- A match function to support PCRE and lua pattern
--- lua pattern will be deprecated in YunoHost
+-- A match function that uses PCRE regex as default
+-- If '%.' is found in the regex, we assume it's a LUA regex (legacy code)
 function match(s, regex)
     if not string.find(regex, '%%%.') then
         if rex.match(s, regex) then
             return true
         end
-    elseif string.match(s,regex)  then
+    elseif string.match(s,regex) then
         return true
     end
     return false
