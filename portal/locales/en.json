@@ -19,6 +19,7 @@
    "confirm": "Confirm",
    "login": "Login",
    "logout": "Logout",
+   "obsolete_version": "The version of YunoHost running on this server is obsolete and should be upgraded to YunoHost 3.x / Stretch. Please contact your administrator about this.",
    "password_changed": "Password successfully changed",
    "password_changed_error": "An error occurred on password changing",
    "password_not_match": "New passwords don't match",
