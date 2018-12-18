@@ -30,6 +30,7 @@
    "good_practices_about_user_password": "Pick a user password of at least 8 characters - though it is good practice to use longer ones (i.e. a passphrase) and/or use various kind of characters (uppercase, lowercase, digits and special characters).",
    "wrong_current_password": "The current password is wrong",
    "invalid_mail": "Invalid e-mail address",
+   "obsolete_version": "The version of YunoHost running on this server is obsolete and should be upgraded to YunoHost 4.x / Buster. Please contact your administrator about this.",
    "invalid_domain": "Invalid domain in",
    "invalid_mailforward": "Invalid e-mail forwarding address",
    "mail_already_used": "E-mail address already in use",
