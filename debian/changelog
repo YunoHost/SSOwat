@@ -1,3 +1,11 @@
+ssowat (3.4.0) testing; urgency=low
+
+  * [enh] Add PCRE regex support (#102)
+
+  Thanks to all the contributors (ljf) <3 !
+
+ -- Alexandre Aubin <alex.aubin@mailoo.org> Thu, 20 Dev 2018 22:27:00 +0000
+
 ssowat (3.3.2) stable; urgency=low
 
   * [fix] CVE-2018-11347 http header injection (thanks to Bram for the fix !)
