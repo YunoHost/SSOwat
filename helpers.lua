@@ -938,6 +938,7 @@ function logout()
         delete_cookie()
         cache:delete("session_"..authUser)
         cache:delete(authUser.."-"..conf["ldap_identifier"]) -- Ugly trick to reload cache
+        cache:delete(authUser.."-password")
         flash("info", t("logged_out"))
     end
 
