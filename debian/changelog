@@ -1,3 +1,11 @@
+ssowat (2.7.15) stable; urgency=low
+
+  * Add a warning about Jessie being deprecated and encouragement to migrate
+    to Stretch / 3.x
+  * [fix] CVE-2018-11347 http header injection (by Bram)
+
+ -- Alexandre Aubin <alex.aubin@mailoo.org>  Tue, 08 Jan 2019 18:00:00 +0000
+
 ssowat (2.7.14) stable; urgency=low
 
   * Make tile dragging work on mobile devices
