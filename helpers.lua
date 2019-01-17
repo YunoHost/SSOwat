@@ -355,6 +355,15 @@ function set_headers(user)
             conf["ldap_identifier"].."=".. user ..","..conf["ldap_group"],
             cache:get(user.."-password")
         )
+        -- If the ldap connection fail (because the password was changed).
+        -- Logout the user and invalid the password
+        if not ldap then
+            ngx.log(ngx.NOTICE, "LDAP connection failed. Disconnect user : ".. user)
+            cache:delete(authUser.."-password")
+            flash("info", t("please_login"))
+            local back_url = ngx.var.scheme .. "://" .. ngx.var.host .. ngx.var.uri .. uri_args_string()
+            return redirect(conf.portal_url.."?r="..ngx.encode_base64(back_url))
+        end
         ngx.log(ngx.NOTICE, "Reloading LDAP values for: "..user)
         for dn, attribs in ldap:search {
             base = conf["ldap_identifier"].."=".. user ..","..conf["ldap_group"],
@@ -938,6 +947,7 @@ function logout()
         delete_cookie()
         cache:delete("session_"..authUser)
         cache:delete(authUser.."-"..conf["ldap_identifier"]) -- Ugly trick to reload cache
+        cache:delete(authUser.."-password")
         flash("info", t("logged_out"))
     end
 
