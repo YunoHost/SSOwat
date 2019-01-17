@@ -358,7 +358,7 @@ function set_headers(user)
         -- If the ldap connection fail (because the password was changed).
         -- Logout the user and invalid the password
         if not ldap then
-            ngx.log(ngx.NOTICE, "LDAP connection failled. Disconnect user : ".. user)
+            ngx.log(ngx.NOTICE, "LDAP connection failed. Disconnect user : ".. user)
             cache:delete(authUser.."-password")
             flash("info", t("please_login"))
             local back_url = ngx.var.scheme .. "://" .. ngx.var.host .. ngx.var.uri .. uri_args_string()
