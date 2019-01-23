@@ -38,7 +38,10 @@ end
 
 -- Test whether a string starts with another
 function string.starts(String, Start)
-   return string.sub(String, 1, string.len(Start)) == Start
+    if not String then
+        return false
+    end
+    return string.sub(String, 1, string.len(Start)) == Start
 end
 
 
