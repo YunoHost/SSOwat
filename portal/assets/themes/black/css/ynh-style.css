@@ -1,0 +1,12 @@
+
+#logo {
+  z-index: 10;
+  background-image: url("../img/logo-ynh-white.svg");
+}
+
+.overlay {
+  background-color: black;
+  width: 100%;
+  height: 100%;
+  position: absolute;
+}

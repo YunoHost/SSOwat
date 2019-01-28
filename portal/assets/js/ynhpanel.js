@@ -223,13 +223,6 @@ domReady(function(){
   meta_viewport = document.querySelector('meta[name="viewport"]');
   meta_viewport_content = meta_viewport.getAttribute('content');
 
-  // Add portal stylesheet
-  var portalStyle = document.createElement("link");
-  portalStyle.setAttribute("rel", "stylesheet");
-  portalStyle.setAttribute("type", "text/css");
-  portalStyle.setAttribute("href", '/ynhpanel.css');
-  document.getElementsByTagName("head")[0].insertBefore(portalStyle, null);
-
   // Create portal link
   var portal = document.createElement('a');
   portal.setAttribute('id', 'ynh-overlay-switch');
@@ -301,6 +294,26 @@ domReady(function(){
         element.addEventListener(pfx[p]+type, callback, false);
       }
     }
+
+
+    // Load all stylesheets after getting config
+
+    // Add portal stylesheet
+    var portalStyle = document.createElement("link");
+    portalStyle.setAttribute("rel", "stylesheet");
+    portalStyle.setAttribute("type", "text/css");
+    portalStyle.setAttribute("href", '/ynhpanel.css');
+    document.getElementsByTagName("head")[0].insertBefore(portalStyle, null);
+
+    // Custom style from theme
+    if (response.theme) {
+      var portalThemeStyle = document.createElement("link");
+      portalThemeStyle.setAttribute("rel", "stylesheet");
+      portalThemeStyle.setAttribute("type", "text/css");
+      portalThemeStyle.setAttribute("href", '/yunohost/sso/assets/themes/'+ response.theme +'/css/ynhpanel.css');
+      document.getElementsByTagName("head")[0].insertBefore(portalThemeStyle, null);
+    };
+
 
     // Bind YNH Button
     window.addEvent(portal, 'click', function(e){

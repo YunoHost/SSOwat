@@ -133,6 +133,12 @@ img {
   text-align: center;
   margin-bottom: 0;
   opacity: 0.7;
+  width: 100px;
+  height: 100px;
+  background-image: url("../img/logo-ynh-white.svg");
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
 }
 
 .logo img {

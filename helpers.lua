@@ -547,6 +547,7 @@ function get_data_for(view)
         local mails = get_mails(user)
         data = {
             connected  = true,
+            theme      = conf.theme,
             portal_url = conf.portal_url,
             uid        = user,
             cn         = cache:get(user.."-cn"),
@@ -679,7 +680,7 @@ function edit_user()
 
                         -- Open the LDAP connection
                         local ldap = lualdap.open_simple(conf["ldap_host"], dn, args.currentpassword)
-                        
+
                         local password = hash_password(args.newpassword)
 
                         -- Modify the LDAP information
@@ -906,7 +907,7 @@ function login()
     local uri_args = ngx.req.get_uri_args()
 
     args.user = string.lower(args.user)
-    
+
     local user = authenticate(args.user, args.password)
     if user then
         ngx.status = ngx.HTTP_CREATED
