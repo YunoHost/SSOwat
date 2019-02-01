@@ -204,16 +204,6 @@ function domReady(cb) {
       : cb();
 }
 
-function loadScript(url, callback) {
-  var script = document.createElement('script');
-  script.type = 'text/javascript';
-  script.src = url;
-  // There are several events for cross browser compatibility.
-  script.onreadystatechange = callback;
-  script.onload = callback;
-  // Fire the loading
-  document.head.appendChild(script);
-}
 
 /* ----------------------------------------------------------
   Main
@@ -264,16 +254,6 @@ domReady(function(){
     // Response is JSON
     response = JSON.parse(r.responseText);
 
-    var pfx = ["webkit", "moz", "MS", "o", ""];
-    function PrefixedEvent(element, type, callback) {
-      for (var p = 0; p < pfx.length; p++) {
-        if (!pfx[p]) type = type.toLowerCase();
-        element.addEventListener(pfx[p]+type, callback, false);
-      }
-    }
-
-
-    // Load all stylesheets after getting config
 
     // Add portal stylesheet
     var portalStyle = document.createElement("link");
@@ -282,7 +262,7 @@ domReady(function(){
     portalStyle.setAttribute("href", '/ynhpanel.css');
     document.getElementsByTagName("head")[0].insertBefore(portalStyle, null);
 
-    // Custom style from theme
+    // Custom style from theme's id specified in config
     if (response.theme) {
       var portalThemeStyle = document.createElement("link");
       portalThemeStyle.setAttribute("rel", "stylesheet");
@@ -315,5 +295,6 @@ domReady(function(){
 
   };
   r.send();
+
 
 });
