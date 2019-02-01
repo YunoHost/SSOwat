@@ -1,0 +1,4 @@
+
+.app_logo:hover::after, .app_logo:hover::before {
+  background: rgba(0,0,0,0.5) !important;
+}

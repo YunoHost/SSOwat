@@ -1,0 +1,11 @@
+
+#ynh-overlay-switch {
+  background-image: url("../img/logo-ynh-white.svg");
+}
+
+#ynh-overlay {
+  background-color: black;
+  width: 100%;
+  height: 100%;
+  position: absolute;
+}
