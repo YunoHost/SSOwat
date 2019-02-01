@@ -14,7 +14,7 @@
 <div id="apps" class="wrapper apps">
   <ul class="listing-apps">
   {{#app}}
-  <li><a href="https://{{url}}"><span class="first-letter"></span><span class="name">{{name}}</span></a></li>
+    <li><a class="app_logo" href="https://{{url}}" onclick="appClick(event, 'https://{{url}}')"><span class="first-letter"></span><span class="name">{{name}}</span></a></li>
   {{/app}}
   </ul>
 </div>

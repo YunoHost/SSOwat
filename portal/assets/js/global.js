@@ -1,3 +1,36 @@
+
+// scripts loader
+function loadScript(url, callback) {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src = url;
+  // There are several events for cross browser compatibility.
+  script.onreadystatechange = callback;
+  script.onload = callback;
+  // Fire the loading
+  document.head.appendChild(script);
+}
+
+// handle app links so they work both in plain info page and in the info iframe called from ynhpanel.js
+function appClick (evnt, url) {
+
+  // if asked to open in new tab
+  if (
+    evnt.ctrlKey ||
+    evnt.shiftKey ||
+    evnt.metaKey ||
+    (evnt.button && evnt.button == 1)
+  ) return
+
+  // if asked in current tab
+  else {
+    evnt.preventDefault();
+    parent.location.href= url;
+    return false;
+  };
+
+}
+
 document.addEventListener('DOMContentLoaded', function() {
 
   // Variables
@@ -34,5 +67,21 @@ document.addEventListener('DOMContentLoaded', function() {
     // Append to form-group.
     addMaildrop.parentNode.insertBefore(inputDropClone, addMaildrop);
   });
+
+
+  // Get user's infos
+  var r = new XMLHttpRequest();
+  r.open("GET", "/ynhpanel.json", true);
+  r.onreadystatechange = function () {
+    // Die if error
+    if (r.readyState != 4 || r.status != 200) return;
+    // Response is JSON
+    response = JSON.parse(r.responseText);
+
+    // load additional theme's script
+    loadScript("/yunohost/sso/assets/themes/"+ response.theme +"/js/ynhpanel.js");
+
+  };
+  r.send();
 
 });

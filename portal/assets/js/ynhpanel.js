@@ -204,6 +204,16 @@ function domReady(cb) {
       : cb();
 }
 
+function loadScript(url, callback) {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src = url;
+  // There are several events for cross browser compatibility.
+  script.onreadystatechange = callback;
+  script.onload = callback;
+  // Fire the loading
+  document.head.appendChild(script);
+}
 
 /* ----------------------------------------------------------
   Main
@@ -223,12 +233,6 @@ domReady(function(){
   meta_viewport = document.querySelector('meta[name="viewport"]');
   meta_viewport_content = meta_viewport.getAttribute('content');
 
-  // Add portal stylesheet
-  var portalStyle = document.createElement("link");
-  portalStyle.setAttribute("rel", "stylesheet");
-  portalStyle.setAttribute("type", "text/css");
-  portalStyle.setAttribute("href", '/ynhpanel.css');
-  document.getElementsByTagName("head")[0].insertBefore(portalStyle, null);
 
   // Create portal link
   var portal = document.createElement('a');
@@ -242,14 +246,13 @@ domReady(function(){
 
 
   // Create overlay element
-  var overlay = document.createElement("div");
+  var overlay = document.createElement('iframe');
+  overlay.src = "/yunohost/sso/info.html";
   overlay.setAttribute("id","ynh-overlay");
-  overlay.setAttribute("style","display:none");
+  overlay.setAttribute("style","opacity:0"); // make sure the overlay is invisible already when loading it
 
   document.body.insertBefore(overlay, null);
 
-  //Color Application
-  var colors = ['redbg','purpledarkbg','darkbluebg','orangebg','greenbg','darkbluebg','purpledarkbg','yellowbg','lightpinkbg','pinkbg','turquoisebg','yellowbg','lightbluebg','purpledarkbg', 'bluebg'];
 
   // Get user's app
   var r = new XMLHttpRequest();
@@ -261,39 +264,6 @@ domReady(function(){
     // Response is JSON
     response = JSON.parse(r.responseText);
 
-    // Add overlay header
-    overlay.innerHTML += '<div id="ynh-user" class="ynh-wrapper info">' +
-                          '<ul class="ul-reset user-menu"><li><a class="icon icon-connexion disableAjax" href="'+ response.portal_url +'?action=logout">'+response.t_logout+'</a></li></ul>'+
-                          '<a class="user-container user-container-info disableAjax" href="'+ response.portal_url +'edit.html">' +
-                            '<h2 class="user-username">'+ response.uid +'</h2>' +
-                            '<small class="user-fullname">'+ response.givenName + ' ' + response.sn +'</small>' +
-                            '<span class="user-mail">'+ response.mail +'</span>' +
-                          '</a>' +
-                        '</div>';
-
-
-    // Add application links
-    var links = [];
-    Array.prototype.forEach.call(response.app, function(app, n){
-      randomColorNumber = parseInt(app.name, 36) % colors.length;
-      links.push('<li><a class="'+colors[randomColorNumber]+' disableAjax" href="//'+app.url+'"><span class="first-letter" data-first-letter="'+ app.name.substr(0,2) +'"></span><span class="name">'+app.name+'</span></a></li>');
-    });
-    overlay.innerHTML += '<div id="ynh-apps" class="ynh-wrapper apps"><ul class="listing-apps">'+ links.join("\n") +'</ul></div>';
-
-    // Add footer links
-    overlay.innerHTML += '<div id="ynh-footer" class="ynh-wrapper footer"><nav>' + "\n" +
-                          '<a class="link-profile-edit" href="/yunohost/sso/edit.html">'+ response.t_footerlink_edit +'</a>' + "\n" +
-                          '<a class="link-documentation" href="//yunohost.org/docs" target="_blank">'+ response.t_footerlink_documentation +'</a>' + "\n" +
-                          '<a class="link-documentation" href="//yunohost.org/support" target="_blank">'+ response.t_footerlink_support +'</a>' + "\n" +
-                          '<a class="link-admin" href="/yunohost/admin/" target="_blank">'+ response.t_footerlink_administration +'</a>' + "\n" +
-                        '</nav></div>';
-
-    // Add overlay to DOM
-    var btn = document.getElementById('logo'),
-        yunoverlay = document.getElementById('ynh-overlay'),
-        user = document.getElementById('ynh-user'),
-        apps = document.getElementById('ynh-apps');
-
     var pfx = ["webkit", "moz", "MS", "o", ""];
     function PrefixedEvent(element, type, callback) {
       for (var p = 0; p < pfx.length; p++) {
@@ -302,28 +272,44 @@ domReady(function(){
       }
     }
 
+
+    // Load all stylesheets after getting config
+
+    // Add portal stylesheet
+    var portalStyle = document.createElement("link");
+    portalStyle.setAttribute("rel", "stylesheet");
+    portalStyle.setAttribute("type", "text/css");
+    portalStyle.setAttribute("href", '/ynhpanel.css');
+    document.getElementsByTagName("head")[0].insertBefore(portalStyle, null);
+
+    // Custom style from theme
+    if (response.theme) {
+      var portalThemeStyle = document.createElement("link");
+      portalThemeStyle.setAttribute("rel", "stylesheet");
+      portalThemeStyle.setAttribute("type", "text/css");
+      portalThemeStyle.setAttribute("href", '/yunohost/sso/assets/themes/'+ response.theme +'/css/ynhpanel.css');
+      document.getElementsByTagName("head")[0].insertBefore(portalThemeStyle, null);
+    };
+
+
     // Bind YNH Button
     window.addEvent(portal, 'click', function(e){
       // Prevent default click
       window.eventPreventDefault(e);
-      // Toggle overlay on YNHPortal button
-      //Element.toggleClass(overlay, 'visible');
+      // Toggle overlay on YNHPortal button click
+      Element.toggleClass(overlay, 'visible');
       Element.toggleClass(portal, 'visible');
       Element.toggleClass(document.querySelector('html'), 'ynh-panel-active');
+      Element.toggleClass(overlay, 'ynh-active');
 
-
-      if(yunoverlay.classList.contains('ynh-active')) {
+      if(overlay.classList.contains('ynh-active')) {
           meta_viewport.setAttribute('content', meta_viewport_content);
-          yunoverlay.classList.add('ynh-fadeOut');
-          PrefixedEvent(yunoverlay, "AnimationEnd", function(){
-            if(yunoverlay.classList.contains('ynh-fadeOut')) {
-              yunoverlay.classList.remove('ynh-active');
-            }
-          });
+          Element.addClass(overlay, 'ynh-fadeIn');
+          Element.removeClass(overlay, 'ynh-fadeOut');
         }else {
           meta_viewport.setAttribute('content', "width=device-width");
-          yunoverlay.classList.remove('ynh-fadeOut');
-          yunoverlay.classList.add('ynh-active');
+          Element.removeClass(overlay, 'ynh-fadeIn');
+          Element.addClass(overlay, 'ynh-fadeOut');
         }
     });
 
