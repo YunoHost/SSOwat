@@ -3,5 +3,22 @@
     "information": "Ваша информация",
     "username": "Имя пользователя",
     "password": "Пароль",
-    "fullname": "Полное имя"
+    "fullname": "Полное имя",
+    "mail_addresses": "Адреса почты",
+    "ok": "ОК",
+    "cancel": "Отменить",
+    "change_password": "Сменить пароль",
+    "edit": "Редактировать",
+    "current_password": "Текущий пароль",
+    "new_password": "Новый пароль",
+    "confirm": "Подтвердить",
+    "login": "Логин",
+    "logout": "Выйти",
+    "password_changed": "Пароль успешно изменен",
+    "password_changed_error": "При смене пароля возникла ошибка",
+    "invalid_mail": "Неправильный адрес почты",
+    "invalid_mailforward": "Неправильный адрес переадресации почты",
+    "mail_already_used": "Этот адрес почты уже используется:",
+    "information_updated": "Информация обновлена",
+    "user_saving_fail": "Во время сохранения изменению внесённых пользователем, возникла ошибка"
 }
