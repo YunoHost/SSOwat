@@ -348,6 +348,11 @@ if conf["unprotected_urls"] then
         and not is_protected() then
             if hlp.is_logged_in() then
                 hlp.set_headers()
+            elseif string.match(ngx.var.uri, "^/ynhpanel.js$")
+            or string.match(ngx.var.uri, "^/ynhpanel.css$")
+            or string.match(ngx.var.uri, "^/ynhpanel.json$") then
+                local back_url = "https://" .. ngx.var.host .. ngx.var.uri .. hlp.uri_args_string()
+                return hlp.redirect(conf.portal_url.."?r="..ngx.encode_base64(back_url))
             end
             return hlp.pass()
         end
@@ -361,6 +366,11 @@ if conf["unprotected_regex"] then
         and not is_protected() then
             if hlp.is_logged_in() then
                 hlp.set_headers()
+            elseif string.match(ngx.var.uri, "^/ynhpanel.js$")
+            or string.match(ngx.var.uri, "^/ynhpanel.css$")
+            or string.match(ngx.var.uri, "^/ynhpanel.json$") then
+                local back_url = "https://" .. ngx.var.host .. ngx.var.uri .. hlp.uri_args_string()
+                return hlp.redirect(conf.portal_url.."?r="..ngx.encode_base64(back_url))
             end
             return hlp.pass()
         end
