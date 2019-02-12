@@ -78,10 +78,22 @@ document.addEventListener('DOMContentLoaded', function() {
     // Response is JSON
     response = JSON.parse(r.responseText);
 
-    // load additional theme's script
-    loadScript("/yunohost/sso/assets/themes/"+ response.theme +"/js/ynhpanel.js");
-
   };
   r.send();
+
+  if(window.location != window.parent.location) {
+    // Set class to body to show we're in overlay
+    document.body.classList.add('overlay');
+      let userContainer = document.querySelector('a.user-container');
+      userContainer.classList.replace('user-container-info', 'user-container-edit');
+      userContainer.setAttribute('href', userContainer
+          .getAttribute('href')
+          .replace('edit.html', ''));
+      userContainer.addEventListener('click', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          window.parent.location.href = userContainer.getAttribute('href');
+      })
+  }
 
 });

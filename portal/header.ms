@@ -35,6 +35,10 @@
 </head>
 <body class="{{#connected}}logged{{/connected}}">
 
+  <h1 id="logo" class="logo">
+      <img src="assets/img/logo-ynh-white.svg"/><span class="element-invisible">Yunohost</span>
+  </h1>
+
   <div class="overlay">
     {{#flash_win}}
     <div class="wrapper messages success">{{.}}</div>

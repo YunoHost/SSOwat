@@ -126,6 +126,39 @@ img {
 .ynh-wrapper:after {content: " ";display: table;}
 .ynh-wrapper:after {clear: both;}
 
+/* Logo */
+body.overlay .logo {
+  display: none;
+}
+
+.logo {
+  text-align: center;
+  margin-bottom: 0;
+  opacity: 0.7;
+}
+
+.logo img {
+  margin-top: 4%;
+  width: 4em;
+}
+
+.logged .logo {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 0;
+  opacity: 0.7;
+}
+.logged .logo img {
+  margin-top: 0;
+  width: 2.5em;
+  padding: 0.3em;
+  border-radius: 5px;
+}
+
+.ynh-panel-active .logo {
+  display: none;
+}
 
 /* messages */
 .messages {
@@ -365,6 +398,7 @@ textarea {
           transition: all 0.1s ease;
   -webkit-transition: all 0.1s ease;
 }
+
 .user-container-edit:hover:after,
 .user-container-password:hover:after {
   left: -20px;

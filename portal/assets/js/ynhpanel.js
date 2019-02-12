@@ -234,7 +234,6 @@ domReady(function(){
   // Portal link is draggable, for user convenience
   dragg('ynh-overlay-switch');
 
-
   // Create overlay element
   var overlay = document.createElement('iframe');
   overlay.src = "/yunohost/sso/info.html";
@@ -242,7 +241,6 @@ domReady(function(){
   overlay.setAttribute("style","opacity:0"); // make sure the overlay is invisible already when loading it
 
   document.body.insertBefore(overlay, null);
-
 
   // Get user's app
   var r = new XMLHttpRequest();
@@ -261,14 +259,6 @@ domReady(function(){
     portalStyle.setAttribute("type", "text/css");
     portalStyle.setAttribute("href", '/ynhpanel.css');
     document.getElementsByTagName("head")[0].insertBefore(portalStyle, null);
-
-    // Custom style from theme id specified in config
-      var portalThemeStyle = document.createElement("link");
-      portalThemeStyle.setAttribute("rel", "stylesheet");
-      portalThemeStyle.setAttribute("type", "text/css");
-      portalThemeStyle.setAttribute("href", '/yunohost/sso/assets/themes/'+ response.theme +'/css/ynhpanel.css');
-      document.getElementsByTagName("head")[0].insertBefore(portalThemeStyle, null);
-
 
     // Bind YNH Button
     window.addEvent(portal, 'click', function(e){
