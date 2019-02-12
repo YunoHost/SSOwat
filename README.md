@@ -18,11 +18,17 @@ Requirements
 - Nginx-extras from Debian wheezy-backports
 - lua-json
 - lua-ldap
+- lua-filesystem
+- lua-socket
+- lua-rex-pcre
 
 **OR**
 
 - Nginx "Openresty" flavored : http://openresty.org/
 - lua-ldap
+- lua-filesystem
+- lua-socket
+- lua-rex-pcre
 
 Installation
 ------------
