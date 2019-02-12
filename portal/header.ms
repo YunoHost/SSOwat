@@ -13,9 +13,7 @@
 
   <!-- Stylesheets -->
   <link rel="stylesheet" href="assets/css/ynh-style.css">
-  {{#theme}}
-  <link rel="stylesheet" href="assets/themes/{{theme}}/css/ynh-style.css">
-  {{/theme}}
+  <link rel="stylesheet" href="assets/themes/{{theme_name}}.css">
 
   <!-- Icons -->
   <link rel="shortcut icon" href="assets/icons/favicon.ico">

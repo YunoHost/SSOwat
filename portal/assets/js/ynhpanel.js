@@ -262,14 +262,12 @@ domReady(function(){
     portalStyle.setAttribute("href", '/ynhpanel.css');
     document.getElementsByTagName("head")[0].insertBefore(portalStyle, null);
 
-    // Custom style from theme's id specified in config
-    if (response.theme) {
+    // Custom style from theme id specified in config
       var portalThemeStyle = document.createElement("link");
       portalThemeStyle.setAttribute("rel", "stylesheet");
       portalThemeStyle.setAttribute("type", "text/css");
       portalThemeStyle.setAttribute("href", '/yunohost/sso/assets/themes/'+ response.theme +'/css/ynhpanel.css');
       document.getElementsByTagName("head")[0].insertBefore(portalThemeStyle, null);
-    };
 
 
     // Bind YNH Button
