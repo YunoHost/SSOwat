@@ -173,3 +173,7 @@ Array of regular expressions to be matched against URLS **and** URIs and their r
 #### default_language
 
 Language code used by default in views (**default**: `en`)
+
+#### theme
+
+Can be either `default` or `vapor`.
