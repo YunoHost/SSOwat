@@ -192,8 +192,7 @@ var dragg = function(id) {
       // Reset dragging status
       dragged = false;
   });
-}
-
+};
 
 /* Smallest DOMReady
   http://dustindiaz.com/smallest-domready-ever
@@ -239,7 +238,7 @@ domReady(function(){
   var overlay = document.createElement('iframe');
   overlay.src = "/yunohost/sso/info.html";
   overlay.setAttribute("id","ynh-overlay");
-  overlay.setAttribute("style","opacity:0"); // make sure the overlay is invisible already when loading it
+  overlay.setAttribute("style","visibility: hidden;"); // make sure the overlay is invisible already when loading it
 
   document.body.insertBefore(overlay, null);
 
@@ -293,6 +292,5 @@ domReady(function(){
 
   };
   r.send();
-
 
 });

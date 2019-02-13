@@ -56,14 +56,14 @@ body {/*overflow-y: scroll;*/}
 
 /* Background */
 #ynh-overlay {
-  display: block;
+  visibility: hidden;
   position: fixed;
   top:0;
   left: 0;
   width: 100%;
   height: 100%;
   z-index: 9999999;
-  opacity: 0;
+  display: block;
   border: none;
   color:#fff;
   background: #41444F;
@@ -79,12 +79,24 @@ body {/*overflow-y: scroll;*/}
 
 /*FadeIn*/
 @-webkit-keyframes fadeIn {
-  0% {opacity: 0;}
-  100% {opacity: 1;}
+  0% {
+    visibility: hidden;
+    opacity:0;
+  }
+  100% {
+    visibility: visible;
+    opacity: 1;
+  }
 }
 @keyframes fadeIn {
-  0% {opacity: 0;}
-  100% {opacity: 1;}
+  0% {
+    visibility: hidden;
+    opacity: 0;
+  }
+  100% {
+    visibility: visible;
+    opacity: 1;
+  }
 }
 
 .ynh-fadeIn {
@@ -106,12 +118,24 @@ body {/*overflow-y: scroll;*/}
 
 /*FadeOut*/
 @-webkit-keyframes fadeOut {
-  0% {opacity: 1;}
-  100% {opacity: 0;}
+  0% {
+    visibility: visible;
+    opacity: 1;
+  }
+  100% {
+    visibility: hidden;
+    opacity: 0;
+  }
 }
 @keyframes fadeOut {
-  0% {opacity: 1;}
-  100% {opacity: 0;}
+  0% {
+    visibility: visible;
+    opacity: 1;
+  }
+  100% {
+    visibility: hidden;
+    opacity: 0;
+  }
 }
 .ynh-fadeOut {
   -webkit-animation-name: fadeOut;
