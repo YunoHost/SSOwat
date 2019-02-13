@@ -140,8 +140,8 @@ body {/*overflow-y: scroll;*/}
 .ynh-fadeOut {
   -webkit-animation-name: fadeOut;
   animation-name: fadeOut;
-  -webkit-animation-duration: 0.5s;
-  animation-duration: 0.5s;
+  -webkit-animation-duration: 0.2s;
+  animation-duration: 0.2s;
   -webkit-animation-fill-mode: both;
   animation-fill-mode: both;
 }
