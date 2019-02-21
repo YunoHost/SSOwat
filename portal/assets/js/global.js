@@ -1,5 +1,6 @@
 
 // handle app links so they work both in plain info page and in the info iframe called from ynhpanel.js
+// FIXME : the appClick thing should be added with a selector on relevant items after the DOM loaded, not hardcoded in the .ms templates ?
 function appClick (evnt, url) {
 
   // if asked to open in new tab
@@ -19,6 +20,11 @@ function appClick (evnt, url) {
 
 }
 
+
+// FIXME : this stuff is really weird given that global.js
+// is ran on all pages, even if you are not logged in ...
+// Maybe add a check. I noticed that if the user is logged in,
+// there's a "logged" class added to the body.
 document.addEventListener('DOMContentLoaded', function() {
 
   // Variables
