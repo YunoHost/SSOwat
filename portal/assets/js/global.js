@@ -68,20 +68,4 @@ document.addEventListener('DOMContentLoaded', function() {
     addMaildrop.parentNode.insertBefore(inputDropClone, addMaildrop);
   });
 
-
-  // Get user's infos
-  var r = new XMLHttpRequest();
-  r.open("GET", "/ynhpanel.json", true);
-  r.onreadystatechange = function () {
-    // Die if error
-    if (r.readyState != 4 || r.status != 200) return;
-    // Response is JSON
-    response = JSON.parse(r.responseText);
-
-    // load additional theme's script
-    loadScript("/yunohost/sso/assets/themes/"+ response.theme +"/js/ynhpanel.js");
-
-  };
-  r.send();
-
 });
