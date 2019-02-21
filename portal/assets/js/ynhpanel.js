@@ -243,6 +243,7 @@ domReady(function(){
   document.body.insertBefore(overlay, null);
 
   // Add portal stylesheet
+  // FIXME : check we really need to do this ... imho it's included directly in the html iframe ?
   var portalStyle = document.createElement("link");
   portalStyle.setAttribute("rel", "stylesheet");
   portalStyle.setAttribute("type", "text/css");
