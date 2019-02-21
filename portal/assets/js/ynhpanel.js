@@ -242,47 +242,32 @@ domReady(function(){
 
   document.body.insertBefore(overlay, null);
 
+  // Add portal stylesheet
+  var portalStyle = document.createElement("link");
+  portalStyle.setAttribute("rel", "stylesheet");
+  portalStyle.setAttribute("type", "text/css");
+  portalStyle.setAttribute("href", '/ynhpanel.css');
+  document.getElementsByTagName("head")[0].insertBefore(portalStyle, null);
 
-  // Get user's app
-  var r = new XMLHttpRequest();
-  r.open("GET", "/ynhpanel.json", true);
-  r.onreadystatechange = function () {
-    // Die if error
-    if (r.readyState != 4 || r.status != 200) return;
+  // Bind YNH Button
+  window.addEvent(portal, 'click', function(e){
+    // Prevent default click
+    window.eventPreventDefault(e);
+    // Toggle overlay on YNHPortal button click
+    Element.toggleClass(overlay, 'visible');
+    Element.toggleClass(portal, 'visible');
+    Element.toggleClass(document.querySelector('html'), 'ynh-panel-active');
+    Element.toggleClass(overlay, 'ynh-active');
 
-    // Response is JSON
-    response = JSON.parse(r.responseText);
-
-
-    // Add portal stylesheet
-    var portalStyle = document.createElement("link");
-    portalStyle.setAttribute("rel", "stylesheet");
-    portalStyle.setAttribute("type", "text/css");
-    portalStyle.setAttribute("href", '/ynhpanel.css');
-    document.getElementsByTagName("head")[0].insertBefore(portalStyle, null);
-
-    // Bind YNH Button
-    window.addEvent(portal, 'click', function(e){
-      // Prevent default click
-      window.eventPreventDefault(e);
-      // Toggle overlay on YNHPortal button click
-      Element.toggleClass(overlay, 'visible');
-      Element.toggleClass(portal, 'visible');
-      Element.toggleClass(document.querySelector('html'), 'ynh-panel-active');
-      Element.toggleClass(overlay, 'ynh-active');
-
-      if(overlay.classList.contains('ynh-active')) {
-          meta_viewport.setAttribute('content', meta_viewport_content);
-          Element.addClass(overlay, 'ynh-fadeIn');
-          Element.removeClass(overlay, 'ynh-fadeOut');
-        }else {
-          meta_viewport.setAttribute('content', "width=device-width");
-          Element.removeClass(overlay, 'ynh-fadeIn');
-          Element.addClass(overlay, 'ynh-fadeOut');
-        }
-    });
-
-  };
-  r.send();
+    if(overlay.classList.contains('ynh-active')) {
+        meta_viewport.setAttribute('content', meta_viewport_content);
+        Element.addClass(overlay, 'ynh-fadeIn');
+        Element.removeClass(overlay, 'ynh-fadeOut');
+      }else {
+        meta_viewport.setAttribute('content', "width=device-width");
+        Element.removeClass(overlay, 'ynh-fadeIn');
+        Element.addClass(overlay, 'ynh-fadeOut');
+      }
+  });
 
 });
