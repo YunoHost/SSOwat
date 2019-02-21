@@ -586,7 +586,7 @@ function get_data_for(view)
     data['flash_fail'] = {flashs["fail"]}
     data['flash_win']  = {flashs["win"] }
     data['flash_info'] = {flashs["info"]}
-    data['theme_name'] = ""..conf["theme"]
+    data['theme'] = conf["theme"]
 
     return data
 end

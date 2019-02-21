@@ -11,5 +11,8 @@
 
   <!-- Scripts -->
   <script src="assets/js/global.js"></script>
+  {{#theme}}
+  <script src="assets/themes/{{theme}}/global.js"></script>
+  {{/theme}}
 </body>
 </html>
