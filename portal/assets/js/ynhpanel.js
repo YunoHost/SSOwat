@@ -118,7 +118,7 @@ window.eventPreventDefault = function(event) {
   http://jsfiddle.net/tovic/Xcb8d/light/
 -------------------------- */
 
-var dragg = function(id) {
+function make_element_draggable(id) {
 
   // Variables
   this.elem = document.getElementById(id),
@@ -222,52 +222,48 @@ domReady(function(){
   meta_viewport = document.querySelector('meta[name="viewport"]');
   meta_viewport_content = meta_viewport.getAttribute('content');
 
+  // Inject portal button
+  var portalButton = document.createElement('a');
+  portalButton.setAttribute('id', 'ynh-overlay-switch');
+  portalButton.setAttribute('href', '/yunohost/sso/');
+  portalButton.setAttribute('class', 'disableAjax');
+  document.body.insertBefore(portalButton, null);
+  // Make portal button draggable, for user convenience
+  make_element_draggable('ynh-overlay-switch');
 
-  // Create portal link
-  var portal = document.createElement('a');
-  portal.setAttribute('id', 'ynh-overlay-switch');
-  portal.setAttribute('href', '/yunohost/sso/');
-  portal.setAttribute('class', 'disableAjax');
-  document.body.insertBefore(portal, null);
+  // Prepare and inject the portal overlay (what is activated when clicking on the portal button)
+  var portalOverlay = document.createElement('iframe');
+  portalOverlay.src = "/yunohost/sso/info.html";
+  portalOverlay.setAttribute("id","ynh-overlay");
+  portalOverlay.setAttribute("style","visibility: hidden;"); // make sure the overlay is invisible already when loading it
+  document.body.insertBefore(portalOverlay, null);
 
-  // Portal link is draggable, for user convenience
-  dragg('ynh-overlay-switch');
-
-
-  // Create overlay element
-  var overlay = document.createElement('iframe');
-  overlay.src = "/yunohost/sso/info.html";
-  overlay.setAttribute("id","ynh-overlay");
-  overlay.setAttribute("style","visibility: hidden;"); // make sure the overlay is invisible already when loading it
-
-  document.body.insertBefore(overlay, null);
-
-  // Add portal stylesheet
-  // FIXME : check we really need to do this ... imho it's included directly in the html iframe ?
+  // Inject portal stylesheet
+  // (we need it for the portal button to be displayed correctly)
   var portalStyle = document.createElement("link");
   portalStyle.setAttribute("rel", "stylesheet");
   portalStyle.setAttribute("type", "text/css");
   portalStyle.setAttribute("href", '/ynhpanel.css');
   document.getElementsByTagName("head")[0].insertBefore(portalStyle, null);
 
-  // Bind YNH Button
-  window.addEvent(portal, 'click', function(e){
-    // Prevent default click
-    window.eventPreventDefault(e);
-    // Toggle overlay on YNHPortal button click
-    Element.toggleClass(overlay, 'visible');
-    Element.toggleClass(portal, 'visible');
-    Element.toggleClass(document.querySelector('html'), 'ynh-panel-active');
-    Element.toggleClass(overlay, 'ynh-active');
+  // Bind portal button
+  window.addEvent(portalButton, 'click', function(e){
+      // Prevent default click
+      window.eventPreventDefault(e);
+      // Toggle overlay on YNHPortal button click
+      Element.toggleClass(portalOverlay, 'visible');
+      Element.toggleClass(portalButton, 'visible');
+      Element.toggleClass(document.querySelector('html'), 'ynh-panel-active');
+      Element.toggleClass(portalOverlay, 'ynh-active');
 
-    if(overlay.classList.contains('ynh-active')) {
-        meta_viewport.setAttribute('content', meta_viewport_content);
-        Element.addClass(overlay, 'ynh-fadeIn');
-        Element.removeClass(overlay, 'ynh-fadeOut');
-      }else {
-        meta_viewport.setAttribute('content', "width=device-width");
-        Element.removeClass(overlay, 'ynh-fadeIn');
-        Element.addClass(overlay, 'ynh-fadeOut');
+      if (portalOverlay.classList.contains('ynh-active')) {
+          meta_viewport.setAttribute('content', meta_viewport_content);
+          Element.addClass(portalOverlay, 'ynh-fadeIn');
+          Element.removeClass(portalOverlay, 'ynh-fadeOut');
+      } else {
+          meta_viewport.setAttribute('content', "width=device-width");
+          Element.removeClass(portalOverlay, 'ynh-fadeIn');
+          Element.addClass(portalOverlay, 'ynh-fadeOut');
       }
   });
 
