@@ -194,20 +194,11 @@ function make_element_draggable(id) {
   });
 };
 
-/* Smallest DOMReady
-  http://dustindiaz.com/smallest-domready-ever
--------------------------- */
-function domReady(cb) {
-   /in/.test(document.readyState) // in = loadINg
-      ? setTimeout('domReady('+cb+')', 9)
-      : cb();
-}
-
-
 /* ----------------------------------------------------------
   Main
 ---------------------------------------------------------- */
-domReady(function(){
+document.addEventListener('DOMContentLoaded', function() {
+
   // Don't do this in iframe
   if (window.self !== window.top) {return false;}
 
