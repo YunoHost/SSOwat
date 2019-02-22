@@ -292,8 +292,7 @@ function init_portal()
 {
 
   // Variables
-  var colors = ['redbg','purpledarkbg','darkbluebg','orangebg','greenbg','darkbluebg','purpledarkbg','yellowbg','lightpinkbg','pinkbg','turquoisebg','yellowbg','lightbluebg','purpledarkbg', 'bluebg']
-    , addMailAlias = document.getElementById('add-mailalias')
+  var addMailAlias = document.getElementById('add-mailalias')
     , addMaildrop = document.getElementById('add-maildrop')
   ;
 
@@ -320,15 +319,7 @@ function init_portal()
     for (var i = 0; i < app_tiles.length; i++) {
 
         var el = app_tiles[i];
-
-        // Select a color value from the App label
-        randomColorNumber = parseInt(el.textContent, 36) % colors.length;
-        //randomColorNumber = i%colors.length; // Old value
-        // Add color class.
-        el.classList.add(colors[randomColorNumber]);
-        // Set first-letter data attribute.
-        el.querySelector('.first-letter').setAttribute('data-first-letter', el.textContent.substring(0, 2));
-
+        set_app_tile_style(el);
         // handle app links so they work both in plain info page and in the info iframe called from ynhpanel.js
         el.addEventListener('click', function(event) {
         // if asked to open in new tab
@@ -345,6 +336,17 @@ function init_portal()
         }, false);
      }
   }
+}
+
+var app_tile_colors = ['redbg','purpledarkbg','darkbluebg','orangebg','greenbg','darkbluebg','purpledarkbg','yellowbg','lightpinkbg','pinkbg','turquoisebg','yellowbg','lightbluebg','purpledarkbg', 'bluebg'];
+function set_app_tile_style(el)
+{
+    // Select a color value from the App label
+    randomColorNumber = parseInt(el.textContent, 36) % app_tile_colors.length;
+    // Add color class.
+    el.classList.add(app_tile_colors[randomColorNumber]);
+    // Set first-letter data attribute.
+    el.querySelector('.first-letter').setAttribute('data-first-letter', el.textContent.substring(0, 2));
 }
 
 function tweak_portal_when_in_iframe()
