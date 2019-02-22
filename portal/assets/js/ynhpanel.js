@@ -216,7 +216,7 @@ document.addEventListener('DOMContentLoaded', function() {
         init_portal();
         if (in_overlay_iframe) { tweak_portal_when_in_iframe(); }
     }
-}
+});
 
 //
 // This function is called when ynhpanel.js is included in an app
@@ -283,17 +283,82 @@ function init_portal_button_and_overlay()
       }
   });
 
-});
+}
 
 //
 // This function is called to initialize elements like the app tile colors and other things ...
 //
 function init_portal()
 {
-    // Import stuff from global.js ...
+
+  // Variables
+  var colors = ['redbg','purpledarkbg','darkbluebg','orangebg','greenbg','darkbluebg','purpledarkbg','yellowbg','lightpinkbg','pinkbg','turquoisebg','yellowbg','lightbluebg','purpledarkbg', 'bluebg']
+    , addMailAlias = document.getElementById('add-mailalias')
+    , addMaildrop = document.getElementById('add-maildrop')
+  ;
+
+  addMailAlias && addMailAlias.addEventListener('click', function(){
+    // Clone last input.
+    var inputAliasClone = document.querySelector('.mailalias-input').cloneNode(true);
+    // Empty value.
+    inputAliasClone.value = '';
+    // Append to form-group.
+    addMailAlias.parentNode.insertBefore(inputAliasClone, addMailAlias);
+  });
+
+  addMaildrop && addMaildrop.addEventListener('click', function(){
+    // Clone last input.
+    var inputDropClone = document.querySelector('.maildrop-input').cloneNode(true);
+    // Empty value.
+    inputDropClone.value = '';
+    // Append to form-group.
+    addMaildrop.parentNode.insertBefore(inputDropClone, addMaildrop);
+  });
+
+  var app_tiles = document.getElementsByClassName("app-tile");
+  if (app_tiles) {
+    for (var i = 0; i < app_tiles.length; i++) {
+
+        var el = app_tiles[i];
+
+        // Select a color value from the App label
+        randomColorNumber = parseInt(el.textContent, 36) % colors.length;
+        //randomColorNumber = i%colors.length; // Old value
+        // Add color class.
+        el.classList.add(colors[randomColorNumber]);
+        // Set first-letter data attribute.
+        el.querySelector('.first-letter').setAttribute('data-first-letter', el.textContent.substring(0, 2));
+
+        // handle app links so they work both in plain info page and in the info iframe called from ynhpanel.js
+        el.addEventListener('click', function(event) {
+        // if asked to open in new tab
+        if (event.ctrlKey || event.shiftKey || event.metaKey
+            || (event.button && event.button == 1)) {
+            return
+        }
+        // if asked in current tab
+        else {
+            event.preventDefault();
+            parent.location.href=this.href;
+            return false;
+        };
+        }, false);
+     }
+  }
 }
 
 function tweak_portal_when_in_iframe()
 {
-    // Import stuff from global.js ...
+    // Set class to body to show we're in overlay
+    document.body.classList.add('overlay');
+    let userContainer = document.querySelector('a.user-container');
+    userContainer.classList.replace('user-container-info', 'user-container-edit');
+    userContainer.setAttribute('href', userContainer
+        .getAttribute('href')
+        .replace('edit.html', ''));
+    userContainer.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        window.parent.location.href = userContainer.getAttribute('href');
+    })
 }
