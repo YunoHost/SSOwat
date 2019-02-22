@@ -205,7 +205,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // - this script is loaded inside the "regular" portal when going to /yunohost/sso.
 
     var in_app = ! document.body.classList.contains('ynh-user-portal');
-    var in_overlay_iframe = (window.self === window.top);
+    var in_overlay_iframe = (window.location != window.parent.location);
 
     if (in_app)
     {
