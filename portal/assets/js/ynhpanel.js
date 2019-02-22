@@ -91,6 +91,7 @@ Element.toggleClass = function(element, className) {
   https://github.com/Darklg/JavaScriptUtilities/blob/master/assets/js/vanilla-js/libs/vanilla-events.js
 -------------------------- */
 window.addEvent = function(el, eventName, callback, options) {
+    if (el == null) { return; }
     if (el.addEventListener) {
         if (!options || typeof(options) !== "object") {
             options = {};
@@ -197,7 +198,7 @@ function make_element_draggable(id) {
 /* ----------------------------------------------------------
   Main
 ---------------------------------------------------------- */
-document.addEventListener('DOMContentLoaded', function() {
+window.addEvent(document, 'DOMContentLoaded', function() {
 
     // 3 different cases :
     // - this script is loaded from inside an app
@@ -293,51 +294,41 @@ function init_portal_button_and_overlay()
 function init_portal()
 {
 
-  // Variables
-  var addMailAlias = document.getElementById('add-mailalias')
-    , addMaildrop = document.getElementById('add-maildrop')
-  ;
-
-  addMailAlias && addMailAlias.addEventListener('click', function(){
+  window.addEvent(document.getElementById('add-mailalias'), "click", function() {
     // Clone last input.
     var inputAliasClone = document.querySelector('.mailalias-input').cloneNode(true);
     // Empty value.
     inputAliasClone.value = '';
     // Append to form-group.
-    addMailAlias.parentNode.insertBefore(inputAliasClone, addMailAlias);
+    this.parentNode.insertBefore(inputAliasClone, this);
   });
 
-  addMaildrop && addMaildrop.addEventListener('click', function(){
+  window.addEvent(document.getElementById('add-maildrop'), "click", function() {
     // Clone last input.
     var inputDropClone = document.querySelector('.maildrop-input').cloneNode(true);
     // Empty value.
     inputDropClone.value = '';
     // Append to form-group.
-    addMaildrop.parentNode.insertBefore(inputDropClone, addMaildrop);
+    this.parentNode.insertBefore(inputDropClone, this);
   });
 
-  var app_tiles = document.getElementsByClassName("app-tile");
-  if (app_tiles) {
-    for (var i = 0; i < app_tiles.length; i++) {
-
-        var el = app_tiles[i];
+  Array.each(document.getElementsByClassName("app-tile"), function(el) {
         set_app_tile_style(el);
         // handle app links so they work both in plain info page and in the info iframe called from ynhpanel.js
-        el.addEventListener('click', function(event) {
-        // if asked to open in new tab
-        if (event.ctrlKey || event.shiftKey || event.metaKey
-            || (event.button && event.button == 1)) {
-            return
-        }
-        // if asked in current tab
-        else {
-            event.preventDefault();
-            parent.location.href=this.href;
-            return false;
-        };
-        }, false);
-     }
-  }
+        window.addEvent(el, 'click', function(event) {
+            // if asked to open in new tab
+            if (event.ctrlKey || event.shiftKey || event.metaKey
+                || (event.button && event.button == 1)) {
+                return
+            }
+            // if asked in current tab
+            else {
+                event.preventDefault();
+                parent.location.href=this.href;
+                return false;
+            };
+        });
+  });
 }
 
 var app_tile_colors = ['redbg','purpledarkbg','darkbluebg','orangebg','greenbg','darkbluebg','purpledarkbg','yellowbg','lightpinkbg','pinkbg','turquoisebg','yellowbg','lightbluebg','purpledarkbg', 'bluebg'];
@@ -360,9 +351,9 @@ function tweak_portal_when_in_iframe()
     userContainer.setAttribute('href', userContainer
         .getAttribute('href')
         .replace('edit.html', ''));
-    userContainer.addEventListener('click', function(e) {
+    window.addEvent(userContainer, 'click', function(e) {
         e.preventDefault();
         e.stopPropagation();
         window.parent.location.href = userContainer.getAttribute('href');
-    })
+    });
 }
