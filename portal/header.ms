@@ -33,7 +33,7 @@
   <meta name="msapplication-TileColor" content="#41444f">
   <meta name="msapplication-TileImage" content="/mstile-144x144.png">
 </head>
-<body class="{{#connected}}logged{{/connected}}">
+<body class="ynh-user-portal {{#connected}}logged{{/connected}}">
 
   <h1 id="logo" class="logo">
       <img src="assets/img/logo-ynh-white.svg"/><span class="element-invisible">Yunohost</span>

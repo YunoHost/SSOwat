@@ -199,9 +199,34 @@ function make_element_draggable(id) {
 ---------------------------------------------------------- */
 document.addEventListener('DOMContentLoaded', function() {
 
-  // Don't do this in iframe
-  if (window.self !== window.top) {return false;}
+    // 3 different cases :
+    // - this script is loaded from inside an app
+    // - this script is loaded inside the portal, inside an iframe/overlay activated by clicking the portal button inside an app
+    // - this script is loaded inside the "regular" portal when going to /yunohost/sso.
 
+    var in_app = ! document.body.classList.contains('ynh-user-portal');
+    var in_overlay_iframe = (window.self === window.top);
+
+    if (in_app)
+    {
+        init_portal_button_and_overlay();
+    }
+    else
+    {
+        init_portal();
+        if (in_overlay_iframe) { tweak_portal_when_in_iframe(); }
+    }
+}
+
+//
+// This function is called when ynhpanel.js is included in an app
+//
+// It will create the small yunohost "portal button" usually in the bottom
+// right corner and initialize the portal overlay, shown when clicking the
+// portal button meant to make it easier to switch between apps.
+//
+function init_portal_button_and_overlay()
+{
   // Set and store meta viewport
   var meta_viewport = document.querySelector('meta[name="viewport"]');
   if (meta_viewport === null) {
@@ -259,3 +284,16 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 
 });
+
+//
+// This function is called to initialize elements like the app tile colors and other things ...
+//
+function init_portal()
+{
+    // Import stuff from global.js ...
+}
+
+function tweak_portal_when_in_iframe()
+{
+    // Import stuff from global.js ...
+}
