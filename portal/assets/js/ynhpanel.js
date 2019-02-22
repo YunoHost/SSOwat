@@ -347,13 +347,27 @@ function tweak_portal_when_in_iframe()
     // Set class to body to show we're in overlay
     document.body.classList.add('in_app_overlay');
     let userContainer = document.querySelector('a.user-container');
-    userContainer.classList.replace('user-container-info', 'user-container-edit');
-    userContainer.setAttribute('href', userContainer
-        .getAttribute('href')
-        .replace('edit.html', ''));
-    window.addEvent(userContainer, 'click', function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        window.parent.location.href = userContainer.getAttribute('href');
-    });
+    if (userContainer) {
+        userContainer.classList.replace('user-container-info', 'user-container-edit');
+        userContainer.setAttribute('href', userContainer
+            .getAttribute('href')
+            .replace('edit.html', ''));
+        window.addEvent(userContainer, 'click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            window.parent.location.href = userContainer.getAttribute('href');
+        });
+    }
+    let logoutButton = document.getElementById('ynh-logout');
+    if (logoutButton)
+    {
+        // We force to do the logout "globally", not just in the
+        // iframe, otherwise after login out the url might still be
+        // domain.tld/app which is weird ...
+        window.addEvent(logoutButton, 'click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            window.parent.location.href = logoutButton.getAttribute("href");
+        });
+    }
 }
