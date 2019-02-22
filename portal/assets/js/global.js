@@ -1,26 +1,3 @@
-
-// handle app links so they work both in plain info page and in the info iframe called from ynhpanel.js
-// FIXME : the appClick thing should be added with a selector on relevant items after the DOM loaded, not hardcoded in the .ms templates ?
-function appClick (evnt, url) {
-
-  // if asked to open in new tab
-  if (
-    evnt.ctrlKey ||
-    evnt.shiftKey ||
-    evnt.metaKey ||
-    (evnt.button && evnt.button == 1)
-  ) return
-
-  // if asked in current tab
-  else {
-    evnt.preventDefault();
-    parent.location.href= url;
-    return false;
-  };
-
-}
-
-
 // FIXME : this stuff is really weird given that global.js
 // is ran on all pages, even if you are not logged in ...
 // Maybe add a check. I noticed that if the user is logged in,
@@ -61,6 +38,26 @@ document.addEventListener('DOMContentLoaded', function() {
     // Append to form-group.
     addMaildrop.parentNode.insertBefore(inputDropClone, addMaildrop);
   });
+
+  // handle app links so they work both in plain info page and in the info iframe called from ynhpanel.js
+  var app_tiles = document.getElementsByClassName("app-tile");
+  if (app_tiles) {
+    for (var i = 0; i < app_tiles.length; i++) {
+        app_tiles[i].addEventListener('click', function(event) {
+        // if asked to open in new tab
+        if (event.ctrlKey || event.shiftKey || event.metaKey
+            || (event.button && event.button == 1)) {
+            return
+        }
+        // if asked in current tab
+        else {
+            event.preventDefault();
+            parent.location.href=this.href;
+            return false;
+        };
+        }, false);
+     }
+  }
 
   // FIXME - I don't understand what this do ...
   // This looks kinda hackish :|
