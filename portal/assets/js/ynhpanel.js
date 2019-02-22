@@ -263,6 +263,9 @@ function init_portal_button_and_overlay()
   document.getElementsByTagName("head")[0].insertBefore(portalStyle, null);
 
   // Bind portal button
+  // FIXME : this somehow prevent the portalButton
+  // from being dragged correctly
+  // when mouse is moving too fast
   window.addEvent(portalButton, 'click', function(e){
       // Prevent default click
       window.eventPreventDefault(e);
@@ -282,7 +285,6 @@ function init_portal_button_and_overlay()
           Element.addClass(portalOverlay, 'ynh-fadeOut');
       }
   });
-
 }
 
 //
