@@ -156,6 +156,10 @@ img {
   display: none;
 }
 
+.in_app_overlay .logo {
+  display: none;
+}
+
 /* messages */
 .messages {
   color: #FFF;

@@ -352,7 +352,7 @@ function set_app_tile_style(el)
 function tweak_portal_when_in_iframe()
 {
     // Set class to body to show we're in overlay
-    document.body.classList.add('overlay');
+    document.body.classList.add('in_app_overlay');
     let userContainer = document.querySelector('a.user-container');
     userContainer.classList.replace('user-container-info', 'user-container-edit');
     userContainer.setAttribute('href', userContainer
