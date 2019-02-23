@@ -315,6 +315,14 @@ if hlp.is_logged_in() then
     if string.match(ngx.var.uri, "^/ynhpanel.json$") then
         hlp.serve("/yunohost/sso/assets/js/ynhpanel.json")
     end
+    -- TODO : don't forget to open a PR to enable access to those
+    -- in yunohost_panel.conf.inc
+    if string.match(ngx.var.uri, "^/ynhpanel_custom.js$") then
+        hlp.serve("/yunohost/sso/assets/themes/"..conf.theme.."/custom.js")
+    end
+    if string.match(ngx.var.uri, "^/ynhpanel_custom.css$") then
+        hlp.serve("/yunohost/sso/assets/themes/"..conf.theme.."/custom.css")
+    end
 
     -- If user has no access to this URL, redirect him to the portal
     if not hlp.has_access() then
