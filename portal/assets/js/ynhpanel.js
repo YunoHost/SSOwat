@@ -324,7 +324,8 @@ function init_portal()
   });
 
   Array.each(document.getElementsByClassName("app-tile"), function(el) {
-        set_app_tile_style(el);
+        // Set first-letter data attribute.
+        el.querySelector('.first-letter').innerHTML = el.getAttribute("data-appname").substring(0, 2);
         // handle app links so they work both in plain info page and in the info iframe called from ynhpanel.js
         window.addEvent(el, 'click', function(event) {
             // if asked to open in new tab
@@ -340,17 +341,6 @@ function init_portal()
             };
         });
   });
-}
-
-var app_tile_colors = ['redbg','purpledarkbg','darkbluebg','orangebg','greenbg','darkbluebg','purpledarkbg','yellowbg','lightpinkbg','pinkbg','turquoisebg','yellowbg','lightbluebg','purpledarkbg', 'bluebg'];
-function set_app_tile_style(el)
-{
-    // Select a color value from the App label
-    randomColorNumber = parseInt(el.textContent, 36) % app_tile_colors.length;
-    // Add color class.
-    el.classList.add(app_tile_colors[randomColorNumber]);
-    // Set first-letter data attribute.
-    el.querySelector('.first-letter').innerHTML = el.getAttribute("data-appname").substring(0, 2);
 }
 
 function tweak_portal_when_in_iframe()
