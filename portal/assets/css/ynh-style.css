@@ -331,13 +331,12 @@ textarea {
     -webkit-transform: skew(0deg, 45deg);
   }
 
-.listing-apps span {
-  display: block;
-  margin: -1.2em 0 0 0.2em;
-}
-  .listing-apps .first-letter { margin: 0; }
-  .listing-apps .first-letter:before {
-    content: attr(data-first-letter);
+  .listing-apps span {
+    display: block;
+    margin: -1.2em 0 0 0.2em;
+  }
+  .listing-apps .first-letter {
+    margin: 0;
     display: inline-block;
   }
   .listing-apps .name {

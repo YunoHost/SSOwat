@@ -14,7 +14,12 @@
 <div id="apps" class="wrapper apps">
   <ul class="listing-apps">
   {{#app}}
-    <li><a class="app-tile" href="https://{{url}}"><span class="first-letter"></span><span class="name">{{name}}</span></a></li>
+    <li>
+      <a class="app-tile" href="https://{{url}}" data-appname="{{name}}">
+        <span class="first-letter"></span>
+        <span class="name">{{name}}</span>
+      </a>
+    </li>
   {{/app}}
   </ul>
 </div>

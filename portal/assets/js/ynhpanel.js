@@ -350,7 +350,7 @@ function set_app_tile_style(el)
     // Add color class.
     el.classList.add(app_tile_colors[randomColorNumber]);
     // Set first-letter data attribute.
-    el.querySelector('.first-letter').setAttribute('data-first-letter', el.textContent.substring(0, 2));
+    el.querySelector('.first-letter').innerHTML = el.getAttribute("data-appname").substring(0, 2);
 }
 
 function tweak_portal_when_in_iframe()
