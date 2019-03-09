@@ -266,12 +266,12 @@ function init_portal_button_and_overlay()
   var customStyle = document.createElement("link");
   customStyle.setAttribute("rel", "stylesheet");
   customStyle.setAttribute("type", "text/css");
-  customStyle.setAttribute("href", '/ynhpanel_custom.css');
+  customStyle.setAttribute("href", '/ynhtheme/custom.css');
   document.getElementsByTagName("head")[0].insertBefore(customStyle, null);
   // Inject custom / theme js
   var customScript = document.createElement("script");
   customScript.setAttribute("type", "text/javascript");
-  customScript.setAttribute("src", '/ynhpanel_custom.js');
+  customScript.setAttribute("src", '/ynhtheme/custom.js');
   document.getElementsByTagName("head")[0].insertBefore(customScript, null);
 
   // Bind portal button
