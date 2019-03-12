@@ -70,7 +70,6 @@ html {
 body {
   background: #41444f;
   font-family: 'source_sans_proregular';
-  overflow-y: scroll;
   font-size: 1em;
   line-height:1.5;
   margin: 0;
@@ -131,11 +130,12 @@ img {
   text-align: center;
   margin-bottom: 0;
   opacity: 0.7;
-}
-
-.logo img {
   margin-top: 4%;
   width: 10em;
+  width: 100px;
+  height: 100px;
+  background-image: url("../img/logo-ynh-white.svg");
+  background-repeat: no-repeat;
 }
 
 .logged .logo {
