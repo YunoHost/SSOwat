@@ -10,13 +10,23 @@ a.app-tile,
 }
 
 /* The layout is slightly different, the apps are scollable but not the headers and footers */
-.overlay {
+html {
+  height:100%;
+ }
+body {
   background-image: url("background.jpg");
+  background-repeat: no-repeat;
+  background-size: cover;
   width: 100%;
   height: 100%;
+  overflow: hidden;
+}
+
+.overlay {
   position: absolute;
-  background-size: cover;
-  background-position: center;
+  width: 100%;
+  height: 100%;
+  z-index: 10;
 }
 
 .overlay #apps {
@@ -48,6 +58,7 @@ a.app-tile,
 
 /* Use custom ynh logo white (there's a white one in assets, but let's not depend on it) */
 #logo {
+  margin-top: 0px;
   z-index: 10;
   background-image: url("/ynhtheme/ynhlogo.svg");
 }
