@@ -1,3 +1,13 @@
+ssowat (3.5.0) testing; urgency=low
+
+  - Fix string helper if string is empty (#115)
+  - Add missing dependencies to README (53a738e)
+  - [i18n] Improve russian translations
+
+  Contributors: Josué Tille, Lukas Fülling, Алексей
+
+ -- Alexandre Aubin <alex.aubin@mailoo.org> Wed, 13 Mar 2019 17:00:00 +0000
+
 ssowat (3.4.2) stable; urgency=low
 
   * Bumping version number to 3.4.2 for stable release
