@@ -128,17 +128,18 @@ img {
 /* Logo */
 .logo {
   opacity: 0.7;
-  margin-top: 4%;
+  margin-top: 6em;
   width: 100%;
-  height: 10em;
+  height: 9em;
   background-image: url("../img/logo-ynh-white.svg");
   background-repeat: no-repeat;
   background-position: center 100%;
+  background-size: contain;
 }
 
 .logged .logo {
   position: fixed;
-  width: 10em;
+  width: 5em;
   bottom: 20px;
   right: 20px;
   z-index: 0;
