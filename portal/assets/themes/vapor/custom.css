@@ -1,7 +1,7 @@
 /* ==========================================================================
    Vaporwave theme
    ========================================================================== */
-body {
+.ynh-user-portal {
     min-height: 100vh;
     background: rgb(205, 118, 255) !important;
     background: -moz-linear-gradient(45deg, rgb(205, 118, 255) 0%, rgb(93, 150, 168) 100%) !important;

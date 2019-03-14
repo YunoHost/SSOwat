@@ -305,24 +305,39 @@ end
 -- `/yunohost/sso/assets/js/ynhpanel.js` file.
 --
 
+function scandir(directory, callback)
+    -- FIXME : this sometime fails (randomly...)
+    -- because of 'interrupted system call'
+    -- use find (and not ls) to list only files recursively and with their full path relative to the asked directory
+    local pfile = io.popen('cd "'..directory..'" && find * -type f')
+    for filename in pfile:lines() do
+        callback(filename)
+    end
+    pfile:close()
+end
+
+function serveAsset(shortcut, full)
+  if string.match(ngx.var.uri, "^"..shortcut.."$") then
+      hlp.serve("/yunohost/sso/assets/"..full)
+  end
+end
+
+function serveThemeFile(filename)
+  serveAsset("/ynhtheme/"..filename, "themes/"..conf.theme.."/"..filename)
+end
+
 if hlp.is_logged_in() then
-    if string.match(ngx.var.uri, "^/ynhpanel.js$") then
-        hlp.serve("/yunohost/sso/assets/js/ynhpanel.js")
-    end
-    if string.match(ngx.var.uri, "^/ynhpanel.css$") then
-        hlp.serve("/yunohost/sso/assets/css/ynhpanel.css")
-    end
-    if string.match(ngx.var.uri, "^/ynhpanel.json$") then
-        hlp.serve("/yunohost/sso/assets/js/ynhpanel.json")
-    end
+    -- serve ynhpanel files
+    serveAsset("/ynhpanel.js", "js/ynhpanel.js")
+    serveAsset("/ynhpanel.json", "js/ynhpanel.json")
+    serveAsset("/ynhpanel.css", "css/ynhpanel.css")
+    -- serve theme's files
     -- TODO : don't forget to open a PR to enable access to those
     -- in yunohost_panel.conf.inc
-    if string.match(ngx.var.uri, "^/ynhpanel_custom.js$") then
-        hlp.serve("/yunohost/sso/assets/themes/"..conf.theme.."/custom.js")
-    end
-    if string.match(ngx.var.uri, "^/ynhpanel_custom.css$") then
-        hlp.serve("/yunohost/sso/assets/themes/"..conf.theme.."/custom.css")
-    end
+    -- FIXME? I think it would be better here not to use an absolute path
+    -- but I didn't succeed to figure out where is the current location of the script
+    -- if you call it from "portal/assets/themes/" the ls fails
+    scandir("/usr/share/ssowat/portal/assets/themes/"..conf.theme, serveThemeFile)
 
     -- If user has no access to this URL, redirect him to the portal
     if not hlp.has_access() then

@@ -1,0 +1,42 @@
+/* Make page texts black */
+.user-container h2,
+.user-container small,
+.user-container .user-mail,
+.user-container .user-mail,
+.overlay .footer a,
+a.app-tile,
+#ynh-logout {
+  color: black !important;
+}
+
+/* The layout is slightly different, the apps are scollable but not the headers and footers */
+
+.ynh-user-portal {
+  background-image: url("background.jpg");
+  background-repeat: no-repeat;
+  background-size: cover;
+  width: 100%;
+  height: 100%;
+}
+
+/* Apps colors */
+.app-tile {
+  background-color: rgba(255, 255, 255, 0.5) !important;
+}
+
+.app-tile:hover:after,
+.app-tile:focus:after,
+.app-tile:hover:before,
+.app-tile:focus:before {
+    background: rgba(255, 255, 255, 0.5) !important;
+}
+
+/* Use a custom logo image */
+#ynh-logo {
+  z-index: 10;
+  background-image: url("./cloud.png");
+}
+
+#ynh-overlay-switch {
+  background-image: url("./cloud.png");
+}

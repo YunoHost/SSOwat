@@ -35,8 +35,8 @@
 </head>
 <body class="ynh-user-portal {{#connected}}logged{{/connected}}">
 
-  <div id="logo" class="logo">
-      <img src="assets/img/logo-ynh-white.svg"/><span class="element-invisible">Yunohost</span>
+  <div id="ynh-logo" class="ynh-logo">
+    <span class="element-invisible">Yunohost</span>
   </div>
 
   <div class="overlay">
