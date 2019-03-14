@@ -11,6 +11,7 @@
     background: -ms-linear-gradient(45deg, rgb(205, 118, 255) 0%, rgb(93, 150, 168) 100%) !important;
     background: linear-gradient(45deg, rgb(205, 118, 255) 0%, rgb(93, 150, 168) 100%) !important;
     filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#C82BFF', endColorstr='#0C76A8', GradientType=1) !important;
+    font-family: "Comic Sans","Comic Sans MS","Chalkboard","ChalkboardSE-Regular","Marker Felt","Purisa","URW Chancery L",cursive,sans-serif;
 }
 
 .messages.danger { background: #c0392b80; }
@@ -18,18 +19,14 @@
 .messages.success { background: #27ae6080; }
 .messages.info { background: #2980b980; }
 
+
 a, small, span,
 .ynh-wrapper.footer a,
 .user-menu a,
 .user-container.user-container-info span,
 input.btn.classic-btn.large-btn {
-    color: #e0e0e0 !important;
-}
-
-.form-group input::placeholder,
-.form-group input::-ms-input-placeholder,
-.form-group input:-ms-input-placeholder {
-    color: #f4f4f4 !important;
+    color: black !important;
+    font-family: "Comic Sans","Comic Sans MS","Chalkboard","ChalkboardSE-Regular","Marker Felt","Purisa","URW Chancery L",cursive,sans-serif;
 }
 
 form.login-form input {
@@ -46,57 +43,111 @@ input.btn.classic-btn.large-btn:hover,
 }
 
 .ynh-wrapper.footer a:before {
-    color: #cc45ee !important;
+    content: none;
 }
 
 .ynh-wrapper.footer nav {
-    border-color: #cc45ee !important;
+    border-top: 2px dashed #333;
+    padding-top: 15px;
 }
+
+.ynh-wrapper.footer nav a {
+    padding: 5px;
+}
+
+input.btn.classic-btn.large-btn[type="submit"]
+{
+    background: url('/yunohost/sso/assets/themes/vapor/rainbow.gif') !important;
+}
+
+.btn,
+.ynh-wrapper a,
+.btn.large-btn.classic-btn,
+.btn.large-btn.validate-btn
+{
+    background: #ddd;
+    border: 5px outset #ddd !important;
+}
+
+.btn:hover,
+.ynh-wrapper a:hover
+{
+    border-style: inset !important;
+}
+
 
 .listing-apps li a span,
 .listing-apps li a:hover span,
 .listing-apps li a:active span,
 .listing-apps li a:focus span {
-    color: white !important;
+    color: black !important;
 }
 
-.listing-apps li,
-.listing-apps li a {
-    transition: all 0.3s ease-in-out, background 0ms; /* fix gray flicker on initial load */
-    border: none transparent !important;
-    box-shadow: 2px 2px 3px rgba(0, 0, 0, 0.1),
-    -2px -2px 3px 0 rgba(0, 0, 0, 0.1) inset;
+.listing-apps li {
+    border: 10px ridge #ccc;
+    box-shadow: none;
+    height: 11em;
+    width: 11em;
 }
 
-.listing-apps li:hover,
-.listing-apps li a:hover {
-    box-shadow: 2px 2px 3px rgba(0, 0, 0, 0),
-    -2px -2px 3px 0 rgba(0, 0, 0, 0) inset;
+.listing-apps li:hover {
+    border-style: groove;
 }
 
-.btn.large-btn.classic-btn,
-.btn.large-btn.validate-btn {
-    background: rgba(200, 200, 200, 0.4) !important;
+.listing-apps a {
+    height: 2.46em;
+    width: 2.46em;
 }
 
-.btn.large-btn.classic-btn:hover,
-.btn.large-btn.validate-btn:hover {
-    background: rgba(255, 255, 255, 0.4) !important;
+
+/* Disable the app list tile hover effect */
+.listing-apps a:hover,
+.listing-apps a:focus {
+    left: inherit;
+    top: inherit;
+    box-shadow: none;
+    background: #ccc !important;
+}
+.listing-apps a::before,
+.listing-apps a::after
+{
+    content: none;
 }
 
-/* There are no colors, there is only vapor! */
-.app-tile,
+.app-tile
+{
+    color: black !important;
+    background: #fff !important;
+}
 .form-group input,
-.form-group label,
 a.btn:hover,
 .btn.large-btn {
-    background: rgba(200, 200, 200, 0.2) !important;
-    border: none;
+    color: black !important;
+    background: #eee;
+}
+
+.form-group label
+{
+    color: black !important;
+    background: #ccc !important;
+    border: 5px outset #bbb;
+    border-bottom:none;
 }
 
 .app-tile:hover:after,
 .app-tile:focus:after,
 .app-tile:hover:before,
 .app-tile:focus:before {
-    background: rgba(200, 200, 200, 0.4) !important;
+    background: #eee !important;
+}
+
+
+.user-container::before {
+    border: none;
+    border-radius: 0;
+    background: url("/yunohost/sso/assets/themes/vapor/profile.png");
+    background-size: contain;
+    width: 60px;
+    content: "";
+    margin-top: 5px;
 }
