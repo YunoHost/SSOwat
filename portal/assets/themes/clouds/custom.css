@@ -12,8 +12,9 @@ a.app-tile,
 /* The layout is slightly different, the apps are scollable but not the headers and footers */
 html {
   height:100%;
- }
-body {
+}
+
+.ynh-user-portal {
   background-image: url("background.jpg");
   background-repeat: no-repeat;
   background-size: cover;
