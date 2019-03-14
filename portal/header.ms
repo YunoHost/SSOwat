@@ -35,7 +35,7 @@
 </head>
 <body class="ynh-user-portal {{#connected}}logged{{/connected}}">
 
-  <div id="logo" class="logo">
+  <div id="ynh-logo" class="ynh-logo">
     <span class="element-invisible">Yunohost</span>
   </div>
 

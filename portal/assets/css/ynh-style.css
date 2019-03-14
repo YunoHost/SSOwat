@@ -126,7 +126,7 @@ img {
 .ynh-wrapper:after {clear: both;}
 
 /* Logo */
-.logo {
+.ynh-logo {
   opacity: 0.7;
   margin-top: 6em;
   width: 100%;
@@ -137,7 +137,7 @@ img {
   background-size: contain;
 }
 
-.logged .logo {
+.logged .ynh-logo {
   position: fixed;
   width: 5em;
   bottom: 20px;
@@ -147,11 +147,11 @@ img {
   background-position: center center;
 }
 
-.ynh-panel-active .logo {
+.ynh-panel-active .ynh-logo {
   display: none;
 }
 
-.in_app_overlay .logo {
+.in_app_overlay .ynh-logo {
   display: none;
 }
 

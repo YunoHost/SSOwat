@@ -32,7 +32,7 @@ a.app-tile,
 }
 
 /* Use a custom logo image */
-#logo {
+#ynh-logo {
   z-index: 10;
   background-image: url("./cloud.png");
 }

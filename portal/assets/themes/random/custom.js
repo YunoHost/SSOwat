@@ -118,7 +118,7 @@ ynhLib.onWindowLoad(function () {
   var chosenLogoStyleString = ynhLib.logo.makeLogoStyleString();
 
   // set logo color in portal
-  var ynhLogo = document.getElementById("logo");
+  var ynhLogo = document.getElementById("ynh-logo");
   if (ynhLogo) ynhLogo.setAttribute("style", chosenLogoStyleString);
 
   // set overlay switch color in apps (NOTE: this is not always working, there is probably a problem of loading order)
