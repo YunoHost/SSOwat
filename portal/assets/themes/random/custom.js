@@ -96,18 +96,15 @@ var ynhLib = {
 
     availableColors: ["cyan", "fushia", "green", "orange", "pink", "purple", "red", "yellow"],
     makeLogoStyleString: function () {
-      return 'background-image: url("/ynhtheme/logo/'+ ynhLib.random.entry(ynhLib.logo.availableColors) +'.svg")';
+      return 'background-image: url("/yunohost/sso/assets/themes/random/logo/'+ ynhLib.random.entry(ynhLib.logo.availableColors) +'.svg")';
     },
 
   },
 
-  //                              ¬
-  //
-
 };
 
-//\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/
-//\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/
+// ######################################################################
+// ######################################################################
 
 ynhLib.onWindowLoad(function () {
 
