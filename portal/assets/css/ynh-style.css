@@ -140,6 +140,7 @@ img {
 .logged .ynh-logo {
   position: fixed;
   width: 5em;
+  height: 5em;
   bottom: 20px;
   right: 20px;
   z-index: 0;
