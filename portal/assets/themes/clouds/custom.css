@@ -10,9 +10,6 @@ a.app-tile,
 }
 
 /* The layout is slightly different, the apps are scollable but not the headers and footers */
-html {
-  height:100%;
-}
 
 .ynh-user-portal {
   background-image: url("background.jpg");
@@ -20,29 +17,6 @@ html {
   background-size: cover;
   width: 100%;
   height: 100%;
-  overflow: hidden;
-}
-
-.overlay {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  z-index: 10;
-}
-
-.overlay #apps {
-  max-height: 70%;
-  overflow: auto;
-
-}
-
-.overlay .footer {
-  position: absolute;
-  bottom: 0;
-}
-
-.listing-apps {
-  padding-top: 10px;
 }
 
 /* Apps colors */
