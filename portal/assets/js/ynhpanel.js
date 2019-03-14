@@ -257,6 +257,7 @@ function init_portal_button_and_overlay()
 
   // Inject portal stylesheet
   // (we need it for the portal button to be displayed correctly)
+  // FIXME : Really wondering if we shouldn't set this in data/templates/nginx/plain/yunohost_panel.conf.inc ...
   var portalStyle = document.createElement("link");
   portalStyle.setAttribute("rel", "stylesheet");
   portalStyle.setAttribute("type", "text/css");
@@ -276,8 +277,9 @@ function init_portal_button_and_overlay()
 
   // Bind portal button
   // FIXME : this somehow prevent the portalButton
-  // from being dragged correctly
-  // when mouse is moving too fast
+  // from being dragged correctly when mouse is moving too fast
+  // ... this seem to be okay in the "app" itself, but the bug
+  // is happening when *in* the portal overlay inside an app...
   window.addEvent(portalButton, 'click', function(e){
       // Prevent default click
       window.eventPreventDefault(e);

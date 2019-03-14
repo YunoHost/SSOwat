@@ -306,11 +306,11 @@ end
 --
 
 function scandir(directory, callback)
-    local i, popen = 0, io.popen
+    -- FIXME : this sometime fails (randomly...)
+    -- because of 'interrupted system call'
     -- use find (and not ls) to list only files recursively and with their full path relative to the asked directory
-    local pfile = popen('cd "'..directory..'" && find * -type f')
+    local pfile = io.popen('cd "'..directory..'" && find * -type f')
     for filename in pfile:lines() do
-        i = i + 1
         callback(filename)
     end
     pfile:close()
