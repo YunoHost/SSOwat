@@ -70,7 +70,6 @@ html {
 body {
   background: #41444f;
   font-family: 'source_sans_proregular';
-  overflow-y: scroll;
   font-size: 1em;
   line-height:1.5;
   margin: 0;
@@ -128,29 +127,24 @@ img {
 
 /* Logo */
 .logo {
-  text-align: center;
-  margin-bottom: 0;
   opacity: 0.7;
-}
-
-.logo img {
   margin-top: 4%;
-  width: 10em;
+  width: 100%;
+  height: 10em;
+  background-image: url("../img/logo-ynh-white.svg");
+  background-repeat: no-repeat;
+  background-position: center 100%;
 }
 
 .logged .logo {
   position: fixed;
+  width: 10em;
   bottom: 20px;
   right: 20px;
   z-index: 0;
   opacity: 0.7;
+  background-position: center center;
 }
-  .logged .logo img {
-    margin-top: 0;
-    width: 2.5em;
-    padding: 0.3em;
-    border-radius: 5px;
-  }
 
 .ynh-panel-active .logo {
   display: none;
