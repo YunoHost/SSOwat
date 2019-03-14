@@ -56,13 +56,12 @@ body {
     background: rgba(255, 255, 255, 0.5) !important;
 }
 
-/* Use custom ynh logo white (there's a white one in assets, but let's not depend on it) */
+/* Use a custom logo image */
 #logo {
-  margin-top: 0px;
   z-index: 10;
-  background-image: url("/ynhtheme/ynhlogo.svg");
+  background-image: url("./cloud.png");
 }
 
 #ynh-overlay-switch {
-  background-image: url("/ynhtheme/ynhlogo.svg");
+  background-image: url("./cloud.png");
 }
