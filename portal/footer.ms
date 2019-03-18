@@ -10,9 +10,9 @@
   </div>
 
   <!-- Scripts -->
-  <script src="assets/js/ynhpanel.js"></script>
+  <script src="assets/js/ynh_portal.js"></script>
   {{#theme}}
-  <script src="assets/themes/{{theme}}/custom.js"></script>
+  <script src="assets/themes/{{theme}}/custom_portal.js"></script>
   {{/theme}}
 </body>
 </html>

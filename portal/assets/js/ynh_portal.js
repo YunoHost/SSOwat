@@ -1,9 +1,18 @@
-/* ----------------------------------------------------------
-  Utilities
----------------------------------------------------------- */
+/*
+===============================================================================
+ This JS file is loaded : 
+ - in the YunoHost user portal
+ - on every app page if the app nginx's conf does include the ynh snippet
+===============================================================================
+*/
 
-/* Console log fix
--------------------------- */
+/*
+=====================
+  Utilities
+=====================
+*/
+
+/* Console log fix */
 if (typeof(console) === 'undefined') {
     var console = {};
     console.log = console.error = console.info = console.debug = console.warn = console.trace = console.dir = console.dirxml = console.group = console.groupEnd = console.time = console.timeEnd = console.assert = console.profile = function() {};
@@ -220,7 +229,7 @@ window.addEvent(document, 'DOMContentLoaded', function() {
 });
 
 //
-// This function is called when ynhpanel.js is included in an app
+// This function is called when ynh_portal.js is included in an app
 //
 // It will create the small yunohost "portal button" usually in the bottom
 // right corner and initialize the portal overlay, shown when clicking the
@@ -308,7 +317,7 @@ function init_portal()
   Array.each(document.getElementsByClassName("app-tile"), function(el) {
         // Set first-letter data attribute.
         el.querySelector('.first-letter').innerHTML = el.getAttribute("data-appname").substring(0, 2);
-        // handle app links so they work both in plain info page and in the info iframe called from ynhpanel.js
+        // handle app links so they work both in plain info page and in the info iframe called from ynh_portal.js
         window.addEvent(el, 'click', function(event) {
             // if asked to open in new tab
             if (event.ctrlKey || event.shiftKey || event.metaKey

@@ -12,8 +12,8 @@
   <meta name="robots" content="noindex, nofollow">
 
   <!-- Stylesheets -->
-  <link rel="stylesheet" href="assets/css/ynh-style.css">
-  <link rel="stylesheet" href="assets/themes/{{theme}}/custom.css">
+  <link rel="stylesheet" href="assets/css/ynh_portal.css">
+  <link rel="stylesheet" href="assets/themes/{{theme}}/custom_portal.css">
 
   <!-- Icons -->
   <link rel="shortcut icon" href="assets/icons/favicon.ico">
