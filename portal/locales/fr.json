@@ -45,5 +45,5 @@
     "password_too_simple_2": "Le mot de passe doit comporter au moins 8 caractères et contenir des chiffres, des majuscules et des minuscules",
     "password_too_simple_3": "Le mot de passe doit comporter au moins 8 caractères et contenir des chiffres, des majuscules, des minuscules et des caractères spéciaux",
     "password_too_simple_4": "Le mot de passe doit comporter au moins 12 caractères et contenir des chiffres, des majuscules, des minuscules et des caractères spéciaux",
-    "good_practices_about_user_password": "Vous êtes maintenant sur le point de définir un nouveau mot de passe utilisateur. Le mot de passe doit comporter au moins 8 caractères - bien qu'il soit recommandé d'utiliser un mot de passe plus long (c'est-à-dire une phrase secrète) et/ou d'utiliser différents types de caractères (majuscules, minuscules, chiffres et caractères spéciaux)."
+    "good_practices_about_user_password": "Vous êtes maintenant sur le point de définir un nouveau mot de passe utilisateur. Le mot de passe doit comporter au moins 8 caractères — bien qu'il soit recommandé d'utiliser un mot de passe plus long (c'est-à-dire une phrase secrète) et/ou d'utiliser différents types de caractères (majuscules, minuscules, chiffres et caractères spéciaux)."
 }
