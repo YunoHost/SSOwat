@@ -255,26 +255,6 @@ function init_portal_button_and_overlay()
   portalOverlay.setAttribute("style","visibility: hidden;"); // make sure the overlay is invisible already when loading it
   document.body.insertBefore(portalOverlay, null);
 
-  // Inject portal stylesheet
-  // (we need it for the portal button to be displayed correctly)
-  // FIXME : Really wondering if we shouldn't set this in data/templates/nginx/plain/yunohost_panel.conf.inc ...
-  var portalStyle = document.createElement("link");
-  portalStyle.setAttribute("rel", "stylesheet");
-  portalStyle.setAttribute("type", "text/css");
-  portalStyle.setAttribute("href", '/ynhpanel.css');
-  document.getElementsByTagName("head")[0].insertBefore(portalStyle, null);
-  // Inject custom / theme css
-  var customStyle = document.createElement("link");
-  customStyle.setAttribute("rel", "stylesheet");
-  customStyle.setAttribute("type", "text/css");
-  customStyle.setAttribute("href", '/ynhtheme/custom.css');
-  document.getElementsByTagName("head")[0].insertBefore(customStyle, null);
-  // Inject custom / theme js
-  var customScript = document.createElement("script");
-  customScript.setAttribute("type", "text/javascript");
-  customScript.setAttribute("src", '/ynhtheme/custom.js');
-  document.getElementsByTagName("head")[0].insertBefore(customScript, null);
-
   // Bind portal button
   // FIXME : this somehow prevent the portalButton
   // from being dragged correctly when mouse is moving too fast
