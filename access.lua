@@ -329,7 +329,6 @@ end
 if hlp.is_logged_in() then
     -- serve ynhpanel files
     serveAsset("/ynhpanel.js", "js/ynhpanel.js")
-    serveAsset("/ynhpanel.json", "js/ynhpanel.json")
     serveAsset("/ynhpanel.css", "css/ynhpanel.css")
     -- serve theme's files
     -- TODO : don't forget to open a PR to enable access to those
