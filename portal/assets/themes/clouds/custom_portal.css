@@ -16,12 +16,6 @@ a.app-tile,
   color: black !important;
 }
 
-.content {
-  width: 100%;
-  height: 100%;
-  overflow: auto;
-}
-
 .ynh-user-portal {
   background-image: url("background.jpg");
   background-repeat: no-repeat;
