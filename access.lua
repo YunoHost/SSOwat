@@ -331,8 +331,6 @@ if hlp.is_logged_in() then
     serveAsset("/ynh_portal.js", "js/ynh_portal.js")
     serveAsset("/ynh_overlay.css", "css/ynh_overlay.css")
     -- serve theme's files
-    -- TODO : don't forget to open a PR to enable access to those
-    -- in yunohost_panel.conf.inc
     -- FIXME? I think it would be better here not to use an absolute path
     -- but I didn't succeed to figure out where is the current location of the script
     -- if you call it from "portal/assets/themes/" the ls fails
