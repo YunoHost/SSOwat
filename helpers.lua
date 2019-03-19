@@ -437,7 +437,7 @@ end
 --
 -- Takes an URI, and returns file content with the proper HTTP headers.
 -- It is used to render the SSOwat portal *only*.
-function serve(uri)
+function serve(uri, cache)
     rel_path = string.gsub(uri, conf["portal_path"], "/")
 
     -- Load login.html as index
@@ -505,8 +505,12 @@ function serve(uri)
     flashs["win"] = nil
     flashs["info"] = nil
 
-    -- Ain't nobody got time for cache
-    ngx.header["Cache-Control"] = "no-cache"
+    if cache == "static_asset" then
+        ngx.header["Cache-Control"] = "public, max-age=3600"
+    else
+        -- Ain't nobody got time for cache
+        ngx.header["Cache-Control"] = "no-cache"
+    end
 
     -- Print file content
     ngx.say(content)

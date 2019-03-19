@@ -150,7 +150,13 @@ then
                and (not ngx.var.http_referer
                     or hlp.string.starts(ngx.var.http_referer, conf.portal_url)))
         then
-            return hlp.serve(ngx.var.uri)
+            -- If this is an asset, enable caching
+            if hlp.string.starts(ngx.var.uri, conf["portal_path"].."assets")
+            then
+               return hlp.serve(ngx.var.uri, "static_asset")
+            else
+               return hlp.serve(ngx.var.uri)
+            end
 
 
         -- If all the previous cases have failed, redirect to portal
@@ -318,7 +324,7 @@ end
 
 function serveAsset(shortcut, full)
   if string.match(ngx.var.uri, "^"..shortcut.."$") then
-      hlp.serve("/yunohost/sso/assets/"..full)
+      hlp.serve("/yunohost/sso/assets/"..full, "static_asset")
   end
 end
 
