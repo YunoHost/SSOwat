@@ -260,7 +260,7 @@ function init_portal_button_and_overlay()
 
   // Prepare and inject the portal overlay (what is activated when clicking on the portal button)
   var portalOverlay = document.createElement('iframe');
-  portalOverlay.src = "/yunohost/sso/info.html";
+  portalOverlay.src = "/yunohost/sso/portal.html";
   portalOverlay.setAttribute("id","ynh-overlay");
   portalOverlay.setAttribute("style","visibility: hidden;"); // make sure the overlay is invisible already when loading it
   document.body.insertBefore(portalOverlay, null);

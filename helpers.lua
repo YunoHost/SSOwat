@@ -443,7 +443,7 @@ function serve(uri, cache)
     -- Load login.html as index
     if rel_path == "/" then
         if is_logged_in() then
-            rel_path = "/info.html"
+            rel_path = "/portal.html"
         else
             rel_path = "/login.html"
         end
@@ -535,7 +535,7 @@ function get_data_for(view)
         }
 
     -- For those views, we may need user information
-    elseif view == "info.html"
+    elseif view == "portal.html"
         or view == "edit.html"
         or view == "password.html"
         or view == "ynhpanel.json" then
@@ -701,7 +701,7 @@ function edit_user()
 
                             -- Reset the password cache
                             cache:set(user.."-password", args.newpassword, conf["session_timeout"])
-                            return redirect(conf.portal_url.."info.html")
+                            return redirect(conf.portal_url.."portal.html")
                         else
                             flash("fail", t("password_changed_error"))
                         end
@@ -884,7 +884,7 @@ function edit_user()
                      -- Ugly trick to force cache reloading
                      set_headers(user)
                      flash("win", t("information_updated"))
-                     return redirect(conf.portal_url.."info.html")
+                     return redirect(conf.portal_url.."portal.html")
 
                  else
                      flash("fail", t("user_saving_fail"))

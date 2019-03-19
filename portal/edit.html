@@ -3,7 +3,7 @@
     <li><a id="ynh-logout" class="icon icon-connexion" href="?action=logout">{{t_logout}}</a></li>
   </ul>
 
-  <a class="user-container user-container-edit" href="info.html">
+  <a class="user-container user-container-edit" href="portal.html">
     <h2 class="user-username">{{{uid}}}</h2>
     <small class="user-fullname">{{givenName}} {{sn}}</small>
     <span class="user-mail">{{mail}}</span>
@@ -11,7 +11,7 @@
 </div>
 
 <div class="ynh-wrapper edit">
-  <form class="form-edit" role="form" method="POST" action="edit.html">
+  <form class="form-edit" role="form" method="POST" action="portal.html">
 
     <div class="form-section">
       <div class="form-group">
@@ -47,7 +47,7 @@
     </div>
 
     <div class="btn-group">
-      <a role="button" href="info.html" class="btn large-btn">{{t_cancel}}</a>
+      <a role="button" href="portal.html" class="btn large-btn">{{t_cancel}}</a>
       <input type="submit" class="btn classic-btn large-btn" value="{{t_ok}}">
     </div>
 
