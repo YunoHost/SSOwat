@@ -1,6 +1,6 @@
 /*
 ===============================================================================
- This JS file is loaded : 
+ This JS file is loaded :
  - in the YunoHost user portal
  - on every app page if the app nginx's conf does include the ynh snippet
 ===============================================================================
@@ -146,6 +146,16 @@ function make_element_draggable(id) {
     selected = elem;
     x_elem = x_pos - selected.offsetLeft;
     y_elem = y_pos - selected.offsetTop;
+
+    // We add listening event for the iframe itself ...
+    // otherwise dragging the tile on the iframe doesn't
+    // work properly.
+    // We do this at click time to have a better chance
+    // that the iframe's body is indeed loaded ...
+    // (a bit hackish but meh)
+    portalOverlay = document.getElementById("ynh-overlay").contentDocument.body;
+    window.addEvent(portalOverlay, 'mousemove', _onMove);
+    window.addEvent(portalOverlay, 'touchmove', _onMove, {passive: false});
   };
 
   var _shutDrag = function(e){
@@ -248,6 +258,13 @@ function init_portal_button_and_overlay()
   meta_viewport = document.querySelector('meta[name="viewport"]');
   meta_viewport_content = meta_viewport.getAttribute('content');
 
+  // Prepare and inject the portal overlay (what is activated when clicking on the portal button)
+  var portalOverlay = document.createElement('iframe');
+  portalOverlay.src = "/yunohost/sso/info.html";
+  portalOverlay.setAttribute("id","ynh-overlay");
+  portalOverlay.setAttribute("style","visibility: hidden;"); // make sure the overlay is invisible already when loading it
+  document.body.insertBefore(portalOverlay, null);
+
   // Inject portal button
   var portalButton = document.createElement('a');
   portalButton.setAttribute('id', 'ynh-overlay-switch');
@@ -257,18 +274,7 @@ function init_portal_button_and_overlay()
   // Make portal button draggable, for user convenience
   make_element_draggable('ynh-overlay-switch');
 
-  // Prepare and inject the portal overlay (what is activated when clicking on the portal button)
-  var portalOverlay = document.createElement('iframe');
-  portalOverlay.src = "/yunohost/sso/info.html";
-  portalOverlay.setAttribute("id","ynh-overlay");
-  portalOverlay.setAttribute("style","visibility: hidden;"); // make sure the overlay is invisible already when loading it
-  document.body.insertBefore(portalOverlay, null);
-
   // Bind portal button
-  // FIXME : this somehow prevent the portalButton
-  // from being dragged correctly when mouse is moving too fast
-  // ... this seem to be okay in the "app" itself, but the bug
-  // is happening when *in* the portal overlay inside an app...
   window.addEvent(portalButton, 'click', function(e){
       // Prevent default click
       window.eventPreventDefault(e);

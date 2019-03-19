@@ -71,6 +71,7 @@ html {
   font-family: sans-serif; /* 1 */
   -ms-text-size-adjust: 100%; /* 2 */
   -webkit-text-size-adjust: 100%; /* 2 */
+  height: 100%;
 }
 
 body {
@@ -80,6 +81,7 @@ body {
   line-height:1.5;
   margin: 0;
   padding: 0;
+  height: 100%;
 }
 
 h1:first-child,
