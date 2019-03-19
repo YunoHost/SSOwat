@@ -39,7 +39,7 @@
     <span class="element-invisible">Yunohost</span>
   </div>
 
-  <div class="overlay">
+  <div class="content">
     {{#flash_win}}
     <div class="wrapper messages success">{{.}}</div>
     {{/flash_win}}
