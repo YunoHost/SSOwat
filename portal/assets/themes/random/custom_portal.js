@@ -1,3 +1,14 @@
+/*
+===============================================================================
+ This JS file may be used to customize the YunoHost user portal *and* also
+ will be loaded in all app pages if the app nginx's conf does include the
+ appropriate snippet.
+
+ You can monkeypatch init_portal (loading of the user portal) and
+ init_portal_button_and_overlay (loading of the button and overlay...) to do
+ custom stuff
+===============================================================================
+*/
 
 var ynhLib = {
 
@@ -75,10 +86,6 @@ var ynhLib = {
     return fullQueue;
   },
 
-  onWindowLoad: function(func){
-    window.onload = ynhLib.queue(window.onload, func);
-  },
-
   //
   //                              SET APP ICON STYLE
 
@@ -106,20 +113,33 @@ var ynhLib = {
 // ######################################################################
 // ######################################################################
 
-ynhLib.onWindowLoad(function () {
+/* Monkeypatch init_portal to customize the app tile style */
+init_portal_original = init_portal;
+init_portal = function()
+{
+    init_portal_original();
 
-  // set apps colors
-  Array.each(document.getElementsByClassName("app-tile"), ynhLib.set_app_tile_style);
+    // set apps colors
+    Array.each(document.getElementsByClassName("app-tile"), ynhLib.set_app_tile_style);
 
-  // log color css string
-  var chosenLogoStyleString = ynhLib.logo.makeLogoStyleString();
+    // log color css string
+    var chosenLogoStyleString = ynhLib.logo.makeLogoStyleString();
 
-  // set logo color in portal
-  var ynhLogo = document.getElementById("ynh-logo");
-  if (ynhLogo) ynhLogo.setAttribute("style", chosenLogoStyleString);
+    // set logo color in portal
+    var ynhLogo = document.getElementById("ynh-logo");
+    if (ynhLogo) ynhLogo.setAttribute("style", chosenLogoStyleString);
+}
 
-  // set overlay switch color in apps (NOTE: this is not always working, there is probably a problem of loading order)
-  var overlaySwitch = document.getElementById("ynh-overlay-switch");
-  if (overlaySwitch) overlaySwitch.setAttribute("style", chosenLogoStyleString);
+/*Monkey patching example to do custom stuff when loading inside an app */
+init_portal_button_and_overlay_original = init_portal_button_and_overlay;
+init_portal_button_and_overlay = function()
+{
+    init_portal_button_and_overlay_original();
 
-});
+    // log color css string
+    var chosenLogoStyleString = ynhLib.logo.makeLogoStyleString();
+
+    // set overlay switch color in apps (NOTE: this is not always working, there is probably a problem of loading order)
+    var overlaySwitch = document.getElementById("ynh-overlay-switch");
+    if (overlaySwitch) overlaySwitch.setAttribute("style", chosenLogoStyleString);
+}

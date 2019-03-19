@@ -1,6 +1,0 @@
-.app-tile:focus:after,
-.app-tile:hover:after,
-.app-tile:focus:before,
-.app-tile:hover:before {
-  background:var(--background-color, red) !important;
-}

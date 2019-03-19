@@ -1,0 +1,13 @@
+/*
+===============================================================================
+ This file contain extra CSS rules to customize the YunoHost user portal and
+ can be used to customize app tiles, buttons, etc...
+===============================================================================
+*/
+
+.app-tile:focus:after,
+.app-tile:hover:after,
+.app-tile:focus:before,
+.app-tile:hover:before {
+  background:var(--background-color, red) !important;
+}

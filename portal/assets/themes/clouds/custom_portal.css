@@ -1,3 +1,10 @@
+/*
+===============================================================================
+ This file contain extra CSS rules to customize the YunoHost user portal and
+ can be used to customize app tiles, buttons, etc...
+===============================================================================
+*/
+
 /* Make page texts black */
 .user-container h2,
 .user-container small,
@@ -8,8 +15,6 @@ a.app-tile,
 #ynh-logout {
   color: black !important;
 }
-
-/* The layout is slightly different, the apps are scollable but not the headers and footers */
 
 .ynh-user-portal {
   background-image: url("background.jpg");
@@ -34,9 +39,5 @@ a.app-tile,
 /* Use a custom logo image */
 #ynh-logo {
   z-index: 10;
-  background-image: url("./cloud.png");
-}
-
-#ynh-overlay-switch {
   background-image: url("./cloud.png");
 }
