@@ -82,6 +82,9 @@ body {
   margin: 0;
   padding: 0;
   height: 100%;
+  top: 0;
+  position: absolute;
+  width: 100%;
 }
 
 h1:first-child,
@@ -121,6 +124,12 @@ img {
 /* Layout */
 .content {
   padding: 2%;
+}
+
+.logged .content {
+  width: 100%;
+  height: 100%;
+  overflow: auto; /* scroll .content, not body for easier background customization */
 }
 
 .ynh-wrapper {
