@@ -334,6 +334,7 @@ end
 
 if hlp.is_logged_in() then
     -- serve ynhpanel files
+    serveAsset("/ynh_userinfo.json", "js/ynh_userinfo.js")
     serveAsset("/ynh_portal.js", "js/ynh_portal.js")
     serveAsset("/ynh_overlay.css", "css/ynh_overlay.css")
     -- serve theme's files
