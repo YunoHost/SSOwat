@@ -162,7 +162,12 @@ then
         -- If all the previous cases have failed, redirect to portal
         else
             hlp.flash("info", hlp.t("please_login"))
-            return hlp.redirect(conf.portal_url)
+            -- Force the scheme to HTTPS. This is to avoid an issue with redirection loop
+            -- when trying to access http://main.domain.tld/ (SSOwat finds that user aint
+            -- logged in, therefore redirects to SSO, which redirects to the back_url, which
+            -- redirect to SSO, ..)
+            local back_url = "https://" .. ngx.var.host .. ngx.var.uri .. hlp.uri_args_string()
+            return hlp.redirect(conf.portal_url.."?r="..ngx.encode_base64(back_url))
         end
 
 
