@@ -54,7 +54,8 @@ function get_config()
         skipped_urls              = {},
         ldap_attributes           = {"uid", "givenname", "sn", "cn", "homedirectory", "mail", "maildrop"},
         allow_mail_authentication = true,
-        default_language          = "en"
+        default_language          = "en",
+        theme                     = "default"
     }
 
 

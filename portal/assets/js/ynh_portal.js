@@ -1,9 +1,18 @@
-/* ----------------------------------------------------------
-  Utilities
----------------------------------------------------------- */
+/*
+===============================================================================
+ This JS file is loaded :
+ - in the YunoHost user portal
+ - on every app page if the app nginx's conf does include the ynh snippet
+===============================================================================
+*/
 
-/* Console log fix
--------------------------- */
+/*
+=====================
+  Utilities
+=====================
+*/
+
+/* Console log fix */
 if (typeof(console) === 'undefined') {
     var console = {};
     console.log = console.error = console.info = console.debug = console.warn = console.trace = console.dir = console.dirxml = console.group = console.groupEnd = console.time = console.timeEnd = console.assert = console.profile = function() {};
@@ -91,6 +100,7 @@ Element.toggleClass = function(element, className) {
   https://github.com/Darklg/JavaScriptUtilities/blob/master/assets/js/vanilla-js/libs/vanilla-events.js
 -------------------------- */
 window.addEvent = function(el, eventName, callback, options) {
+    if (el == null) { return; }
     if (el.addEventListener) {
         if (!options || typeof(options) !== "object") {
             options = {};
@@ -118,7 +128,7 @@ window.eventPreventDefault = function(event) {
   http://jsfiddle.net/tovic/Xcb8d/light/
 -------------------------- */
 
-var dragg = function(id) {
+function make_element_draggable(id) {
 
   // Variables
   this.elem = document.getElementById(id),
@@ -136,6 +146,16 @@ var dragg = function(id) {
     selected = elem;
     x_elem = x_pos - selected.offsetLeft;
     y_elem = y_pos - selected.offsetTop;
+
+    // We add listening event for the iframe itself ...
+    // otherwise dragging the tile on the iframe doesn't
+    // work properly.
+    // We do this at click time to have a better chance
+    // that the iframe's body is indeed loaded ...
+    // (a bit hackish but meh)
+    portalOverlay = document.getElementById("ynh-overlay").contentDocument.body;
+    window.addEvent(portalOverlay, 'mousemove', _onMove);
+    window.addEvent(portalOverlay, 'touchmove', _onMove, {passive: false});
   };
 
   var _shutDrag = function(e){
@@ -192,26 +212,41 @@ var dragg = function(id) {
       // Reset dragging status
       dragged = false;
   });
-}
-
-
-/* Smallest DOMReady
-  http://dustindiaz.com/smallest-domready-ever
--------------------------- */
-function domReady(cb) {
-   /in/.test(document.readyState) // in = loadINg
-      ? setTimeout('domReady('+cb+')', 9)
-      : cb();
-}
-
+};
 
 /* ----------------------------------------------------------
   Main
 ---------------------------------------------------------- */
-domReady(function(){
-  // Don't do this in iframe
-  if (window.self !== window.top) {return false;}
+window.addEvent(document, 'DOMContentLoaded', function() {
 
+    // 3 different cases :
+    // - this script is loaded from inside an app
+    // - this script is loaded inside the portal, inside an iframe/overlay activated by clicking the portal button inside an app
+    // - this script is loaded inside the "regular" portal when going to /yunohost/sso.
+
+    var in_app = ! document.body.classList.contains('ynh-user-portal');
+    var in_overlay_iframe = (window.location != window.parent.location);
+
+    if (in_app)
+    {
+        init_portal_button_and_overlay();
+    }
+    else
+    {
+        init_portal();
+        if (in_overlay_iframe) { tweak_portal_when_in_iframe(); }
+    }
+});
+
+//
+// This function is called when ynh_portal.js is included in an app
+//
+// It will create the small yunohost "portal button" usually in the bottom
+// right corner and initialize the portal overlay, shown when clicking the
+// portal button meant to make it easier to switch between apps.
+//
+function init_portal_button_and_overlay()
+{
   // Set and store meta viewport
   var meta_viewport = document.querySelector('meta[name="viewport"]');
   if (meta_viewport === null) {
@@ -223,111 +258,114 @@ domReady(function(){
   meta_viewport = document.querySelector('meta[name="viewport"]');
   meta_viewport_content = meta_viewport.getAttribute('content');
 
-  // Add portal stylesheet
-  var portalStyle = document.createElement("link");
-  portalStyle.setAttribute("rel", "stylesheet");
-  portalStyle.setAttribute("type", "text/css");
-  portalStyle.setAttribute("href", '/ynhpanel.css');
-  document.getElementsByTagName("head")[0].insertBefore(portalStyle, null);
+  // Prepare and inject the portal overlay (what is activated when clicking on the portal button)
+  var portalOverlay = document.createElement('iframe');
+  portalOverlay.src = "/yunohost/sso/portal.html";
+  portalOverlay.setAttribute("id","ynh-overlay");
+  portalOverlay.setAttribute("style","visibility: hidden;"); // make sure the overlay is invisible already when loading it
+  document.body.insertBefore(portalOverlay, null);
 
-  // Create portal link
-  var portal = document.createElement('a');
-  portal.setAttribute('id', 'ynh-overlay-switch');
-  portal.setAttribute('href', '/yunohost/sso/');
-  portal.setAttribute('class', 'disableAjax');
-  document.body.insertBefore(portal, null);
+  // Inject portal button
+  var portalButton = document.createElement('a');
+  portalButton.setAttribute('id', 'ynh-overlay-switch');
+  portalButton.setAttribute('href', '/yunohost/sso/');
+  portalButton.setAttribute('class', 'disableAjax');
+  document.body.insertBefore(portalButton, null);
+  // Make portal button draggable, for user convenience
+  make_element_draggable('ynh-overlay-switch');
 
-  // Portal link is draggable, for user convenience
-  dragg('ynh-overlay-switch');
-
-
-  // Create overlay element
-  var overlay = document.createElement("div");
-  overlay.setAttribute("id","ynh-overlay");
-  overlay.setAttribute("style","display:none");
-
-  document.body.insertBefore(overlay, null);
-
-  //Color Application
-  var colors = ['redbg','purpledarkbg','darkbluebg','orangebg','greenbg','darkbluebg','purpledarkbg','yellowbg','lightpinkbg','pinkbg','turquoisebg','yellowbg','lightbluebg','purpledarkbg', 'bluebg'];
-
-  // Get user's app
-  var r = new XMLHttpRequest();
-  r.open("GET", "/ynhpanel.json", true);
-  r.onreadystatechange = function () {
-    // Die if error
-    if (r.readyState != 4 || r.status != 200) return;
-
-    // Response is JSON
-    response = JSON.parse(r.responseText);
-
-    // Add overlay header
-    overlay.innerHTML += '<div id="ynh-user" class="ynh-wrapper info">' +
-                          '<ul class="ul-reset user-menu"><li><a class="icon icon-connexion disableAjax" href="'+ response.portal_url +'?action=logout">'+response.t_logout+'</a></li></ul>'+
-                          '<a class="user-container user-container-info disableAjax" href="'+ response.portal_url +'edit.html">' +
-                            '<h2 class="user-username">'+ response.uid +'</h2>' +
-                            '<small class="user-fullname">'+ response.givenName + ' ' + response.sn +'</small>' +
-                            '<span class="user-mail">'+ response.mail +'</span>' +
-                          '</a>' +
-                        '</div>';
-
-
-    // Add application links
-    var links = [];
-    Array.prototype.forEach.call(response.app, function(app, n){
-      randomColorNumber = parseInt(app.name, 36) % colors.length;
-      links.push('<li><a class="'+colors[randomColorNumber]+' disableAjax" href="//'+app.url+'"><span class="first-letter" data-first-letter="'+ app.name.substr(0,2) +'"></span><span class="name">'+app.name+'</span></a></li>');
-    });
-    overlay.innerHTML += '<div id="ynh-apps" class="ynh-wrapper apps"><ul class="listing-apps">'+ links.join("\n") +'</ul></div>';
-
-    // Add footer links
-    overlay.innerHTML += '<div id="ynh-footer" class="ynh-wrapper footer"><nav>' + "\n" +
-                          '<a class="link-profile-edit" href="/yunohost/sso/edit.html">'+ response.t_footerlink_edit +'</a>' + "\n" +
-                          '<a class="link-documentation" href="//yunohost.org/docs" target="_blank">'+ response.t_footerlink_documentation +'</a>' + "\n" +
-                          '<a class="link-documentation" href="//yunohost.org/support" target="_blank">'+ response.t_footerlink_support +'</a>' + "\n" +
-                          '<a class="link-admin" href="/yunohost/admin/" target="_blank">'+ response.t_footerlink_administration +'</a>' + "\n" +
-                        '</nav></div>';
-
-    // Add overlay to DOM
-    var btn = document.getElementById('logo'),
-        yunoverlay = document.getElementById('ynh-overlay'),
-        user = document.getElementById('ynh-user'),
-        apps = document.getElementById('ynh-apps');
-
-    var pfx = ["webkit", "moz", "MS", "o", ""];
-    function PrefixedEvent(element, type, callback) {
-      for (var p = 0; p < pfx.length; p++) {
-        if (!pfx[p]) type = type.toLowerCase();
-        element.addEventListener(pfx[p]+type, callback, false);
-      }
-    }
-
-    // Bind YNH Button
-    window.addEvent(portal, 'click', function(e){
+  // Bind portal button
+  window.addEvent(portalButton, 'click', function(e){
       // Prevent default click
       window.eventPreventDefault(e);
-      // Toggle overlay on YNHPortal button
-      //Element.toggleClass(overlay, 'visible');
-      Element.toggleClass(portal, 'visible');
+      // Toggle overlay on YNHPortal button click
+      Element.toggleClass(portalOverlay, 'visible');
+      Element.toggleClass(portalButton, 'visible');
       Element.toggleClass(document.querySelector('html'), 'ynh-panel-active');
+      Element.toggleClass(portalOverlay, 'ynh-active');
 
-
-      if(yunoverlay.classList.contains('ynh-active')) {
+      if (portalOverlay.classList.contains('ynh-active')) {
           meta_viewport.setAttribute('content', meta_viewport_content);
-          yunoverlay.classList.add('ynh-fadeOut');
-          PrefixedEvent(yunoverlay, "AnimationEnd", function(){
-            if(yunoverlay.classList.contains('ynh-fadeOut')) {
-              yunoverlay.classList.remove('ynh-active');
-            }
-          });
-        }else {
+          Element.addClass(portalOverlay, 'ynh-fadeIn');
+          Element.removeClass(portalOverlay, 'ynh-fadeOut');
+      } else {
           meta_viewport.setAttribute('content', "width=device-width");
-          yunoverlay.classList.remove('ynh-fadeOut');
-          yunoverlay.classList.add('ynh-active');
-        }
-    });
+          Element.removeClass(portalOverlay, 'ynh-fadeIn');
+          Element.addClass(portalOverlay, 'ynh-fadeOut');
+      }
+  });
+}
 
-  };
-  r.send();
+//
+// This function is called to initialize elements like the app tile colors and other things ...
+//
+function init_portal()
+{
 
-});
+  window.addEvent(document.getElementById('add-mailalias'), "click", function() {
+    // Clone last input.
+    var inputAliasClone = document.querySelector('.mailalias-input').cloneNode(true);
+    // Empty value.
+    inputAliasClone.value = '';
+    // Append to form-group.
+    this.parentNode.insertBefore(inputAliasClone, this);
+  });
+
+  window.addEvent(document.getElementById('add-maildrop'), "click", function() {
+    // Clone last input.
+    var inputDropClone = document.querySelector('.maildrop-input').cloneNode(true);
+    // Empty value.
+    inputDropClone.value = '';
+    // Append to form-group.
+    this.parentNode.insertBefore(inputDropClone, this);
+  });
+
+  Array.each(document.getElementsByClassName("app-tile"), function(el) {
+        // Set first-letter data attribute.
+        el.querySelector('.first-letter').innerHTML = el.getAttribute("data-appname").substring(0, 2);
+        // handle app links so they work both in plain info page and in the info iframe called from ynh_portal.js
+        window.addEvent(el, 'click', function(event) {
+            // if asked to open in new tab
+            if (event.ctrlKey || event.shiftKey || event.metaKey
+                || (event.button && event.button == 1)) {
+                return
+            }
+            // if asked in current tab
+            else {
+                event.preventDefault();
+                parent.location.href=this.href;
+                return false;
+            };
+        });
+  });
+}
+
+function tweak_portal_when_in_iframe()
+{
+    // Set class to body to show we're in overlay
+    document.body.classList.add('in_app_overlay');
+    let userContainer = document.querySelector('a.user-container');
+    if (userContainer) {
+        userContainer.classList.replace('user-container-info', 'user-container-edit');
+        userContainer.setAttribute('href', userContainer
+            .getAttribute('href')
+            .replace('edit.html', ''));
+        window.addEvent(userContainer, 'click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            window.parent.location.href = userContainer.getAttribute('href');
+        });
+    }
+    let logoutButton = document.getElementById('ynh-logout');
+    if (logoutButton)
+    {
+        // We force to do the logout "globally", not just in the
+        // iframe, otherwise after login out the url might still be
+        // domain.tld/app which is weird ...
+        window.addEvent(logoutButton, 'click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            window.parent.location.href = logoutButton.getAttribute("href");
+        });
+    }
+}

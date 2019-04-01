@@ -1,0 +1,179 @@
+/*
+===============================================================================
+ This file contains CSS rules loaded on all apps page (*if* the app nginx's
+ conf does include the appropriate snippet) for the small YunoHost button in
+ bottom-right corner + portal overlay.
+
+ The yunohost button corresponds to : #ynh-overlay-switch
+ The yunohost portal overlay / iframe corresponds to : #ynh-overlay
+
+ BE CAREFUL that you should *not* add too-general rules that apply to
+ non-yunohost elements (for instance all 'a' or 'p' elements...) as it will
+ likely break app's rendering
+===============================================================================
+*/
+
+/* ******************************************************************
+  General
+******************************************************************* */
+
+html.ynh-panel-active {
+  /* Disable any scrolling on app */
+  overflow: hidden;
+}
+
+body {/*overflow-y: scroll;*/}
+
+#ynh-overlay-switch,
+#ynh-overlay-switch *,
+#ynh-overlay,
+#ynh-overlay * {
+  -webkit-box-sizing: border-box;
+     -moz-box-sizing: border-box;
+          box-sizing: border-box;
+}
+
+
+/* ******************************************************************
+  Button
+******************************************************************* */
+#ynh-overlay-switch {
+  display: block;
+  position: fixed;
+  z-index: 10000000;
+  bottom: 20px;
+  right: 35px;
+  width: 100px;
+  height: 90px;
+  padding: 12px;
+  border: 12px solid #41444f;
+  border-radius: 5px;
+  background: #41444f;
+  background-image: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4KPCEtLSBHZW5lcmF0b3I6IEFkb2JlIElsbHVzdHJhdG9yIDE1LjAuMCwgU1ZHIEV4cG9ydCBQbHVnLUluICAtLT4KPCFET0NUWVBFIHN2ZyBQVUJMSUMgIi0vL1czQy8vRFREIFNWRyAxLjEvL0VOIiAiaHR0cDovL3d3dy53My5vcmcvR3JhcGhpY3MvU1ZHLzEuMS9EVEQvc3ZnMTEuZHRkIiBbCgk8IUVOVElUWSBuc19mbG93cyAiaHR0cDovL25zLmFkb2JlLmNvbS9GbG93cy8xLjAvIj4KXT4KPHN2ZyB2ZXJzaW9uPSIxLjEiCgkgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgeG1sbnM6YT0iaHR0cDovL25zLmFkb2JlLmNvbS9BZG9iZVNWR1ZpZXdlckV4dGVuc2lvbnMvMy4wLyIKCSB4PSIwcHgiIHk9IjBweCIgd2lkdGg9Ijk4cHgiIGhlaWdodD0iODVweCIgdmlld0JveD0iLTAuMjUgLTAuMjUgOTggODUiCgkgb3ZlcmZsb3c9InZpc2libGUiIGVuYWJsZS1iYWNrZ3JvdW5kPSJuZXcgLTAuMjUgLTAuMjUgOTggODUiIHhtbDpzcGFjZT0icHJlc2VydmUiPgo8ZGVmcz4KPC9kZWZzPgo8cGF0aCBmaWxsPSIjRkZGRkZGIiBkPSJNOTcsNTFjLTIuMDIsNC45OC04LjMzLDUuNjctMTQsN2MtMC42MDksNi4yOSwzLjA1LDEwLjk1LTEsMTZjLTYuNDEtMC4yNi03LjQ3MS01Ljg1OS03LTEzYy0xLDAtMiwwLTMsMAoJYy0yLjA5LDIuNzcsMC45LDQuNTIsMCw4Yy0xLjEyLDQuMzQtNy44OCw3LjkxLTExLDdjLTIuMTgtMC42NDEtNS45Ni02LjYzLTUtMTJjMi44Mi0yLjcxLDIuNzYsMy4xMiw2LDNjNS4wNS03Ljg0LTkuNjMtOC41NS04LTE3CgljMS4yNC02LjQyLDExLjY2LTkuNjYsMTUtMWMxLjU0LDQuMjEtNS4xNywwLjE2LTUsM2MtMC4yNzksMS42MiwwLjk1LDEuNzIsMSwzYzIuNTIsMC43NywxLjY4LTIuMTYsMy0zYzEuODU5LTEuMTcsMy4wOS0wLjc1LDYtMQoJYzIuNDUtMi41NSwxLjA4LTguOTIsNC0xMWMzLjg3LDAuNDYsNi4wOCwyLjU5LDYsN0M5MS4wMSw0Ni4xMDksOTQuMyw0Ni4wNSw5Nyw1MXoiLz4KPHBhdGggZmlsbD0iI0ZGRkZGRiIgZD0iTTg3LDEzYzAuNjA5LDMuMjEsMi4zMiw0Ljk4LDIsOGMtMC4zNCwzLjIxLTIuOSw4LjgzLTQsOWMtMS4xNywwLjE4LTEuMzQsMS43OC0yLDIKCWMtNC42NiwxLjU3LTEyLjM5MS0xLjQ4LTE0LTdjLTEuMTYtMy45NywxLjktMTMuMzcsNC0xN2MxLjMtMi4yNSwxLjIyMS0yLjk5LDUtNGMyLjQxLTAuNjUsMy42NS0yLjI1LDYsMAoJYzAuNDcxLDAuNDUsMS4zLDAuNDksMS44NSwwLjg5Yy0wLjE5OSwwLDIsMy4xNCwyLjE1LDQuMTFDODguMzIsMTEuMDcsODYuNzcsMTEuNzgsODcsMTN6IE03OSwyMmMxLjc3OS0xLjg5LDMuMjktNC4wNCwzLTgKCUM3Ny40OSwxMi4zMyw3NC42NywyMS4zLDc5LDIyeiIvPgo8cGF0aCBmaWxsPSIjRkZGRkZGIiBkPSJNNjcsMjFjLTAuMDcsNS44MSwyLjQ4LDEwLjcsMCwxNWMtNi43MywxLjA2LTcuMjQtNC4xLTExLTZjLTEuOTM5LDEuMzktMS40OSw1LjE4LTMsNwoJYy0zLjc4LDAuNDQtNC42OS0xLjk3LTctM2MyLjQ3LTcuODEsMS4yNi0xOC45OCwyLTI2YzguNTgtMC41OCw3LjY4LDguMzIsMTIsMTJjMC41Mi00LjM0LTAuMzU5LTE1LjUyLDMtMjAKCUM3MC4zMywzLjI5LDY3LjA5LDEyLjk5LDY3LDIxeiIvPgo8cGF0aCBmaWxsPSIjRkZGRkZGIiBkPSJNNTIsNTVjMS45Myw4LjQxLDAuMTIsMjIuNjg5LTEyLDIwYy0xLjU5LTAuMzUtOC40Mi01LjIyLTktN2MtMS42Mi01LDAuMzQtMTMuMzQsMy0xNgoJQzM5LjAzLDQ2Ljk3LDQ1LjQ4LDUwLjM1OSw1Miw1NXogTTM5LDY2YzQuNTUsMC45Niw2LjMtNC4yLDQtN0MzOS4zNyw1OS4wMywzOC42MSw2MS45MzksMzksNjZ6Ii8+CjxwYXRoIGZpbGw9IiNGRkZGRkYiIGQ9Ik0zOSw4YzUuNTgsMC45LDYuNCw2LjgxLDUsMTVjLTEuNDMsOC4zOC0zLjAyLDE0LjU5LTksMTVjLTkuNTcsMC42NS0xMi4yNS0xNi42OS05LTI5CgljOC4zMiwxLjI3LDYuNTksMTAuMzYsNiwxN2MyLjcxLDAuODMsMi4yLTAuODUsMy0yQzM3LjA1LDIxLjA0LDM3LjgyLDEzLjYxLDM5LDh6Ii8+CjxwYXRoIGZpbGw9IiNGRkZGRkYiIGQ9Ik0yOCw2MmMwLjEsNS42Nyw0LjQsMTEuMzMsMiwxN2MtNC4zMi0xLjAxLTYuNTctNC4wOS05LTdjLTMuMTUtMC40OC0yLjI2LDMuMDctNiwyCgljLTAuNjcsNS4wNjEsMi4yOSw3LjU3LTEsMTBjLTQuNy0wLjYzLTYuNjYtNC04LThjLTIuNjEtMS4zOC01LjQ4LTIuNTItNi02YzAuMTQtMy41Myw0LjQ4LTIuODUsNy00YzAuNDctNS41My0xLjQxLTEzLjQxLDItMTYKCWM4LjMxLDAuNDksOC4yMSw3LjEzLDcsMTVjNC4zNiwwLjI5LDQuOTQtNC4zNSw1LTdjMC4wNi0yLjQzLTEuODItOC4yNiwyLTExYzMuMDYtMC43MywyLjk0LDEuNzMsNiwxCglDMzIuMzUsNTIuNywyNy45Miw1Ny40MzksMjgsNjJ6Ii8+CjxwYXRoIGZpbGw9IiNGRkZGRkYiIGQ9Ik0yNCwxMmMxLjA3LDcuMDctMy44Niw4LjE0LTYsMTJjMC4yMSw2Ljg4LTAuNDcsMTIuODYtMiwxOGMtNS44Ni0xLjMyLTguNy0xMC4zOC02LTE3CgljLTAuMzMtMy41Mi01LjI2LTQuMjItNy04Yy0wLjMtMC42Ni0wLjQ3LTQuNDMtMS03QzEuMDksNS42MywwLjU1LDQuMzEsMywxYzguMTYtMC40OSw3LjIxLDguMTMsOSwxNGM1LjA1LDAuMzksMy45MS01LjQyLDgtNgoJQzIwLjk4LDEwLjM1LDIyLjY3LDExLDI0LDEyeiIvPgo8L3N2Zz4K);
+  background-position: center center;
+  background-repeat: no-repeat;
+  background-size: contain;
+  opacity: 0.7;
+}
+/*#ynh-overlay-switch.visible,*/
+#ynh-overlay-switch:hover {
+  background-color: #41444f;
+  border-color: #41444f;
+  background-color: #111;
+  border-color: #111;
+}
+
+
+/* ******************************************************************
+  Overlay
+******************************************************************* */
+
+/* Background */
+#ynh-overlay {
+  visibility: hidden;
+  position: fixed;
+  top:0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 9999999;
+  display: block;
+  border: none;
+  color:#fff;
+  background: #41444F;
+          transition: all 0.2s ease;
+     -moz-transition: all 0.2s ease;
+  -webkit-transition: all 0.2s ease;
+}
+
+
+/* ******************************************************************
+  Animation
+******************************************************************* */
+
+/*FadeIn*/
+@-webkit-keyframes fadeIn {
+  0% {
+    visibility: hidden;
+    opacity:0;
+  }
+  100% {
+    visibility: visible;
+    opacity: 1;
+  }
+}
+@keyframes fadeIn {
+  0% {
+    visibility: hidden;
+    opacity: 0;
+  }
+  100% {
+    visibility: visible;
+    opacity: 1;
+  }
+}
+
+.ynh-fadeIn {
+  -webkit-animation-name: fadeIn;
+  animation-name: fadeIn;
+  -webkit-animation-duration: 0.5s;
+  animation-duration: 0.5s;
+  -webkit-animation-fill-mode: both;
+  animation-fill-mode: both;
+  -webkit-animation-timing-function: cubic-bezier(0.165, 0.840, 0.440, 1.000);
+  animation-timing-function: cubic-bezier(0.165, 0.840, 0.440, 1.000);
+}
+/*
+.ynh-fadeIn.ynh-delay {
+  animation-delay: 0.5s;
+  -webkit-animation-delay: 0.5s;
+}
+*/
+
+/*FadeOut*/
+@-webkit-keyframes fadeOut {
+  0% {
+    visibility: visible;
+    opacity: 1;
+  }
+  100% {
+    visibility: hidden;
+    opacity: 0;
+  }
+}
+@keyframes fadeOut {
+  0% {
+    visibility: visible;
+    opacity: 1;
+  }
+  100% {
+    visibility: hidden;
+    opacity: 0;
+  }
+}
+.ynh-fadeOut {
+  -webkit-animation-name: fadeOut;
+  animation-name: fadeOut;
+  -webkit-animation-duration: 0.2s;
+  animation-duration: 0.2s;
+  -webkit-animation-fill-mode: both;
+  animation-fill-mode: both;
+}
+/*
+.ynh-fadeOut.ynh-delay {
+  animation-delay: 0.5s;
+  -webkit-animation-delay: 0.5s;
+}
+*/
+
+
+/* ******************************************************************
+  Media Queries
+******************************************************************* */
+
+@media screen and (max-width: 500px) {
+  #ynh-overlay-switch {
+    width: 80px;
+    height: 75px;
+  }
+}

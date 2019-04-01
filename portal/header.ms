@@ -12,7 +12,8 @@
   <meta name="robots" content="noindex, nofollow">
 
   <!-- Stylesheets -->
-  <link rel="stylesheet" href="assets/css/ynh-style.css">
+  <link rel="stylesheet" href="assets/css/ynh_portal.css">
+  <link rel="stylesheet" href="assets/themes/{{theme}}/custom_portal.css">
 
   <!-- Icons -->
   <link rel="shortcut icon" href="assets/icons/favicon.ico">
@@ -32,13 +33,13 @@
   <meta name="msapplication-TileColor" content="#41444f">
   <meta name="msapplication-TileImage" content="/mstile-144x144.png">
 </head>
-<body class="{{#connected}}logged{{/connected}}">
+<body class="ynh-user-portal {{#connected}}logged{{/connected}}">
 
-  <h1 id="logo" class="logo">
-      <img src="assets/img/logo-ynh-white.svg"/><span class="element-invisible">Yunohost</span>
-  </h1>
+  <div id="ynh-logo" class="ynh-logo">
+    <span class="element-invisible">Yunohost</span>
+  </div>
 
-  <div class="overlay">
+  <div class="content">
     {{#flash_win}}
     <div class="wrapper messages success">{{.}}</div>
     {{/flash_win}}
@@ -50,4 +51,3 @@
     {{#flash_info}}
     <div class="wrapper messages info">{{.}}</div>
     {{/flash_info}}
-

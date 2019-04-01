@@ -1,0 +1,109 @@
+/*
+===============================================================================
+ This file contain extra CSS rules to customize the YunoHost user portal and
+ can be used to customize app tiles, buttons, etc...
+===============================================================================
+*/
+
+/* ==========================================================================
+   Vaporwave theme
+   ========================================================================== */
+.ynh-user-portal {
+    min-height: 100vh;
+    background: rgb(205, 118, 255) !important;
+    background: -moz-linear-gradient(45deg, rgb(205, 118, 255) 0%, rgb(93, 150, 168) 100%) !important;
+    background: -webkit-gradient(linear, left bottom, right top, color-stop(0%, rgb(205, 118, 255)), color-stop(100%, rgb(93, 150, 168))) !important;
+    background: -webkit-linear-gradient(45deg, rgb(205, 118, 255) 0%, rgb(93, 150, 168) 100%) !important;
+    background: -o-linear-gradient(45deg, rgb(205, 118, 255) 0%, rgb(93, 150, 168) 100%) !important;
+    background: -ms-linear-gradient(45deg, rgb(205, 118, 255) 0%, rgb(93, 150, 168) 100%) !important;
+    background: linear-gradient(45deg, rgb(205, 118, 255) 0%, rgb(93, 150, 168) 100%) !important;
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#C82BFF', endColorstr='#0C76A8', GradientType=1) !important;
+}
+
+.messages.danger { background: #c0392b80; }
+.messages.warning { background: #e67e2280; }
+.messages.success { background: #27ae6080; }
+.messages.info { background: #2980b980; }
+
+a, small, span,
+.ynh-wrapper.footer a,
+.user-menu a,
+.user-container.user-container-info span,
+input.btn.classic-btn.large-btn {
+    color: #e0e0e0 !important;
+}
+
+.form-group input::placeholder,
+.form-group input::-ms-input-placeholder,
+.form-group input:-ms-input-placeholder {
+    color: #f4f4f4 !important;
+}
+
+form.login-form input {
+    color: #222 !important;
+}
+
+a:hover,
+a:active,
+a:focus,
+.form-group input,
+input.btn.classic-btn.large-btn:hover,
+.ynh-wrapper.footer a:hover {
+    color: white !important;
+}
+
+.ynh-wrapper.footer a:before {
+    color: #cc45ee !important;
+}
+
+.ynh-wrapper.footer nav {
+    border-color: #cc45ee !important;
+}
+
+.listing-apps li a span,
+.listing-apps li a:hover span,
+.listing-apps li a:active span,
+.listing-apps li a:focus span {
+    color: white !important;
+}
+
+.listing-apps li,
+.listing-apps li a {
+    transition: all 0.3s ease-in-out, background 0ms; /* fix gray flicker on initial load */
+    border: none transparent !important;
+    box-shadow: 2px 2px 3px rgba(0, 0, 0, 0.1),
+    -2px -2px 3px 0 rgba(0, 0, 0, 0.1) inset;
+}
+
+.listing-apps li:hover,
+.listing-apps li a:hover {
+    box-shadow: 2px 2px 3px rgba(0, 0, 0, 0),
+    -2px -2px 3px 0 rgba(0, 0, 0, 0) inset;
+}
+
+.btn.large-btn.classic-btn,
+.btn.large-btn.validate-btn {
+    background: rgba(200, 200, 200, 0.4) !important;
+}
+
+.btn.large-btn.classic-btn:hover,
+.btn.large-btn.validate-btn:hover {
+    background: rgba(255, 255, 255, 0.4) !important;
+}
+
+/* There are no colors, there is only vapor! */
+.app-tile,
+.form-group input,
+.form-group label,
+a.btn:hover,
+.btn.large-btn {
+    background: rgba(200, 200, 200, 0.2) !important;
+    border: none;
+}
+
+.app-tile:hover:after,
+.app-tile:focus:after,
+.app-tile:hover:before,
+.app-tile:focus:before {
+    background: rgba(200, 200, 200, 0.4) !important;
+}

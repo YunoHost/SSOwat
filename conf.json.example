@@ -2,6 +2,7 @@
    "portal_scheme": "https",
    "portal_domain": "example.com",
    "portal_path": "/ssowat/",
+   "theme": "default",
    "domains": [
         "example.com",
         "example.org"
