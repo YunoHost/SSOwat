@@ -9,5 +9,12 @@
     "logout": "Elsaluti",
     "change_password": "Ŝanĝi pasvorton",
     "edit": "Redakti",
-    "cancel": "Nuligi"
+    "cancel": "Nuligi",
+    "portal": "Yunohost portalo",
+    "fullname": "Plena nomo",
+    "new_mail": "nova-adreso@mia-domajno.org",
+    "confirm": "Konfirmi",
+    "password_changed": "Pasvorto sukcese ŝanĝita",
+    "password_changed_error": "Eraro okazis dum ŝanĝo de pasvorto",
+    "password_not_match": "Novaj pasvortoj ne estas samaj"
 }
