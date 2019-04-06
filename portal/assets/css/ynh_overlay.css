@@ -92,7 +92,7 @@ body {/*overflow-y: scroll;*/}
 ******************************************************************* */
 
 /*FadeIn*/
-@-webkit-keyframes fadeIn {
+@-webkit-keyframes ynhFadeIn {
   0% {
     visibility: hidden;
     opacity:0;
@@ -102,7 +102,7 @@ body {/*overflow-y: scroll;*/}
     opacity: 1;
   }
 }
-@keyframes fadeIn {
+@keyframes ynhFadeIn {
   0% {
     visibility: hidden;
     opacity: 0;
@@ -114,8 +114,8 @@ body {/*overflow-y: scroll;*/}
 }
 
 .ynh-fadeIn {
-  -webkit-animation-name: fadeIn;
-  animation-name: fadeIn;
+  -webkit-animation-name: ynhFadeIn;
+  animation-name: ynhFadeIn;
   -webkit-animation-duration: 0.5s;
   animation-duration: 0.5s;
   -webkit-animation-fill-mode: both;
@@ -131,7 +131,7 @@ body {/*overflow-y: scroll;*/}
 */
 
 /*FadeOut*/
-@-webkit-keyframes fadeOut {
+@-webkit-keyframes ynhFadeOut {
   0% {
     visibility: visible;
     opacity: 1;
@@ -141,7 +141,7 @@ body {/*overflow-y: scroll;*/}
     opacity: 0;
   }
 }
-@keyframes fadeOut {
+@keyframes ynhFadeOut {
   0% {
     visibility: visible;
     opacity: 1;
@@ -152,8 +152,8 @@ body {/*overflow-y: scroll;*/}
   }
 }
 .ynh-fadeOut {
-  -webkit-animation-name: fadeOut;
-  animation-name: fadeOut;
+  -webkit-animation-name: ynhFadeOut;
+  animation-name: ynhFadeOut;
   -webkit-animation-duration: 0.2s;
   animation-duration: 0.2s;
   -webkit-animation-fill-mode: both;
