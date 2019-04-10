@@ -1,3 +1,14 @@
+ssowat (3.5.2) stable; urgency=low
+
+  - Release as stable !
+  - [fix] Avoid name conflict with app classes/effects
+  - [fix] Avoid having to click two times on the tile to show the portal
+  - [i18n] Improve translations for Arabic, Italian
+
+  Thanks to all contributors (Aleks, BoF, silkevicious) <3 !
+
+ -- Alexandre Aubin <alex.aubin@mailoo.org> Wed, 10 Apr 2019 02:07:00 +0000
+
 ssowat (3.5.1) testing; urgency=low
 
   - [enh] Rework portal to be able to have themes ! (#122)
