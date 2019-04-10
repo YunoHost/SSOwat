@@ -1,3 +1,9 @@
+ssowat (3.5.2.1) stable; urgency=low
+
+  - [fix] Small issue where portal overlay caused a blink during app page loading
+
+ -- Alexandre Aubin <alex.aubin@mailoo.org> Wed, 10 Apr 2019 19:27:00 +0000
+
 ssowat (3.5.2) stable; urgency=low
 
   - Release as stable !
