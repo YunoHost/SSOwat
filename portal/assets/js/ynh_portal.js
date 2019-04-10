@@ -264,7 +264,6 @@ function init_portal_button_and_overlay()
   portalOverlay.setAttribute("id","ynh-overlay");
   portalOverlay.setAttribute("style","visibility: hidden;"); // make sure the overlay is invisible already when loading it
   document.body.insertBefore(portalOverlay, null);
-  Element.addClass(portalOverlay, 'ynh-fadeOut');
 
   // Inject portal button
   var portalButton = document.createElement('a');
@@ -283,7 +282,7 @@ function init_portal_button_and_overlay()
       Element.toggleClass(document.querySelector('html'), 'ynh-panel-active');
       Element.toggleClass(portalOverlay, 'ynh-active');
 
-      if (portalOverlay.classList.contains('ynh-active')) {
+      if (Element.hasClass(portalOverlay, 'ynh-active')) {
           meta_viewport.setAttribute('content', meta_viewport_content);
           Element.addClass(portalOverlay, 'ynh-fadeIn');
           Element.removeClass(portalOverlay, 'ynh-fadeOut');
