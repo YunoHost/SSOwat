@@ -1,3 +1,39 @@
+ssowat (3.5.2.1) stable; urgency=low
+
+  - [fix] Small issue where portal overlay caused a blink during app page loading
+
+ -- Alexandre Aubin <alex.aubin@mailoo.org> Wed, 10 Apr 2019 19:27:00 +0000
+
+ssowat (3.5.2) stable; urgency=low
+
+  - Release as stable !
+  - [fix] Avoid name conflict with app classes/effects
+  - [fix] Avoid having to click two times on the tile to show the portal
+  - [i18n] Improve translations for Arabic, Italian
+
+  Thanks to all contributors (Aleks, BoF, silkevicious) <3 !
+
+ -- Alexandre Aubin <alex.aubin@mailoo.org> Wed, 10 Apr 2019 02:07:00 +0000
+
+ssowat (3.5.1) testing; urgency=low
+
+  - [enh] Rework portal to be able to have themes ! (#122)
+  - [i18n] Improve translations for Breton, Chinese, Greek, Hungarian, Swedish, French, Esperanto, Catalan, Occitan
+
+  Thanks to all contributors (Aleks, Jibec, Lukas F., Mélanie C., Quentí, chateau, ppr, Xaloc) <3 !
+
+ -- Alexandre Aubin <alex.aubin@mailoo.org> Wed, 03 Apr 2019 02:38:00 +0000
+
+ssowat (3.5.0) testing; urgency=low
+
+  - Fix string helper if string is empty (#115)
+  - Add missing dependencies to README (53a738e)
+  - [i18n] Improve russian translations
+
+  Contributors: Josué Tille, Lukas Fülling, Алексей
+
+ -- Alexandre Aubin <alex.aubin@mailoo.org> Wed, 13 Mar 2019 17:00:00 +0000
+
 ssowat (3.4.2) stable; urgency=low
 
   * Bumping version number to 3.4.2 for stable release

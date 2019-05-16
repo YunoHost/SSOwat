@@ -39,5 +39,11 @@
     "footerlink_edit": "Editar lo perfil",
     "footerlink_documentation": "Documentacion",
     "footerlink_support": "Assisténcia",
-    "footerlink_administration": "Administracion"
+    "footerlink_administration": "Administracion",
+    "password_listed": "Aqueste senhal es un dels mai utilizats al monde. Se vos plai utilizatz-ne un mai unic.",
+    "password_too_simple_1": "Lo senhal deu conténer almens 8 caractèrs",
+    "password_too_simple_2": "Lo senhal deu conténer almens 8 caractèrs e numbres, majusculas e minusculas",
+    "password_too_simple_3": "Lo senhal deu conténer almens 8 caractèrs e nombres, majusculas e minusculas e caractèrs especials",
+    "password_too_simple_4": "Lo senhal deu conténer almens 12 caractèrs, de nombre, majusculas, minisculas e caractèrs specials",
+    "good_practices_about_user_password": "Sètz a mand de definir un nòu senhal d’utilizaire. Lo nòu senhal deu conténer almens 8 caractèrs, es de bon far d’utilizar un senhal mai long (es a dire una frasa de senhal) e/o utilizar mantuns tipes de caractèrs (majusculas, minusculas, nombres e caractèrs especials)."
 }

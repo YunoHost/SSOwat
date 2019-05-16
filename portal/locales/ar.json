@@ -39,5 +39,6 @@
     "footerlink_edit": "تعديل ملفي الشخصي",
     "footerlink_documentation": "الدليل",
     "footerlink_support": "المساعدة",
-    "footerlink_administration": "الإدارة"
+    "footerlink_administration": "الإدارة",
+    "password_too_simple_1": "يجب أن يكون طول الكلمة السرية على الأقل 8 حروف"
 }

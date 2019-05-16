@@ -1,0 +1,145 @@
+/*
+===============================================================================
+ This file contain extra CSS rules to customize the YunoHost user portal and
+ can be used to customize app tiles, buttons, etc...
+===============================================================================
+*/
+
+.bluebg {
+    background: #3498DB!important;
+}
+.bluebg:hover:after,
+.bluebg:focus:after,
+.bluebg:hover:before,
+.bluebg:focus:before {
+    background: #16527A!important;
+}
+
+.purplebg {
+    background: #9B59B6!important;
+}
+.purplebg:hover:after,
+.purplebg:focus:after,
+.purplebg:hover:before,
+.purplebg:focus:before {
+    background: #532C64!important;
+}
+
+.redbg {
+    background: #E74C3C!important;
+}
+.redbg:hover:after,
+.redbg:focus:after,
+.redbg:hover:before,
+.redbg:focus:before {
+    background: #921E12!important;
+}
+
+.orangebg {
+    background: #F39C12!important;
+}
+.orangebg:hover:after,
+.orangebg:focus:after,
+.orangebg:hover:before,
+.orangebg:focus:before {
+    background: #7F5006!important;
+}
+
+.greenbg {
+    background: #2ECC71!important;
+}
+.greenbg:hover:after,
+.greenbg:focus:after,
+.greenbg:hover:before,
+.greenbg:focus:before {
+    background: #176437!important;
+}
+
+.darkbluebg {
+    background: #34495E!important;
+}
+.darkbluebg:hover:after,
+.darkbluebg:focus:after,
+.darkbluebg:hover:before,
+.darkbluebg:focus:before {
+    background: #07090C!important;
+}
+
+.lightbluebg {
+    background: #6A93D4!important;
+}
+.lightbluebg:hover:after,
+.lightbluebg:focus:after,
+.lightbluebg:hover:before,
+.lightbluebg:focus:before {
+    background: #2B5394!important;
+}
+
+.yellowbg {
+    background: #F1C40F!important;
+}
+.yellowbg:hover:after,
+.yellowbg:focus:after,
+.yellowbg:hover:before,
+.yellowbg:focus:before {
+    background: #796307!important;
+}
+
+
+.lightpinkbg {
+    background: #F76F87!important;
+}
+.lightpinkbg:hover:after,
+.lightpinkbg:focus:after,
+.lightpinkbg:hover:before,
+.lightpinkbg:focus:before {
+    background: #DA0C31!important;
+}
+
+/* Following colors are not used yet */
+.pinkbg {
+    background: #D66D92!important;
+}
+.pinkbg:hover:after,
+.pinkbg:focus:after,
+.pinkbg:hover:before,
+.pinkbg:focus:before {
+    background: #992B52!important;
+}
+
+.turquoisebg {
+    background: #1ABC9C!important;
+}
+.turquoisebg:hover:after,
+.turquoisebg:focus:after,
+.turquoisebg:hover:before,
+.turquoisebg:focus:before {
+    background: #0B4C3F!important;
+}
+.lightyellow {
+    background: #FFC973!important;
+}
+.lightyellow:hover:after,
+.lightyellow:focus:after,
+.lightyellow:hover:before,
+.lightyellow:focus:before {
+    background: #F39500!important;
+}
+.lightgreen {
+    background: #B5F36D!important;
+}
+.lightgreen:hover:after,
+.lightgreen:focus:after,
+.lightgreen:hover:before,
+.lightgreen:focus:before {
+    background: #77CF11!important;
+}
+.purpledarkbg {
+    background: #8E44AD!important;
+}
+.purpledarkbg:hover:after,
+.purpledarkbg:focus:after,
+.purpledarkbg:hover:before,
+.purpledarkbg:focus:before {
+    background: #432051!important;
+}

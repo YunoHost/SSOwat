@@ -150,13 +150,24 @@ then
                and (not ngx.var.http_referer
                     or hlp.string.starts(ngx.var.http_referer, conf.portal_url)))
         then
-            return hlp.serve(ngx.var.uri)
+            -- If this is an asset, enable caching
+            if hlp.string.starts(ngx.var.uri, conf["portal_path"].."assets")
+            then
+               return hlp.serve(ngx.var.uri, "static_asset")
+            else
+               return hlp.serve(ngx.var.uri)
+            end
 
 
         -- If all the previous cases have failed, redirect to portal
         else
             hlp.flash("info", hlp.t("please_login"))
-            return hlp.redirect(conf.portal_url)
+            -- Force the scheme to HTTPS. This is to avoid an issue with redirection loop
+            -- when trying to access http://main.domain.tld/ (SSOwat finds that user aint
+            -- logged in, therefore redirects to SSO, which redirects to the back_url, which
+            -- redirect to SSO, ..)
+            local back_url = "https://" .. ngx.var.host .. ngx.var.uri .. hlp.uri_args_string()
+            return hlp.redirect(conf.portal_url.."?r="..ngx.encode_base64(back_url))
         end
 
 
@@ -305,16 +316,36 @@ end
 -- `/yunohost/sso/assets/js/ynhpanel.js` file.
 --
 
+function scandir(directory, callback)
+    -- FIXME : this sometime fails (randomly...)
+    -- because of 'interrupted system call'
+    -- use find (and not ls) to list only files recursively and with their full path relative to the asked directory
+    local pfile = io.popen('cd "'..directory..'" && find * -type f')
+    for filename in pfile:lines() do
+        callback(filename)
+    end
+    pfile:close()
+end
+
+function serveAsset(shortcut, full)
+  if string.match(ngx.var.uri, "^"..shortcut.."$") then
+      hlp.serve("/yunohost/sso/assets/"..full, "static_asset")
+  end
+end
+
+function serveThemeFile(filename)
+  serveAsset("/ynhtheme/"..filename, "themes/"..conf.theme.."/"..filename)
+end
+
 if hlp.is_logged_in() then
-    if string.match(ngx.var.uri, "^/ynhpanel.js$") then
-        hlp.serve("/yunohost/sso/assets/js/ynhpanel.js")
-    end
-    if string.match(ngx.var.uri, "^/ynhpanel.css$") then
-        hlp.serve("/yunohost/sso/assets/css/ynhpanel.css")
-    end
-    if string.match(ngx.var.uri, "^/ynhpanel.json$") then
-        hlp.serve("/yunohost/sso/assets/js/ynhpanel.json")
-    end
+    -- serve ynhpanel files
+    serveAsset("/ynh_portal.js", "js/ynh_portal.js")
+    serveAsset("/ynh_overlay.css", "css/ynh_overlay.css")
+    -- serve theme's files
+    -- FIXME? I think it would be better here not to use an absolute path
+    -- but I didn't succeed to figure out where is the current location of the script
+    -- if you call it from "portal/assets/themes/" the ls fails
+    scandir("/usr/share/ssowat/portal/assets/themes/"..conf.theme, serveThemeFile)
 
     -- If user has no access to this URL, redirect him to the portal
     if not hlp.has_access() then

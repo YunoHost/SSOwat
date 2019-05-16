@@ -38,7 +38,10 @@ end
 
 -- Test whether a string starts with another
 function string.starts(String, Start)
-   return string.sub(String, 1, string.len(Start)) == Start
+    if not String then
+        return false
+    end
+    return string.sub(String, 1, string.len(Start)) == Start
 end
 
 
@@ -434,13 +437,13 @@ end
 --
 -- Takes an URI, and returns file content with the proper HTTP headers.
 -- It is used to render the SSOwat portal *only*.
-function serve(uri)
+function serve(uri, cache)
     rel_path = string.gsub(uri, conf["portal_path"], "/")
 
     -- Load login.html as index
     if rel_path == "/" then
         if is_logged_in() then
-            rel_path = "/info.html"
+            rel_path = "/portal.html"
         else
             rel_path = "/login.html"
         end
@@ -502,8 +505,12 @@ function serve(uri)
     flashs["win"] = nil
     flashs["info"] = nil
 
-    -- Ain't nobody got time for cache
-    ngx.header["Cache-Control"] = "no-cache"
+    if cache == "static_asset" then
+        ngx.header["Cache-Control"] = "public, max-age=3600"
+    else
+        -- Ain't nobody got time for cache
+        ngx.header["Cache-Control"] = "no-cache"
+    end
 
     -- Print file content
     ngx.say(content)
@@ -528,7 +535,7 @@ function get_data_for(view)
         }
 
     -- For those views, we may need user information
-    elseif view == "info.html"
+    elseif view == "portal.html"
         or view == "edit.html"
         or view == "password.html"
         or view == "ynhpanel.json" then
@@ -547,6 +554,7 @@ function get_data_for(view)
         local mails = get_mails(user)
         data = {
             connected  = true,
+            theme      = conf.theme,
             portal_url = conf.portal_url,
             uid        = user,
             cn         = cache:get(user.."-cn"),
@@ -582,6 +590,7 @@ function get_data_for(view)
     data['flash_fail'] = {flashs["fail"]}
     data['flash_win']  = {flashs["win"] }
     data['flash_info'] = {flashs["info"]}
+    data['theme'] = conf["theme"]
 
     return data
 end
@@ -679,7 +688,7 @@ function edit_user()
 
                         -- Open the LDAP connection
                         local ldap = lualdap.open_simple(conf["ldap_host"], dn, args.currentpassword)
-                        
+
                         local password = hash_password(args.newpassword)
 
                         -- Modify the LDAP information
@@ -692,7 +701,7 @@ function edit_user()
 
                             -- Reset the password cache
                             cache:set(user.."-password", args.newpassword, conf["session_timeout"])
-                            return redirect(conf.portal_url.."info.html")
+                            return redirect(conf.portal_url.."portal.html")
                         else
                             flash("fail", t("password_changed_error"))
                         end
@@ -875,7 +884,7 @@ function edit_user()
                      -- Ugly trick to force cache reloading
                      set_headers(user)
                      flash("win", t("information_updated"))
-                     return redirect(conf.portal_url.."info.html")
+                     return redirect(conf.portal_url.."portal.html")
 
                  else
                      flash("fail", t("user_saving_fail"))
@@ -906,7 +915,7 @@ function login()
     local uri_args = ngx.req.get_uri_args()
 
     args.user = string.lower(args.user)
-    
+
     local user = authenticate(args.user, args.password)
     if user then
         ngx.status = ngx.HTTP_CREATED
