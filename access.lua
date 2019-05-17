@@ -65,7 +65,7 @@ end
 -- If the URL matches the portal URL, serve a portal file or proceed to a
 -- portal operation
 --
-if ngx.var.host == conf["portal_domain"]
+if (ngx.var.host == conf["portal_domain"] or hlp.is_logged_in())
    and hlp.string.starts(ngx.var.uri, string.sub(conf["portal_path"], 1, -2))
 then
 
