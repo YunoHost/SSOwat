@@ -1,3 +1,12 @@
+ssowat (3.6.0) testing; urgency=low
+
+  - [fix] Allow access to portal for other domains than main domain (#136)
+  - [i18n] Improve translation for Spanish
+
+  Thanks to all contributors (Josue, advocatux) <3 !
+
+ -- Alexandre Aubin <alex.aubin@mailoo.org> Wed, 22 May 2019 19:50:00 +0000
+
 ssowat (3.5.2.1) stable; urgency=low
 
   - [fix] Small issue where portal overlay caused a blink during app page loading
