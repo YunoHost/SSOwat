@@ -229,7 +229,10 @@ window.addEvent(document, 'DOMContentLoaded', function() {
 
     if (in_app)
     {
-        init_portal_button_and_overlay();
+        // Do not load inside an app iframe (Roundcube visualisation panel for example).
+        if (window.frameElement == null) {
+            init_portal_button_and_overlay();
+        }
     }
     else
     {
