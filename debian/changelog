@@ -1,3 +1,11 @@
+ssowat (3.6.1) testing; urgency=low
+
+  - [fix] Prevent duplicate portal button when app uses iframes (#137)
+
+  Thanks to all contributors <3 ! (opi)
+
+ -- Alexandre Aubin <alex.aubin@mailoo.org>  Tue, 04 Jun 2019 13:20:00  +0000
+
 ssowat (3.6.0) testing; urgency=low
 
   - [fix] Allow access to portal for other domains than main domain (#136)
