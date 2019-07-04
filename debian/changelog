@@ -1,3 +1,9 @@
+ssowat (3.6.4) stable; urgency=low
+
+  Bumping version number for stable release
+
+ -- Alexandre Aubin <alex.aubin@mailoo.org>  Tue, 04 Jul 2019 23:30:00  +0000
+
 ssowat (3.6.1) testing; urgency=low
 
   - [fix] Prevent duplicate portal button when app uses iframes (#137)
