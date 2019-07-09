@@ -1,9 +1,7 @@
 /*
 ===============================================================================
-   Unsplash themes for SSOWat's backgrounds
-
-   WARNING: external images are queried from Unsplash API every time, which
-   makes this theme not suitable for off-the-internet clients...
+ This file contain extra CSS rules to customize the YunoHost user portal and
+ can be used to customize app tiles, buttons, etc...
 ===============================================================================
 */
 
@@ -24,7 +22,6 @@ body {
 }
 
 .ynh-user-portal {
-  /* If image is not yielded, fall back on traditional grey 'normal' background*/
   background-image: url('https://source.unsplash.com/random/featured/?nature') !important;
   background-repeat: no-repeat;
   background-size: cover;
@@ -58,6 +55,22 @@ body {
 
 .login-form * {
 	border-radius: 5em;
+}
+
+/* Make form black */
+
+.login-form label::before {
+	background: #000; 
+	color: #FFF;
+}
+
+.login-form .form-group * {
+	background: #000; 
+	color: #FFF;
+}
+
+.icon {
+	background: #000;
 }
 
 .messages {
