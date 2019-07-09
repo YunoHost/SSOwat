@@ -1,0 +1,17 @@
+/*
+===============================================================================
+ This file may contain extra CSS rules loaded on all apps page (*if* the app
+ nginx's conf does include the appropriate snippet) for the small YunoHost
+ button in bottom-right corner + portal overlay.
+
+ The yunohost button corresponds to : #ynh-overlay-switch
+ The yunohost portal overlay / iframe corresponds to : #ynh-overlay
+
+ BE CAREFUL that you should *not* add too-general rules that apply to
+ non-yunohost elements (for instance all 'a' or 'p' elements...) as it will
+ likely break app's rendering
+===============================================================================
+*/
+#ynh-overlay-switch {
+  background-image: url("./cloud.png");
+}
