@@ -5,7 +5,7 @@
 ===============================================================================
 */
 
-/* Make page texts black */
+/* Make page texts white */
 .user-container h2,
 .user-container small,
 .user-container .user-mail,
@@ -13,7 +13,12 @@
 .content .footer a,
 a.app-tile,
 #ynh-logout {
-  color: black !important;
+  color: white !important;
+}
+
+body {
+  color: white !important;
+  text-shadow: 3px 4px 4px rgba(0,0,0,.4), -1px -1px 6px rgba(0,0,0,0.2);
 }
 
 .ynh-user-portal {
