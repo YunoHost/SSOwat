@@ -36,7 +36,11 @@ end
 
 -- Efficient function to get a random string
 function random_string()
-    local random_bytes = io.open("/dev/urandom"):read(64);
+    local length = 64
+    local random_bytes = io.open("/dev/urandom"):read(length);
+    if string.len(random_bytes) ~= length then
+        error("Not enough random bytes read")
+    end
     return tohex(random_bytes);
 end
 
