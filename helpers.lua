@@ -12,10 +12,6 @@ local conf = config.get_config()
 local logger = require("log")
 logger.outfile = "/var/log/nginx/ssowat.log"
 
-function log(...)
-    logger.info(...)
-end
-
 -- Read a FS stored file
 function read_file(file)
     local f = io.open(file, "rb")
@@ -164,7 +160,7 @@ function set_auth_cookie(user, domain)
         "SSOwAuthHash="..hash..cookie_str,
         "SSOwAuthExpire="..expire..cookie_str
     }
-    log("Hash "..hash.." generated for "..user.."@"..ngx.var.remote_addr)
+    logger.info("Hash "..hash.." generated for "..user.."@"..ngx.var.remote_addr)
 end
 
 
@@ -228,7 +224,7 @@ function is_logged_in()
                             "|"..expireTime..
                             "|"..session_key)
                     if hash ~= authHash then
-                        log("Hash "..authHash.." rejected for "..user.."@"..ngx.var.remote_addr)
+                        logger.info("Hash "..authHash.." rejected for "..user.."@"..ngx.var.remote_addr)
                     end
                     return hash == authHash
                 end
