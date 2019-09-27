@@ -36,7 +36,7 @@ Installation
 * Fetch the repository
 
 ```bash
-git clone https://github.com/Kloadut/SSOwat /etc/ssowat
+git clone https://github.com/YunoHost/SSOwat /etc/ssowat
 ```
 
 
