@@ -32,7 +32,7 @@
    "invalid_mail": "Invalid e-mail address",
    "invalid_domain": "Invalid domain in",
    "invalid_mailforward": "Invalid e-mail forwarding address",
-   "mail_already_used": "E-mail address already in use:",
+   "mail_already_used": "E-mail address already in use",
    "information_updated": "Info updated",
    "user_saving_fail": "Could not save new user info",
    "missing_required_fields": "Fill inn the required fields",
