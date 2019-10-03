@@ -8,6 +8,10 @@
 -- another.
 --
 
+-- Path of the configuration
+conf_path = "/etc/ssowat/conf.json"
+log_file = "/var/log/nginx/ssowat.log"
+
 -- Remove prepending '@' & trailing 'init.lua'
 script_path = string.sub(debug.getinfo(1).source, 2, -9)
 
@@ -22,6 +26,11 @@ local lfs = require "lfs"
 local socket = require "socket"
 local config = require "config"
 lustache = require "lustache"
+
+-- Make sure the log file exists and we can write in it
+io.popen("touch "..log_file)
+io.popen("chown www-data "..log_file)
+io.popen("chmod u+w "..log_file)
 
 -- Persistent shared table
 flashs = {}
@@ -53,9 +62,6 @@ for file in lfs.dir(locale_dir) do
         i18n[lang] = json.decode(locale_file:read("*all"))
     end
 end 
-
--- Path of the configuration
-conf_path = "/etc/ssowat/conf.json"
 
 -- You should see that in your Nginx error logs by default
 ngx.log(ngx.INFO, "SSOwat ready")
