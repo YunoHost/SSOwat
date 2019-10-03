@@ -10,7 +10,6 @@ module('helpers', package.seeall)
 local cache = ngx.shared.cache
 local conf = config.get_config()
 local logger = require("log")
-logger.outfile = "/var/log/nginx/ssowat.log"
 
 -- Read a FS stored file
 function read_file(file)
@@ -239,7 +238,7 @@ function log_access(user, app)
   local key = "ACC|"..user.."|"..app
   local block = cache:get(key)
   if block == nil then
-    logger.info("ACC "..app.." by "..user.."@"..ngx.var.remote_addr)
+    logger.info("User "..user.."@"..ngx.var.remote_addr.." accesses "..app)
     cache:set(key, "block", 60)
   end
 end
@@ -258,6 +257,7 @@ function has_access(user, url)
     -- If there are no `users` directive, or if the user has no ACL set, he can
     -- access the URL by default
     if not conf["users"] or not conf["users"][user] then
+        logger.debug("No access rules defined for user "..user..", assuming it can access..")
         return true
     end
 
@@ -271,10 +271,12 @@ function has_access(user, url)
         end
 
         if string.starts(url, string.sub(u, 1, -2)) then
+            logger.debug("Logged-in user can access "..ngx.var.uri)
             log_access(user, app)
             return true
         end
     end
+    logger.debug("Logged-in user cannot access "..ngx.var.uri)
     return false
 end
 
@@ -297,10 +299,10 @@ function authenticate(user, password)
             attrs = {conf["ldap_identifier"]}
         } do
             if attribs[conf["ldap_identifier"]] then
-                ngx.log(ngx.NOTICE, "Use email: "..user)
+                logger.debug("Use email: "..user)
                 user = attribs[conf["ldap_identifier"]]
             else
-                ngx.log(ngx.ERR, "Unknown email: "..user)
+                logger.error("Unknown email: "..user)
                 return false
             end
         end
@@ -324,14 +326,12 @@ function authenticate(user, password)
             ensure_user_password_uses_strong_hash(connected, user, password)
         end
         cache:add(user.."-password", password, conf["session_timeout"])
-        ngx.log(ngx.NOTICE, "Connected as: "..user)
-        logger.info("AUTHSUCC "..user.."@"..ngx.var.remote_addr)
+        logger.info("User "..user.." succesfully authenticated from "..ngx.var.remote_addr)
         return user
 
     -- Else, the username/email or the password is wrong
     else
-        ngx.log(ngx.ERR, "Connection failed for: "..user)
-        logger.info("AUTHFAIL "..user.."@"..ngx.var.remote_addr)
+        logger.error("Authentication failure for user "..user.." from "..ngx.var.remote_addr)
         return false
     end
 end
@@ -381,13 +381,13 @@ function set_headers(user)
         -- If the ldap connection fail (because the password was changed).
         -- Logout the user and invalid the password
         if not ldap then
-            ngx.log(ngx.NOTICE, "LDAP connection failed. Disconnect user : ".. user)
+            logger.debug("LDAP connection failed. Disconnect user : ".. user)
             cache:delete(authUser.."-password")
             flash("info", t("please_login"))
             local back_url = ngx.var.scheme .. "://" .. ngx.var.host .. ngx.var.uri .. uri_args_string()
             return redirect(conf.portal_url.."?r="..ngx.encode_base64(back_url))
         end
-        ngx.log(ngx.NOTICE, "Reloading LDAP values for: "..user)
+        logger.debug("Reloading LDAP values for: "..user)
         for dn, attribs in ldap:search {
             base = conf["ldap_identifier"].."=".. user ..","..conf["ldap_group"],
             scope = "base",
@@ -458,6 +458,9 @@ end
 -- Takes an URI, and returns file content with the proper HTTP headers.
 -- It is used to render the SSOwat portal *only*.
 function serve(uri, cache)
+
+    logger.debug("Serving portal uri "..uri.." (if the corresponding file exists)")
+
     rel_path = string.gsub(uri, conf["portal_path"], "/")
 
     -- Load login.html as index
@@ -952,7 +955,7 @@ function login()
         -- pass some additional headers
         if string.match(uri_args.r, "(.*)\n") then
             flash("fail", t("redirection_error_invalid_url"))
-            ngx.log(ngx.ERR, "Redirection url is invalid")
+            logger.debug("Redirection url is invalid")
             return redirect(conf.portal_url)
         end
 
@@ -991,7 +994,7 @@ end
 
 -- Set cookie and redirect (needed to properly set cookie)
 function redirect(url)
-    ngx.log(ngx.NOTICE, "Redirect to: "..url)
+    logger.debug("Redirecting to "..url)
     return ngx.redirect(url)
 end
 
@@ -999,6 +1002,7 @@ end
 -- Set cookie and go on with the response (needed to properly set cookie)
 function pass()
     delete_redirect_cookie()
+    logger.debug("Allowing to pass through "..ngx.var.uri)
 
     -- When we are in the SSOwat portal, we need a default `content-type`
     if string.ends(ngx.var.uri, "/")

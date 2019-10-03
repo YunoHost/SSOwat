@@ -25,6 +25,9 @@ local hlp = require "helpers"
 -- Import Perl regular expressions library
 local rex = require "rex_pcre"
 
+-- Load logging module
+local logger = require("log")
+
 -- Just a note for the client to know that he passed through the SSO
 ngx.header["X-SSO-WAT"] = "You've just been SSOed"
 
@@ -47,7 +50,7 @@ if ngx.var.host ~= conf["portal_domain"] and ngx.var.request_method == "GET" the
         user = cache:get("CDA|"..cda_key)
         if user then
             hlp.set_auth_cookie(user, ngx.var.host)
-            ngx.log(ngx.NOTICE, "Cross-domain authentication: "..user.." connected on "..ngx.var.host)
+            logger.info("Cross-domain authentication: "..user.." connected on "..ngx.var.host)
             cache:delete("CDA|"..cda_key)
         end
 
@@ -74,6 +77,7 @@ then
 
         -- Force portal scheme
         if ngx.var.scheme ~= conf["portal_scheme"] then
+            logger.debug("Redirecting to "..conf.portal_url.."Cross-domain authentication: "..user.." connected on "..ngx.var.host)
             return hlp.redirect(conf.portal_url)
         end
 
@@ -88,6 +92,7 @@ then
         -- Logout is also called via a `GET` method
         -- TODO: change this ?
         if uri_args.action and uri_args.action == 'logout' then
+            logger.debug("Logging out")
             return hlp.logout()
 
         -- If the `r` URI argument is set, it means that we want to
@@ -100,7 +105,7 @@ then
             -- pass some additional headers
             if string.match(back_url, "(.*)\n") then
                 hlp.flash("fail", hlp.t("redirection_error_invalid_url"))
-                ngx.log(ngx.ERR, "Redirection url is invalid")
+                logger.error("Redirection url is invalid")
                 return hlp.redirect(conf.portal_url)
             end
 
@@ -110,7 +115,7 @@ then
             for _, domain in ipairs(conf["domains"]) do
                 local escaped_domain = domain:gsub("-", "%%-") -- escape dash for pattern matching
                 if string.match(back_url, "^http[s]?://"..escaped_domain.."/") then
-                    ngx.log(ngx.INFO, "Redirection to a managed domain found")
+                    logger.debug("Redirection to a managed domain found")
                     managed_domain = true
                     break
                 end
@@ -120,7 +125,7 @@ then
             -- redirect to portal home page
             if not managed_domain then
                 hlp.flash("fail", hlp.t("redirection_error_unmanaged_domain"))
-                ngx.log(ngx.ERR, "Redirection to an external domain aborted")
+                logger.error("Redirection to an external domain aborted")
                 return hlp.redirect(conf.portal_url)
             end
 
@@ -162,6 +167,7 @@ then
         -- If all the previous cases have failed, redirect to portal
         else
             hlp.flash("info", hlp.t("please_login"))
+            logger.debug("User should log in to be able to access "..ngx.var.uri)
             -- Force the scheme to HTTPS. This is to avoid an issue with redirection loop
             -- when trying to access http://main.domain.tld/ (SSOwat finds that user aint
             -- logged in, therefore redirects to SSO, which redirects to the back_url, which
@@ -180,13 +186,16 @@ then
             if hlp.string.ends(ngx.var.uri, conf["portal_path"].."password.html")
             or hlp.string.ends(ngx.var.uri, conf["portal_path"].."edit.html")
             then
+               logger.debug("User attempts to edit its information")
                return hlp.edit_user()
             else
+               logger.debug("User attempts to log in")
                return hlp.login()
             end
         else
             -- Redirect to portal
             hlp.flash("fail", hlp.t("please_login_from_portal"))
+            logger.debug("Invalid POST request not coming from the portal url...")
             return hlp.redirect(conf.portal_url)
         end
     end
@@ -228,6 +237,7 @@ if conf["redirected_urls"] then
         if url == ngx.var.host..ngx.var.uri..hlp.uri_args_string()
         or url == ngx.var.scheme.."://"..ngx.var.host..ngx.var.uri..hlp.uri_args_string()
         or url == ngx.var.uri..hlp.uri_args_string() then
+            logger.debug("Requested URI is in redirected_urls")
             detect_redirection(redirect_url)
         end
     end
@@ -238,6 +248,7 @@ if conf["redirected_regex"] then
         if match(ngx.var.host..ngx.var.uri..hlp.uri_args_string(), regex)
         or match(ngx.var.scheme.."://"..ngx.var.host..ngx.var.uri..hlp.uri_args_string(), regex)
         or match(ngx.var.uri..hlp.uri_args_string(), regex) then
+            logger.debug("Requested URI is in redirected_regex")
             detect_redirection(redirect_url)
         end
     end
@@ -264,16 +275,19 @@ function is_protected()
     for _, url in ipairs(conf["protected_urls"]) do
         if hlp.string.starts(ngx.var.host..ngx.var.uri..hlp.uri_args_string(), url)
         or hlp.string.starts(ngx.var.uri..hlp.uri_args_string(), url) then
+            logger.debug(ngx.var.uri.." is in protected_urls")
             return true
         end
     end
     for _, regex in ipairs(conf["protected_regex"]) do
         if match(ngx.var.host..ngx.var.uri..hlp.uri_args_string(), regex)
         or match(ngx.var.uri..hlp.uri_args_string(), regex) then
+            logger.debug(ngx.var.uri.." is in protected_regex")
             return true
         end
     end
 
+    logger.debug(ngx.var.uri.." is not in protected_urls/regex")
     return false
 end
 
@@ -291,6 +305,7 @@ if conf["skipped_urls"] then
         if (hlp.string.starts(ngx.var.host..ngx.var.uri..hlp.uri_args_string(), url)
         or  hlp.string.starts(ngx.var.uri..hlp.uri_args_string(), url))
         and not is_protected() then
+            logger.debug("Skipping "..ngx.var.uri)
             return hlp.pass()
         end
     end
@@ -301,6 +316,7 @@ if conf["skipped_regex"] then
         if (match(ngx.var.host..ngx.var.uri..hlp.uri_args_string(), regex)
         or  match(ngx.var.uri..hlp.uri_args_string(), regex))
         and not is_protected() then
+            logger.debug("Skipping "..ngx.var.uri)
             return hlp.pass()
         end
     end
@@ -327,6 +343,7 @@ end
 
 function serveAsset(shortcut, full)
   if string.match(ngx.var.uri, "^"..shortcut.."$") then
+      logger.debug("Serving static asset "..full)
       hlp.serve("/yunohost/sso/assets/"..full, "static_asset")
   end
 end
@@ -378,6 +395,7 @@ if conf["unprotected_urls"] then
             if hlp.is_logged_in() then
                 hlp.set_headers()
             end
+            logger.debug(ngx.var.uri.." is in unprotected_urls")
             return hlp.pass()
         end
     end
@@ -391,6 +409,7 @@ if conf["unprotected_regex"] then
             if hlp.is_logged_in() then
                 hlp.set_headers()
             end
+            logger.debug(ngx.var.uri.." is in unprotected_regex")
             return hlp.pass()
         end
     end
@@ -416,6 +435,7 @@ if auth_header then
     _, _, user, password = string.find(ngx.decode_base64(b64_cred), "^(.+):(.+)$")
     user = hlp.authenticate(user, password)
     if user then
+        logger.debug("User got authenticated through basic auth")
         -- If user has no access to this URL, redirect him to the portal
         if not hlp.has_access(user) then
            return hlp.redirect(conf.portal_url)
@@ -450,5 +470,6 @@ end
 -- when trying to access http://main.domain.tld/ (SSOwat finds that user aint
 -- logged in, therefore redirects to SSO, which redirects to the back_url, which
 -- redirect to SSO, ..)
+logger.debug("No rule found for this url. By default, redirecting to portal")
 local back_url = "https://" .. ngx.var.host .. ngx.var.uri .. hlp.uri_args_string()
 return hlp.redirect(conf.portal_url.."?r="..ngx.encode_base64(back_url))
