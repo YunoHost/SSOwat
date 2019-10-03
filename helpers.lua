@@ -11,6 +11,10 @@ local cache = ngx.shared.cache
 local conf = config.get_config()
 local logger = require("log")
 
+-- url parser, c.f. https://rosettacode.org/wiki/URL_parser#Lua
+local url_parser = require "socket.url"
+
+
 -- Read a FS stored file
 function read_file(file)
     local f = io.open(file, "rb")
@@ -234,11 +238,11 @@ function is_logged_in()
     return false
 end
 
-function log_access(user, app)
-  local key = "ACC|"..user.."|"..app
+function log_access(user, uri)
+  local key = "ACC|"..user.."|"..uri
   local block = cache:get(key)
   if block == nil then
-    logger.info("User "..user.."@"..ngx.var.remote_addr.." accesses "..app)
+    logger.info("User "..user.."@"..ngx.var.remote_addr.." accesses "..uri)
     cache:set(key, "block", 60)
   end
 end
@@ -246,9 +250,8 @@ end
 
 -- Check whether a user is allowed to access a URL using the `users` directive
 -- of the configuration file
-function has_access(user, url)
+function has_access(user)
     user = user or authUser
-    url = url or ngx.var.host..ngx.var.uri
 
     if not conf["users"][user] then
         conf = config.get_config()
@@ -262,22 +265,94 @@ function has_access(user, url)
     end
 
     -- Loop through user's ACLs and return if the URL is authorized.
-    for u, app in pairs(conf["users"][user]) do
+    allowed_url_matches = {}
+    for url, app in pairs(conf["users"][user]) do
 
         -- Replace the original domain by a local one if you are connected from
         -- a non-global domain name.
         if ngx.var.host == conf["local_portal_domain"] then
-            u = string.gsub(u, conf["original_portal_domain"], conf["local_portal_domain"])
+            url = string.gsub(url, conf["original_portal_domain"], conf["local_portal_domain"])
         end
 
-        if string.starts(url, string.sub(u, 1, -2)) then
-            logger.debug("Logged-in user can access "..ngx.var.uri)
-            log_access(user, app)
-            return true
+        if string.ends(url, "/") then
+            url = string.sub(url, 1, -1)
+        end
+
+        if string.starts(ngx.var.host..ngx.var.uri, url) then
+            logger.debug("User is allowed to access this match : "..url)
+            table.insert(allowed_url_matches,url)
         end
     end
-    logger.debug("Logged-in user cannot access "..ngx.var.uri)
-    return false
+
+    -- Keep only the longest match and compare it to the longest protected
+    -- match e.g. we don't want to allow the user to access /foo/admin if
+    -- /foo/admin is protected, but this user is only allowed to access /foo
+    local longest_allowed_match = longest_url_path(allowed_url_matches) or ""
+    local longest_protected_match = longest_url_path(protected_matches()) or ""
+
+    logger.debug("Longest allowed match : "..longest_allowed_match)
+    logger.debug("Longest protected match : "..longest_protected_match)
+
+    if string.len(longest_allowed_match) >= string.len(longest_protected_match) then
+        logger.debug("Logged-in user can access "..ngx.var.uri)
+        log_access(user, longest_allowed_match)
+        return true
+    else
+        logger.debug("Logged-in user cannot access "..ngx.var.uri)
+        return false
+    end
+end
+
+
+function protected_matches()
+    if not conf["protected_urls"] then
+        conf["protected_urls"] = {}
+    end
+    if not conf["protected_regex"] then
+        conf["protected_regex"] = {}
+    end
+
+    local url_matches = {}
+
+    for _, url in ipairs(conf["protected_urls"]) do
+        if string.starts(ngx.var.host..ngx.var.uri..uri_args_string(), url)
+        or string.starts(ngx.var.uri..uri_args_string(), url) then
+            logger.debug("protected_url match current uri : "..url)
+            table.insert(url_matches, url)
+        else
+            logger.debug("no match from "..url.." to "..ngx.var.uri)
+        end
+    end
+    for _, regex in ipairs(conf["protected_regex"]) do
+        local m1 = match(ngx.var.host..ngx.var.uri..uri_args_string(), regex)
+        local m2 = match(ngx.var.uri..uri_args_string(), regex)
+        if m1 then
+            logger.debug("protected_regex match current uri : "..regex.." with "..m1)
+            table.insert(url_matches, m1)
+        end
+        if m2 then
+            logger.debug("protected_regex match current uri : "..regex.." with "..m2)
+            table.insert(url_matches, m2)
+        end
+    end
+
+    return url_matches
+end
+
+
+function longest_url_path(urls)
+    local longest = nil
+    for _, url in ipairs(urls) do
+        -- Turn the url into a path, e.g.:
+        -- /foo/bar -> /foo/bar
+        -- domain.tld/foo/bar -> /foo/bar
+        -- https://domain.tld:1234/foo/bar -> /foo/bar
+        current = url_parser.parse(url).path
+        if not longest or string.len(longest) < string.len(current) then
+            longest = current
+        end
+    end
+    return longest
 end
 
 
