@@ -293,7 +293,10 @@ function has_access(user)
     logger.debug("Longest allowed match : "..longest_allowed_match)
     logger.debug("Longest protected match : "..longest_protected_match)
 
-    if string.len(longest_allowed_match) >= string.len(longest_protected_match) then
+    -- For the user to be able to access the content, at least one rule should
+    -- exist and it should be the longest match
+    if longest_allowed_match ~= ""
+    and string.len(longest_allowed_match) >= string.len(longest_protected_match) then
         logger.debug("Logged-in user can access "..ngx.var.uri)
         log_access(user, longest_allowed_match)
         return true
