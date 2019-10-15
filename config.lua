@@ -55,7 +55,8 @@ function get_config()
         ldap_attributes           = {"uid", "givenname", "sn", "cn", "homedirectory", "mail", "maildrop"},
         allow_mail_authentication = true,
         default_language          = "en",
-        theme                     = "default"
+        theme                     = "default",
+        logging                   = "fatal" -- Only log fatal messages by default (so apriori nothing)
     }
 
 
