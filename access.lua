@@ -208,17 +208,15 @@ end
 -- If the URL matches one of the `redirected_urls` in the configuration file,
 -- just redirect to the target URL/URI
 --
--- A match function that uses PCRE regex as default
+-- The 'match' function uses PCRE regex as default
 -- If '%.' is found in the regex, we assume it's a LUA regex (legacy code)
+-- 'match' returns the matched text.
 function match(s, regex)
     if not string.find(regex, '%%%.') then
-        if rex.match(s, regex) then
-            return true
-        end
-    elseif string.match(s,regex) then
-        return true
+        return rex.match(s, regex)
+    else
+        return string.match(s,regex)
     end
-    return false
 end
 
 function detect_redirection(redirect_url)
@@ -290,7 +288,6 @@ function is_protected()
     logger.debug(ngx.var.uri.." is not in protected_urls/regex")
     return false
 end
-
 
 --
 -- 5. Skipped URLs
