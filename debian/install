@@ -3,6 +3,7 @@ access.lua /usr/share/ssowat
 helpers.lua /usr/share/ssowat
 config.lua /usr/share/ssowat
 lustache.lua /usr/share/ssowat
+log.lua /usr/share/ssowat
 lustache /usr/share/ssowat
 portal /usr/share/ssowat
 conf.json.example /etc/ssowat
