@@ -30,7 +30,6 @@ ngx.header["X-SSO-WAT"] = "You've just been SSOed"
 
 -- Quick fix for CVE-2019-11043 about php-fpm and nginx
 local loweruri = string.lower(ngx.var.uri)
-ngx.header["X-SSO-DEBUG"] = loweruri
 if string.match(loweruri, "\n") or string.match(loweruri, "\r") then
     return ngx.exit(ngx.HTTP_FORBIDDEN)
 end
