@@ -1,3 +1,16 @@
+ssowat (3.7.0) testing; urgency=low
+
+  - [enh] Rework handling of protected vs. user-specific rules for permission mechanism (SSOwat#147)
+  - [enh] Messages improvements, string cleaning, language rework... (SSOwat#143)
+  - [i18n] Improved translations for French, Esperanto, Germain, Norwegian Bokmål
+  - [enh] Add debug logs to SSOwat (SSOwat#145)
+  - [fix] Misc micro bugfixes or improvements (SSOwat#140, SSOwat#141)
+  - [enh] READMEs improvements (SSOwat/ee67b6f)
+
+  Thanks to all contributors <3 ! (accross all repo: Yunohost, Moulinette, SSOwat, Yunohost-admin) : advocatux, Aksel K., Aleks, Allan N., amirale qt, Armin P., Bram, ButterflyOfFire, Carles S. A., chema o. r., decentral1se, Emmanuel V., Etienne M., Filip B., Geoff M., htsr, Jibec, Josué, Julien J., Kayou, liberodark, ljf, lucaskev, Lukas D., madtibo, Martin D., Mélanie C., nr 458 h, pitfd, ppr, Quentí, sidddy, troll, tufek yamero, xaloc33, yalh76
+
+ -- Alexandre Aubin <alex.aubin@mailoo.org>  Thu, 31 Oct 2019 18:25:00  +0000
+
 ssowat (3.6.4) stable; urgency=low
 
   Bumping version number for stable release
