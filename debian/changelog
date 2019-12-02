@@ -1,3 +1,9 @@
+ssowat (3.7.0.1) testing; urgency=low
+
+  - [mod] Check skipped_urls before protected_urls (#149)
+
+ -- Alexandre Aubin <alex.aubin@mailoo.org>  Tue, 03 Dev 2019 12:07:00  +0000
+
 ssowat (3.7.0) testing; urgency=low
 
   - [enh] Rework handling of protected vs. user-specific rules for permission mechanism (SSOwat#147)
