@@ -254,7 +254,37 @@ end
 
 
 --
--- 4. Protected URLs
+-- 4. Skipped URLs
+--
+-- If the URL matches one of the `skipped_urls` in the configuration file,
+-- it means that the URL should not be protected by the SSO and no header
+-- has to be sent, even if the user is already authenticated.
+--
+
+if conf["skipped_urls"] then
+    for _, url in ipairs(conf["skipped_urls"]) do
+        if (hlp.string.starts(ngx.var.host..ngx.var.uri..hlp.uri_args_string(), url)
+        or  hlp.string.starts(ngx.var.uri..hlp.uri_args_string(), url))
+        then
+            logger.debug("Skipping "..ngx.var.uri)
+            return hlp.pass()
+        end
+    end
+end
+
+if conf["skipped_regex"] then
+    for _, regex in ipairs(conf["skipped_regex"]) do
+        if (match(ngx.var.host..ngx.var.uri..hlp.uri_args_string(), regex)
+        or  match(ngx.var.uri..hlp.uri_args_string(), regex))
+        then
+            logger.debug("Skipping "..ngx.var.uri)
+            return hlp.pass()
+        end
+    end
+end
+
+--
+-- 5. Protected URLs
 --
 -- If the URL matches one of the `protected_urls` in the configuration file,
 -- we have to protect it even if the URL is also set in the `unprotected_urls`.
@@ -288,37 +318,6 @@ function is_protected()
     logger.debug(ngx.var.uri.." is not in protected_urls/regex")
     return false
 end
-
---
--- 5. Skipped URLs
---
--- If the URL matches one of the `skipped_urls` in the configuration file,
--- it means that the URL should not be protected by the SSO and no header
--- has to be sent, even if the user is already authenticated.
---
-
-if conf["skipped_urls"] then
-    for _, url in ipairs(conf["skipped_urls"]) do
-        if (hlp.string.starts(ngx.var.host..ngx.var.uri..hlp.uri_args_string(), url)
-        or  hlp.string.starts(ngx.var.uri..hlp.uri_args_string(), url))
-        and not is_protected() then
-            logger.debug("Skipping "..ngx.var.uri)
-            return hlp.pass()
-        end
-    end
-end
-
-if conf["skipped_regex"] then
-    for _, regex in ipairs(conf["skipped_regex"]) do
-        if (match(ngx.var.host..ngx.var.uri..hlp.uri_args_string(), regex)
-        or  match(ngx.var.uri..hlp.uri_args_string(), regex))
-        and not is_protected() then
-            logger.debug("Skipping "..ngx.var.uri)
-            return hlp.pass()
-        end
-    end
-end
-
 
 --
 -- 6. Specific files (used in YunoHost)
