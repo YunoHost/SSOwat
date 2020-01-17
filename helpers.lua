@@ -14,6 +14,20 @@ local logger = require("log")
 -- url parser, c.f. https://rosettacode.org/wiki/URL_parser#Lua
 local url_parser = require "socket.url"
 
+-- Import Perl regular expressions library
+local rex = require "rex_pcre"
+
+
+-- The 'match' function uses PCRE regex as default
+-- If '%.' is found in the regex, we assume it's a LUA regex (legacy code)
+-- 'match' returns the matched text.
+function match(s, regex)
+    if not string.find(regex, '%%%.') then
+        return rex.match(s, regex)
+    else
+        return string.match(s,regex)
+    end
+end
 
 -- Read a FS stored file
 function read_file(file)
