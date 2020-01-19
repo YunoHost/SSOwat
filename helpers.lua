@@ -289,7 +289,7 @@ function has_access(user)
         end
 
         if string.ends(url, "/") then
-            url = string.sub(url, 1, -1)
+            url = string.sub(url, 1, -2)
         end
 
         if string.starts(ngx.var.host..ngx.var.uri, url) then
