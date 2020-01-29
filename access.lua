@@ -334,7 +334,9 @@ function serveThemeFile(filename)
   serveAsset("/ynhtheme/"..filename, "themes/"..conf.theme.."/"..filename)
 end
 
-if hlp.is_logged_in() then
+function serveYnhpanel()
+    logger.debug("Serving ynhpanel")
+
     -- serve ynhpanel files
     serveAsset("/ynh_portal.js", "js/ynh_portal.js")
     serveAsset("/ynh_overlay.css", "css/ynh_overlay.css")
@@ -343,19 +345,7 @@ if hlp.is_logged_in() then
     -- but I didn't succeed to figure out where is the current location of the script
     -- if you call it from "portal/assets/themes/" the ls fails
     scandir("/usr/share/ssowat/portal/assets/themes/"..conf.theme, serveThemeFile)
-
-    -- If user has no access to this URL, redirect him to the portal
-    if not hlp.has_access() then
-        return hlp.redirect(conf.portal_url)
-    end
-
-    -- If the user is authenticated and has access to the URL, set the headers
-    -- and let it be
-    hlp.set_headers()
-    return hlp.pass()
 end
-
-
 
 --
 -- 7. Unprotected URLs
@@ -375,6 +365,8 @@ if conf["unprotected_urls"] then
         or  hlp.string.starts(ngx.var.uri..hlp.uri_args_string(), url))
         and not is_protected() then
             if hlp.is_logged_in() then
+                serveYnhpanel()
+
                 hlp.set_headers()
             end
             logger.debug(ngx.var.uri.." is in unprotected_urls")
@@ -389,6 +381,8 @@ if conf["unprotected_regex"] then
         or  hlp.match(ngx.var.uri..hlp.uri_args_string(), regex))
         and not is_protected() then
             if hlp.is_logged_in() then
+                serveYnhpanel()
+
                 hlp.set_headers()
             end
             logger.debug(ngx.var.uri.." is in unprotected_regex")
@@ -397,6 +391,20 @@ if conf["unprotected_regex"] then
     end
 end
 
+
+if hlp.is_logged_in() then
+    serveYnhpanel()
+
+    -- If user has no access to this URL, redirect him to the portal
+    if not hlp.has_access() then
+        return hlp.redirect(conf.portal_url)
+    end
+
+    -- If the user is authenticated and has access to the URL, set the headers
+    -- and let it be
+    hlp.set_headers()
+    return hlp.pass()
+end
 
 
 --
@@ -452,6 +460,6 @@ end
 -- when trying to access http://main.domain.tld/ (SSOwat finds that user aint
 -- logged in, therefore redirects to SSO, which redirects to the back_url, which
 -- redirect to SSO, ..)
-logger.debug("No rule found for this url. By default, redirecting to portal")
+logger.debug("No rule found for "..ngx.var.uri..". By default, redirecting to portal")
 local back_url = "https://" .. ngx.var.host .. ngx.var.uri .. hlp.uri_args_string()
 return hlp.redirect(conf.portal_url.."?r="..ngx.encode_base64(back_url))
