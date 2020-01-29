@@ -267,16 +267,17 @@ end
 function has_access(user)
     user = user or authUser
 
+    logger.debug("User "..user.." try to access "..ngx.var.uri)
+    
     -- Get the longest url permission
     longest_permission_match = longest_url_path(permission_matches()) or ""
 
     logger.debug("Longest permission match : "..longest_permission_match)
 
-    -- If no permission matches, it means that there is no
-    -- permission defined for this url, a logged-in user can access it.
+    -- If no permission matches, it means that there is no permission defined for this url.
     if longest_permission_match == "" then
-        logger.debug("No access rules defined for user "..user..", assuming it can access.")
-        return true
+        logger.debug("No access rules defined for user "..user..", assuming it cannot access.")
+        return false
     end
 
     -- All user in this permission
