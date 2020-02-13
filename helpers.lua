@@ -317,6 +317,39 @@ function permission_matches()
     return url_matches
 end
 
+function get_matches(section)
+    if not conf[section.."_urls"] then
+        conf[section.."_urls"] = {}
+    end
+    if not conf[section.."_regex"] then
+        conf[section.."_regex"] = {}
+    end
+
+    local url_matches = {}
+
+    for _, url in ipairs(conf[section.."_urls"]) do
+        if string.starts(ngx.var.host..ngx.var.uri..uri_args_string(), url)
+        or string.starts(ngx.var.uri..uri_args_string(), url) then
+            logger.debug(section.."_url match current uri : "..url)
+            table.insert(url_matches, url)
+        end
+    end
+    for _, regex in ipairs(conf[section.."_regex"]) do
+        local m1 = match(ngx.var.host..ngx.var.uri..uri_args_string(), regex)
+        local m2 = match(ngx.var.uri..uri_args_string(), regex)
+        if m1 then
+            logger.debug(section.."_regex match current uri : "..regex.." with "..m1)
+            table.insert(url_matches, m1)
+        end
+        if m2 then
+            logger.debug(section.."_regex match current uri : "..regex.." with "..m2)
+            table.insert(url_matches, m2)
+        end
+    end
+
+    return url_matches
+end
+
 function longest_url_path(urls)
     local longest = nil
     for _, url in ipairs(urls) do
@@ -328,6 +361,9 @@ function longest_url_path(urls)
         if not longest or string.len(longest) < string.len(current) then
             longest = current
         end
+    end
+    if longest and string.ends(longest, "/") then
+        longest = string.sub(longest, 1, -2)
     end
     return longest
 end
