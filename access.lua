@@ -270,6 +270,29 @@ if conf["skipped_regex"] then
 end
 
 --
+-- 4b. Noauth URLs
+--
+-- If the URL matches one of the `no_auth` in the configuration file,
+-- it means that the URL should be protected by the SSO but no header
+-- has to be sent, even if the user is already authenticated.
+--
+
+if conf["noauth_urls"] then
+    if hlp.is_logged_in() then
+        for _, noauth in ipairs(conf["noauth_urls"]) do
+            if (hlp.string.starts(ngx.var.host..ngx.var.uri..hlp.uri_args_string(), noauth)
+            or  hlp.string.starts(ngx.var.uri..hlp.uri_args_string(), noauth))
+            then
+                logger.debug("Noauth "..ngx.var.uri)
+                return hlp.pass()
+            end
+        end
+    end
+
+end
+
+
+--
 -- 5. Protected URLs
 --
 -- If the URL matches one of the `protected_urls` in the configuration file,
