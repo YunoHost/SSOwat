@@ -150,6 +150,10 @@ List of URLs and/or URIs that will not be affected by SSOwat. This must be a JSO
 
 List of regular expressions to be matched against URLs **and** URIs to ignore them
 
+#### noauth_urls
+
+List of URLs and/or URIs that will be protected with SSOwatbut no header will be sent. This must be a JSON array, and SSOwat automatically adds itself to this array.
+
 #### unprotected_urls
 
 List of URLs and/or URIs that will not be affected by SSOwat **unless user is authenticated**
