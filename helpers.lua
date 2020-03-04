@@ -262,7 +262,7 @@ function log_access(user, uri)
 end
 
 
--- Check whether a user is allowed to access a URL using the `users` directive
+-- Check whether a user is allowed to access a URL using the `permissions` directive
 -- of the configuration file
 function has_access(user)
     user = user or authUser
