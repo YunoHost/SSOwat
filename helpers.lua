@@ -306,8 +306,7 @@ function permission_matches()
     local url_matches = {}
 
     for url, permission in pairs(conf["permissions"]) do
-        if string.starts(ngx.var.host..ngx.var.uri..uri_args_string(), url)
-        or string.starts(ngx.var.uri..uri_args_string(), url) then
+        if string.starts(ngx.var.host..ngx.var.uri..uri_args_string(), url) then
             logger.debug("Url permission match current uri : "..url)
 
             table.insert(url_matches, url)
