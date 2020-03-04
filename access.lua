@@ -256,7 +256,8 @@ logger.debug("longest protected "..longest_protected_match)
 --
 
 if longest_skipped_match ~= ""
-and string.len(longest_skipped_match) >= string.len(longest_protected_match) then
+and string.len(longest_skipped_match) >= string.len(longest_protected_match) 
+and string.len(longest_skipped_match) > string.len(longest_unprotected_match) then
     logger.debug("Skipping "..ngx.var.uri)
     return hlp.pass()
 end
