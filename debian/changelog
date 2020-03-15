@@ -1,8 +1,19 @@
+ssowat (3.7.0.2) stretch-testing; urgency=low
+
+  - [fix] Match undefined function (SSOwat#151)
+  - [fix] Cohabitation between the old and the new permission system (SSOwat#156)
+
+  - [i18n] Improved translations for French, Basque, Hindi, Turkish, Bengali (Bangladesh), Arabic, Hungarian, Polish, Catalan, Dutch, Portuguese, Italian, German, Swedish, Russian, Esperanto, Occitan, Nepali
+
+  Thanks to all contributors (amirale qt, Quenti, Filip Bengtsson, elie gavoty, xaloc33, ButterflyOfFire, Kay0u) <3 !
+
+ -- Kay0u <pierre@kayou.io>  Sun, 15 Mar 2020 15:48:58 +0000
+
 ssowat (3.7.0.1) testing; urgency=low
 
   - [mod] Check skipped_urls before protected_urls (#149)
 
- -- Alexandre Aubin <alex.aubin@mailoo.org>  Tue, 03 Dev 2019 12:07:00  +0000
+ -- Alexandre Aubin <alex.aubin@mailoo.org>  Tue, 03 Dec 2019 12:07:00  +0000
 
 ssowat (3.7.0) testing; urgency=low
 
