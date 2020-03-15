@@ -262,100 +262,92 @@ function log_access(user, uri)
 end
 
 
--- Check whether a user is allowed to access a URL using the `users` directive
+-- Check whether a user is allowed to access a URL using the `permissions` directive
 -- of the configuration file
 function has_access(user)
     user = user or authUser
 
-    if not conf["users"][user] then
-        conf = config.get_config()
-    end
+    logger.debug("User "..user.." try to access "..ngx.var.uri)
+    
+    -- Get the longest url permission
+    longest_permission_match = longest_url_path(permission_matches()) or ""
 
-    -- If there are no `users` directive, or if the user has no ACL set, he can
-    -- access the URL by default
-    if not conf["users"] or not conf["users"][user] then
-        logger.debug("No access rules defined for user "..user..", assuming it can access..")
-        return true
-    end
+    logger.debug("Longest permission match : "..longest_permission_match)
 
-    -- Loop through user's ACLs and return if the URL is authorized.
-    allowed_url_matches = {}
-    for url, app in pairs(conf["users"][user]) do
-
-        -- Replace the original domain by a local one if you are connected from
-        -- a non-global domain name.
-        if ngx.var.host == conf["local_portal_domain"] then
-            url = string.gsub(url, conf["original_portal_domain"], conf["local_portal_domain"])
-        end
-
-        if string.ends(url, "/") then
-            url = string.sub(url, 1, -1)
-        end
-
-        if string.starts(ngx.var.host..ngx.var.uri, url) then
-            logger.debug("User is allowed to access this match : "..url)
-            table.insert(allowed_url_matches,url)
-        end
-    end
-
-    -- Keep only the longest match and compare it to the longest protected
-    -- match e.g. we don't want to allow the user to access /foo/admin if
-    -- /foo/admin is protected, but this user is only allowed to access /foo
-    local longest_allowed_match = longest_url_path(allowed_url_matches) or ""
-    local longest_protected_match = longest_url_path(protected_matches()) or ""
-
-    logger.debug("Longest allowed match : "..longest_allowed_match)
-    logger.debug("Longest protected match : "..longest_protected_match)
-
-    -- For the user to be able to access the content, at least one rule should
-    -- exist and it should be the longest match
-    if longest_allowed_match ~= ""
-    and string.len(longest_allowed_match) >= string.len(longest_protected_match) then
-        logger.debug("Logged-in user can access "..ngx.var.uri)
-        log_access(user, longest_allowed_match)
-        return true
-    else
-        logger.debug("Logged-in user cannot access "..ngx.var.uri)
+    -- If no permission matches, it means that there is no permission defined for this url.
+    if longest_permission_match == "" then
+        logger.debug("No access rules defined for user "..user..", assuming it cannot access.")
         return false
     end
+
+    -- All user in this permission
+    allowed_users = conf["permissions"][longest_permission_match]
+
+    -- The user has permission to access the content if he is in the list of this one
+    if allowed_users then
+        for _, u in pairs(allowed_users) do
+            if u == user then
+                logger.debug("User "..user.." can access "..ngx.var.uri)
+                log_access(user, longest_permission_match)
+                return true
+            end
+        end
+    end
+
+    logger.debug("User "..user.." cannot access "..ngx.var.uri)
+    return false
 end
 
-
-function protected_matches()
-    if not conf["protected_urls"] then
-        conf["protected_urls"] = {}
-    end
-    if not conf["protected_regex"] then
-        conf["protected_regex"] = {}
+function permission_matches()
+    if not conf["permissions"] then
+        conf["permissions"] = {}
     end
 
     local url_matches = {}
 
-    for _, url in ipairs(conf["protected_urls"]) do
-        if string.starts(ngx.var.host..ngx.var.uri..uri_args_string(), url)
-        or string.starts(ngx.var.uri..uri_args_string(), url) then
-            logger.debug("protected_url match current uri : "..url)
+    for url, permission in pairs(conf["permissions"]) do
+        if string.starts(ngx.var.host..ngx.var.uri..uri_args_string(), url) then
+            logger.debug("Url permission match current uri : "..url)
+
             table.insert(url_matches, url)
-        else
-            logger.debug("no match from "..url.." to "..ngx.var.uri)
-        end
-    end
-    for _, regex in ipairs(conf["protected_regex"]) do
-        local m1 = match(ngx.var.host..ngx.var.uri..uri_args_string(), regex)
-        local m2 = match(ngx.var.uri..uri_args_string(), regex)
-        if m1 then
-            logger.debug("protected_regex match current uri : "..regex.." with "..m1)
-            table.insert(url_matches, m1)
-        end
-        if m2 then
-            logger.debug("protected_regex match current uri : "..regex.." with "..m2)
-            table.insert(url_matches, m2)
         end
     end
 
     return url_matches
 end
 
+function get_matches(section)
+    if not conf[section.."_urls"] then
+        conf[section.."_urls"] = {}
+    end
+    if not conf[section.."_regex"] then
+        conf[section.."_regex"] = {}
+    end
+
+    local url_matches = {}
+
+    for _, url in ipairs(conf[section.."_urls"]) do
+        if string.starts(ngx.var.host..ngx.var.uri..uri_args_string(), url)
+        or string.starts(ngx.var.uri..uri_args_string(), url) then
+            logger.debug(section.."_url match current uri : "..url)
+            table.insert(url_matches, url)
+        end
+    end
+    for _, regex in ipairs(conf[section.."_regex"]) do
+        local m1 = match(ngx.var.host..ngx.var.uri..uri_args_string(), regex)
+        local m2 = match(ngx.var.uri..uri_args_string(), regex)
+        if m1 then
+            logger.debug(section.."_regex match current uri : "..regex.." with "..m1)
+            table.insert(url_matches, m1)
+        end
+        if m2 then
+            logger.debug(section.."_regex match current uri : "..regex.." with "..m2)
+            table.insert(url_matches, m2)
+        end
+    end
+
+    return url_matches
+end
 
 function longest_url_path(urls)
     local longest = nil
@@ -368,6 +360,9 @@ function longest_url_path(urls)
         if not longest or string.len(longest) < string.len(current) then
             longest = current
         end
+    end
+    if longest and string.ends(longest, "/") then
+        longest = string.sub(longest, 1, -2)
     end
     return longest
 end
