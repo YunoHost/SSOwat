@@ -239,6 +239,16 @@ if conf["redirected_regex"] then
 end
 
 
+local longest_protected_match = hlp.longest_url_path(hlp.get_matches("protected")) or ""
+local longest_skipped_match = hlp.longest_url_path(hlp.get_matches("skipped")) or ""
+local longest_unprotected_match = hlp.longest_url_path(hlp.get_matches("unprotected")) or ""
+local longest_noauth_match = hlp.longest_url_path(hlp.get_matches("noauth")) or ""
+
+logger.debug("longest skipped "..longest_skipped_match)
+logger.debug("longest unprotected "..longest_unprotected_match)
+logger.debug("longest protected "..longest_protected_match)
+logger.debug("longest noauth "..longest_noauth_match)
+
 --
 -- 4. Skipped URLs
 --
@@ -247,26 +257,11 @@ end
 -- has to be sent, even if the user is already authenticated.
 --
 
-if conf["skipped_urls"] then
-    for _, url in ipairs(conf["skipped_urls"]) do
-        if (hlp.string.starts(ngx.var.host..ngx.var.uri..hlp.uri_args_string(), url)
-        or  hlp.string.starts(ngx.var.uri..hlp.uri_args_string(), url))
-        then
-            logger.debug("Skipping "..ngx.var.uri)
-            return hlp.pass()
-        end
-    end
-end
-
-if conf["skipped_regex"] then
-    for _, regex in ipairs(conf["skipped_regex"]) do
-        if (hlp.match(ngx.var.host..ngx.var.uri..hlp.uri_args_string(), regex)
-        or  hlp.match(ngx.var.uri..hlp.uri_args_string(), regex))
-        then
-            logger.debug("Skipping "..ngx.var.uri)
-            return hlp.pass()
-        end
-    end
+if longest_skipped_match ~= ""
+and string.len(longest_skipped_match) >= string.len(longest_protected_match) 
+and string.len(longest_skipped_match) > string.len(longest_unprotected_match) then
+    logger.debug("Skipping "..ngx.var.uri)
+    return hlp.pass()
 end
 
 --
@@ -277,59 +272,17 @@ end
 -- has to be sent, even if the user is already authenticated.
 --
 
-if conf["noauth_urls"] then
+if longest_noauth_match ~= ""
+and string.len(longest_noauth_match) >= string.len(longest_protected_match) 
+and string.len(longest_noauth_match) > string.len(longest_unprotected_match) then
     if hlp.is_logged_in() then
-        for _, noauth in ipairs(conf["noauth_urls"]) do
-            if (hlp.string.starts(ngx.var.host..ngx.var.uri..hlp.uri_args_string(), noauth)
-            or  hlp.string.starts(ngx.var.uri..hlp.uri_args_string(), noauth))
-            then
-                logger.debug("Noauth "..ngx.var.uri)
-                return hlp.pass()
-            end
-        end
+      logger.debug("Noauth "..ngx.var.uri)
+      return hlp.pass()
     end
-
-end
-
-
---
--- 5. Protected URLs
---
--- If the URL matches one of the `protected_urls` in the configuration file,
--- we have to protect it even if the URL is also set in the `unprotected_urls`.
--- It could be useful if you want to unprotect every URL except a few
--- particular ones.
---
-
-function is_protected()
-    if not conf["protected_urls"] then
-        conf["protected_urls"] = {}
-    end
-    if not conf["protected_regex"] then
-        conf["protected_regex"] = {}
-    end
-
-    for _, url in ipairs(conf["protected_urls"]) do
-        if hlp.string.starts(ngx.var.host..ngx.var.uri..hlp.uri_args_string(), url)
-        or hlp.string.starts(ngx.var.uri..hlp.uri_args_string(), url) then
-            logger.debug(ngx.var.uri.." is in protected_urls")
-            return true
-        end
-    end
-    for _, regex in ipairs(conf["protected_regex"]) do
-        if hlp.match(ngx.var.host..ngx.var.uri..hlp.uri_args_string(), regex)
-        or hlp.match(ngx.var.uri..hlp.uri_args_string(), regex) then
-            logger.debug(ngx.var.uri.." is in protected_regex")
-            return true
-        end
-    end
-
-    logger.debug(ngx.var.uri.." is not in protected_urls/regex")
-    return false
 end
 
 --
--- 6. Specific files (used in YunoHost)
+-- 5. Specific files (used in YunoHost)
 --
 -- We want to serve specific portal assets right at the root of the domain.
 --
@@ -357,7 +310,9 @@ function serveThemeFile(filename)
   serveAsset("/ynhtheme/"..filename, "themes/"..conf.theme.."/"..filename)
 end
 
-if hlp.is_logged_in() then
+function serveYnhpanel()
+    logger.debug("Serving ynhpanel")
+
     -- serve ynhpanel files
     serveAsset("/ynh_portal.js", "js/ynh_portal.js")
     serveAsset("/ynh_overlay.css", "css/ynh_overlay.css")
@@ -366,6 +321,33 @@ if hlp.is_logged_in() then
     -- but I didn't succeed to figure out where is the current location of the script
     -- if you call it from "portal/assets/themes/" the ls fails
     scandir("/usr/share/ssowat/portal/assets/themes/"..conf.theme, serveThemeFile)
+end
+
+--
+-- 6. Unprotected URLs
+--
+-- If the URL matches one of the `unprotected_urls` in the configuration file,
+-- it means that the URL should not be protected by the SSO *but* headers have
+-- to be sent if the user is already authenticated.
+--
+-- It means that you can let anyone access to an app, but if a user has already
+-- been authenticated on the portal, he can have his authentication headers
+-- passed to the app.
+--
+
+if longest_unprotected_match ~= ""
+and string.len(longest_unprotected_match) > string.len(longest_protected_match) then
+    if hlp.is_logged_in() then
+        serveYnhpanel()
+
+        hlp.set_headers()
+    end
+    logger.debug(ngx.var.uri.." is in unprotected_urls")
+    return hlp.pass()
+end
+
+if hlp.is_logged_in() then
+    serveYnhpanel()
 
     -- If user has no access to this URL, redirect him to the portal
     if not hlp.has_access() then
@@ -379,51 +361,8 @@ if hlp.is_logged_in() then
 end
 
 
-
 --
--- 7. Unprotected URLs
---
--- If the URL matches one of the `unprotected_urls` in the configuration file,
--- it means that the URL should not be protected by the SSO *but* headers have
--- to be sent if the user is already authenticated.
---
--- It means that you can let anyone access to an app, but if a user has already
--- been authenticated on the portal, he can have his authentication headers
--- passed to the app.
---
-
-if conf["unprotected_urls"] then
-    for _, url in ipairs(conf["unprotected_urls"]) do
-        if (hlp.string.starts(ngx.var.host..ngx.var.uri..hlp.uri_args_string(), url)
-        or  hlp.string.starts(ngx.var.uri..hlp.uri_args_string(), url))
-        and not is_protected() then
-            if hlp.is_logged_in() then
-                hlp.set_headers()
-            end
-            logger.debug(ngx.var.uri.." is in unprotected_urls")
-            return hlp.pass()
-        end
-    end
-end
-
-if conf["unprotected_regex"] then
-    for _, regex in ipairs(conf["unprotected_regex"]) do
-        if (hlp.match(ngx.var.host..ngx.var.uri..hlp.uri_args_string(), regex)
-        or  hlp.match(ngx.var.uri..hlp.uri_args_string(), regex))
-        and not is_protected() then
-            if hlp.is_logged_in() then
-                hlp.set_headers()
-            end
-            logger.debug(ngx.var.uri.." is in unprotected_regex")
-            return hlp.pass()
-        end
-    end
-end
-
-
-
---
--- 8. Basic HTTP Authentication
+-- 7. Basic HTTP Authentication
 --
 -- If the `Authorization` header is set before reaching the SSO, we want to
 -- match user and password against the user database.
@@ -459,7 +398,7 @@ end
 
 
 --
--- 9. Redirect to login
+-- 8. Redirect to login
 --
 -- If no previous rule has matched, just redirect to the portal login.
 -- The default is to protect every URL by default.
@@ -475,6 +414,6 @@ end
 -- when trying to access http://main.domain.tld/ (SSOwat finds that user aint
 -- logged in, therefore redirects to SSO, which redirects to the back_url, which
 -- redirect to SSO, ..)
-logger.debug("No rule found for this url. By default, redirecting to portal")
+logger.debug("No rule found for "..ngx.var.uri..". By default, redirecting to portal")
 local back_url = "https://" .. ngx.var.host .. ngx.var.uri .. hlp.uri_args_string()
 return hlp.redirect(conf.portal_url.."?r="..ngx.encode_base64(back_url))
