@@ -275,7 +275,7 @@ end
 if longest_noauth_match ~= ""
 and string.len(longest_noauth_match) >= string.len(longest_protected_match) 
 and string.len(longest_noauth_match) > string.len(longest_unprotected_match) then
-    if hlp.is_logged_in() then
+    if hlp.is_logged_in() and hlp.has_access() then
       logger.debug("Noauth "..ngx.var.uri)
       return hlp.pass()
     end
