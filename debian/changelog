@@ -1,4 +1,10 @@
-ssowat (3.7.0.2) stretch-testing; urgency=low
+ssowat (3.7.0.3) stable; urgency=low
+
+  Bumping version number for stable release
+
+ -- Kay0u <pierre@kayou.io>  Thu, 26 Mar 2020 22:00:21 +0000
+
+ssowat (3.7.0.2) testing; urgency=low
 
   - [fix] Match undefined function (SSOwat#151)
   - [fix] Cohabitation between the old and the new permission system (SSOwat#156)
