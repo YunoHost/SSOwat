@@ -318,7 +318,7 @@ end
 
 if longest_unprotected_match ~= ""
 and string.len(longest_unprotected_match) > string.len(longest_protected_match) then
-    if hlp.is_logged_in() then
+    if hlp.is_logged_in() and hlp.has_access() then
         serveYnhpanel()
 
         hlp.set_headers()
