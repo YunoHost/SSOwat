@@ -11,14 +11,16 @@ function get_config()
     -- Load the configuration file
     local conf_file = assert(io.open(conf_path, "r"), "Configuration file is missing")
     local conf = json.decode(conf_file:read("*all"))
-
+    conf_file:close()
 
     -- Load additional rules from the `.persistent` configuration file.
     -- The `.persistent` file contains rules that will overwrite previous rules.
     -- It typically enables you to set custom rules.
     local persistent_conf_file = io.open(conf_path..".persistent", "r")
     if persistent_conf_file ~= nil then
-        for k, v in pairs(json.decode(persistent_conf_file:read("*all"))) do
+        perm_conf = json.decode(persistent_conf_file:read("*all"))
+        persistent_conf_file:close()
+        for k, v in pairs(perm_conf) do
 
            -- If the configuration key already exists and is a table, merge it
            if conf[k] and type(v) == "table" then
