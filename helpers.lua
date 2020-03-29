@@ -17,6 +17,13 @@ local url_parser = require "socket.url"
 -- Import Perl regular expressions library
 local rex = require "rex_pcre"
 
+function refresh_config()
+    conf = config.get_config()
+end
+
+function get_config()
+    return conf
+end
 
 -- The 'match' function uses PCRE regex as default
 -- If '%.' is found in the regex, we assume it's a LUA regex (legacy code)
@@ -183,8 +190,6 @@ end
 
 -- Expires the 3 session cookies
 function delete_cookie()
-    conf = config.get_config()
-
     local expired_time = "Thu, 01 Jan 1970 00:00:00 UTC"
     for _, domain in ipairs(conf["domains"]) do
         local cookie_str = "; Domain=."..domain..
@@ -372,8 +377,6 @@ end
 -- address.
 -- Reminder: conf["ldap_identifier"] is "uid" by default
 function authenticate(user, password)
-    conf = config.get_config()
-
     -- Try to find the username from an email address by openning an anonymous
     -- LDAP connection and check if the email address exists
     if conf["allow_mail_authentication"] and string.find(user, "@") then
@@ -635,7 +638,6 @@ end
 -- title, the flash notifications' content and the translated strings.
 function get_data_for(view)
     local user = authUser
-    conf = config.get_config()
 
     -- For the login page we only need the page title
     if view == "login.html" then
@@ -711,7 +713,6 @@ end
 -- if it's not the case, it migrates the password to this new hash algorithm
 function ensure_user_password_uses_strong_hash(ldap, user, password)
     local current_hashed_password = nil
-    conf = config.get_config()
 
     for dn, attrs in ldap:search {
         base = conf['ldap_group'],
@@ -761,8 +762,6 @@ end
 -- It has to update cached information and edit the LDAP user entry
 -- according to the changes detected.
 function edit_user()
-    conf = config.get_config()
-
     -- We need these calls since we are in a POST request
     ngx.req.read_body()
     local args = ngx.req.get_post_args()
