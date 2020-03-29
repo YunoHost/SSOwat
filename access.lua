@@ -16,11 +16,12 @@ if not srvkey then
     cache:add("srvkey", srvkey)
 end
 
--- Initialize and get configuration
-local conf = config.get_config()
-
 -- Import helpers
 local hlp = require "helpers"
+
+-- Initialize and get configuration
+hlp.refresh_config()
+local conf = hlp.get_config()
 
 -- Load logging module
 local logger = require("log")
@@ -107,7 +108,6 @@ then
             end
 
             -- Get managed domains
-            conf = config.get_config()
             local managed_domain = false
             for _, domain in ipairs(conf["domains"]) do
                 local escaped_domain = domain:gsub("-", "%%-") -- escape dash for pattern matching
