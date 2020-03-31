@@ -29,8 +29,7 @@ local logger = require("log")
 -- Just a note for the client to know that he passed through the SSO
 ngx.header["X-SSO-WAT"] = "You've just been SSOed"
 
-
-local is_logged_in = hlp.is_logged_in()
+local is_logged_in = hlp.refresh_logged_in()
 
 --
 -- 1. LOGIN
@@ -282,66 +281,27 @@ function serveYnhpanel()
     scandir("/usr/share/ssowat/portal/assets/themes/"..conf.theme, serveThemeFile)
 end
 
--- local longest_protected_match = hlp.longest_url_path(hlp.get_matches("protected")) or ""
--- local longest_skipped_match = hlp.longest_url_path(hlp.get_matches("skipped")) or ""
--- local longest_unprotected_match = hlp.longest_url_path(hlp.get_matches("unprotected")) or ""
--- 
--- logger.debug("longest skipped "..longest_skipped_match)
--- logger.debug("longest unprotected "..longest_unprotected_match)
--- logger.debug("longest protected "..longest_protected_match)
--- 
--- --
--- -- 4. Skipped URLs
--- --
--- -- If the URL matches one of the `skipped_urls` in the configuration file,
--- -- it means that the URL should not be protected by the SSO and no header
--- -- has to be sent, even if the user is already authenticated.
--- --
--- 
--- if longest_skipped_match ~= ""
--- and string.len(longest_skipped_match) >= string.len(longest_protected_match) 
--- and string.len(longest_skipped_match) > string.len(longest_unprotected_match) then
---     logger.debug("Skipping "..ngx.var.uri)
---     return hlp.pass()
--- end
--- 
--- --
--- -- 6. Unprotected URLs
--- --
--- -- If the URL matches one of the `unprotected_urls` in the configuration file,
--- -- it means that the URL should not be protected by the SSO *but* headers have
--- -- to be sent if the user is already authenticated.
--- --
--- -- It means that you can let anyone access to an app, but if a user has already
--- -- been authenticated on the portal, he can have his authentication headers
--- -- passed to the app.
--- --
--- 
--- if longest_unprotected_match ~= ""
--- and string.len(longest_unprotected_match) > string.len(longest_protected_match) then
---     if is_logged_in then
---         serveYnhpanel()
--- 
---         hlp.set_headers()
---     end
---     logger.debug(ngx.var.uri.." is in unprotected_urls")
---     return hlp.pass()
--- end
--- 
--- if is_logged_in then
---     serveYnhpanel()
--- 
---     -- If user has no access to this URL, redirect him to the portal
---     if not hlp.has_access() then
---         return hlp.redirect(conf.portal_url)
---     end
--- 
---     -- If the user is authenticated and has access to the URL, set the headers
---     -- and let it be
---     hlp.set_headers()
---     return hlp.pass()
--- end
+local permission = hlp.get_best_permission()
 
+if permission then
+    if is_logged_in then
+        serveYnhpanel()
+
+        -- If the user is authenticated and has access to the URL, set the headers
+        -- and let it be
+        if permission["auth_header"] then
+            logger.debug("Set Headers")
+            hlp.set_headers()
+        end
+    end
+
+    -- If user has no access to this URL, redirect him to the portal
+    if not hlp.has_access(permission) then
+        return hlp.redirect(conf.portal_url)
+    end
+
+    return hlp.pass()
+end
 
 --
 -- 7. Basic HTTP Authentication
@@ -364,11 +324,14 @@ if auth_header then
         logger.debug("User got authenticated through basic auth")
 
         -- If user has no access to this URL, redirect him to the portal
-        if not hlp.has_access(user) then
+        if not permission or not hlp.has_access(permission, user) then
            return hlp.redirect(conf.portal_url)
         end
 
-        hlp.set_headers(user)
+        if permission["auth_header"] then
+            logger.debug("Set Headers")
+            hlp.set_headers(user)
+        end
         return hlp.pass()
     end
 end
