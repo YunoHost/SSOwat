@@ -229,6 +229,8 @@ function is_logged_in()
     local user = ngx.var.cookie_SSOwAuthUser
     local authHash = ngx.var.cookie_SSOwAuthHash
 
+    authUser = nil
+    
     if expireTime and expireTime ~= ""
     and authHash and authHash ~= ""
     and user and user ~= ""
@@ -682,14 +684,20 @@ function get_data_for(view)
 
         -- Add user's accessible URLs using the ACLs.
         -- It is typically used to build the app list.
-        for url, name in pairs(conf["users"][user]) do
+        for permission_name, permission in pairs(conf["permissions"]) do
+            -- We want to display a tile, and uris is not empty
+            if permission['show_tile'] and next(permission['uris']) ~= nil then
+                url = permission['uris'][1]
+                name = permission['label']
 
-            if ngx.var.host == conf["local_portal_domain"] then
-                url = string.gsub(url, conf["original_portal_domain"], conf["local_portal_domain"])
+                if ngx.var.host == conf["local_portal_domain"] then
+                    url = string.gsub(url, conf["original_portal_domain"], conf["local_portal_domain"])
+                end
+
+                table.insert(sorted_apps, name)
+                table.sort(sorted_apps)
+                table.insert(data["app"], index_of(sorted_apps, name), { url = url, name = name })
             end
-            table.insert(sorted_apps, name)
-            table.sort(sorted_apps)
-            table.insert(data["app"], index_of(sorted_apps, name), { url = url, name = name })
         end
     end
 
