@@ -320,8 +320,9 @@ if longest_unprotected_match ~= ""
 and string.len(longest_unprotected_match) > string.len(longest_protected_match) then
     if hlp.is_logged_in() then
         serveYnhpanel()
-
-        hlp.set_headers()
+        if hlp.has_access() then
+            hlp.set_headers()
+        end
     end
     logger.debug(ngx.var.uri.." is in unprotected_urls")
     return hlp.pass()
