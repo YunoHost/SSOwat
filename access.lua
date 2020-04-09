@@ -289,7 +289,7 @@ if permission then
 
         -- If the user is authenticated and has access to the URL, set the headers
         -- and let it be
-        if permission["auth_header"] then
+        if permission["auth_header"] and hlp.has_access(permission) then
             logger.debug("Set Headers")
             hlp.set_headers()
         end
