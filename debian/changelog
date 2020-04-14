@@ -6,6 +6,12 @@ ssowat (3.8.0) testing; urgency=low
 
  -- Kay0u <pierre@kayou.io>  Thu, 09 Apr 2020 20:24:15 +0000
 
+ssowat (3.7.1.1) stable; urgency=low
+
+  - [fix] Fix an error 500 when accessing SSO through http
+
+ -- Alexandre Aubin <alex.aubin@mailoo.org>  Wed, 15 Apr 2020 01:45:00  +0000
+
 ssowat (3.7.1) stable; urgency=low
 
   - [fix] Don't set auth headers if user don't have access (#158)
