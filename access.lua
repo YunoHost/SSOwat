@@ -74,7 +74,6 @@ then
 
         -- Force portal scheme
         if ngx.var.scheme ~= conf["portal_scheme"] then
-            logger.debug("Redirecting to "..conf.portal_url.."Cross-domain authentication: "..user.." connected on "..ngx.var.host)
             return hlp.redirect(conf.portal_url)
         end
 
@@ -243,9 +242,9 @@ local longest_protected_match = hlp.longest_url_path(hlp.get_matches("protected"
 local longest_skipped_match = hlp.longest_url_path(hlp.get_matches("skipped")) or ""
 local longest_unprotected_match = hlp.longest_url_path(hlp.get_matches("unprotected")) or ""
 
-logger.debug("longest skipped "..longest_skipped_match)
-logger.debug("longest unprotected "..longest_unprotected_match)
-logger.debug("longest protected "..longest_protected_match)
+logger.debug("Longest skipped     : "..longest_skipped_match)
+logger.debug("Longest unprotected : "..longest_unprotected_match)
+logger.debug("Longest protected   : "..longest_protected_match)
 
 --
 -- 4. Skipped URLs
