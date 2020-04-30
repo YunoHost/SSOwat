@@ -215,7 +215,7 @@ function delete_redirect_cookie()
                        "; Secure"..
                        "; HttpOnly"..
                        "; SameSite=Lax"
-    ngx.header["Set-Cookie"] = "SSOwAuthRedirect=;" ..cookie_str
+    ngx.header["Set-Cookie"] = "SSOwAuthRedirect=" ..cookie_str
 end
 
 
