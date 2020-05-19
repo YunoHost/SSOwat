@@ -20,7 +20,7 @@
     "login": "Inloggen",
     "logout": "Uitloggen",
     "mail_addresses": "E-mailadressen",
-    "mail_already_used": "Emailadres al gebruikt:",
+    "mail_already_used": "E-mailadres al in gebruik",
     "mail_forward": "E-mail doorstuuradres",
     "missing_required_fields": "Verplichte velden zijn niet ingevuld",
     "new_forward": "nieuwe_forward@mijndomein.org",
@@ -40,5 +40,10 @@
     "wrong_username_password": "Verkeerde gebruikersnaam of wachtwoord",
     "password_too_simple_2": "Het wachtwoord moet minimaal 8 tekens lang zijn en cijfers, hoofdletters en kleine letters bevatten",
     "password_too_simple_1": "Het wachtwoord moet minimaal 8 tekens lang zijn",
-    "password_listed": "Dit wachtwoord is een van de meest gebruikte wachtwoorden ter wereld. Kies alstublieft iets uniekers."
+    "password_listed": "Dit wachtwoord is een van de meest gebruikte wachtwoorden ter wereld. Kies alstublieft iets uniekers.",
+    "redirection_error_unmanaged_domain": "Omleidingsfout: onbeheerd domein",
+    "redirection_error_invalid_url": "Omleidingsfout: ongeldige URL",
+    "good_practices_about_user_password": "Kies een gebruikerswachtwoord van minimaal 8 tekens - hoewel het een goede gewoonte is om langere (dat wil zeggen een wachtwoordzin) te gebruiken en / of verschillende soorten tekens te gebruiken (hoofdletters, kleine letters, cijfers en speciale tekens).",
+    "password_too_simple_4": "Het wachtwoord moet minimaal 12 tekens lang zijn en cijfers, bovenste, onderste en speciale tekens bevatten",
+    "password_too_simple_3": "Het wachtwoord moet minimaal 8 tekens lang zijn en cijfers, bovenste, onderste en speciale tekens bevatten"
 }

@@ -20,7 +20,7 @@
     "login": "Iniciar sesión",
     "logout": "Cerrar sesión",
     "mail_addresses": "Direcciones de correo electrónico",
-    "mail_already_used": "Dirección de correo electrónico ya está en uso:",
+    "mail_already_used": "Dirección de correo electrónico ya está en uso",
     "mail_forward": "Reenviar correo electrónico",
     "missing_required_fields": "Faltan campos obligatorios",
     "new_forward": "nuevoreenvio@midominioexterior.org",
