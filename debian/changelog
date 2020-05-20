@@ -1,3 +1,11 @@
+ssowat (3.8.0.1) stable; urgency=low
+
+  - [i18n] Improved translations for Chinese (Simplified), Dutch, Greek, Nepali, Polish, Spanish
+
+  Thanks to all contributors (amirale qt) <3 !
+
+ -- Kay0u <pierre@kayou.io>  Wed, 20 May 2020 19:04:19 +0000
+
 ssowat (3.8.0) testing; urgency=low
 
   - Avoid unnecessarily reloading the config file (#159)
