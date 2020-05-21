@@ -244,13 +244,14 @@ function refresh_logged_in()
             if session_key and session_key ~= "" then
                 -- Check cache
                 if cache:get(user.."-password") then
-                    authUser = user
                     local hash = hmac_sha512(srvkey,
-                            authUser..
+                            user..
                             "|"..expireTime..
                             "|"..session_key)
                     if hash ~= authHash then
                         logger.info("Hash "..authHash.." rejected for "..user.."@"..ngx.var.remote_addr)
+                    else
+                        authUser = user
                     end
                     is_logged_in = hash == authHash
                     return is_logged_in
