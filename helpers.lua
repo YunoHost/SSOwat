@@ -310,11 +310,12 @@ function has_access(permission, user)
 
     -- Public access
     if user == nil or permission["public"] then
-        logger.debug("A visitor try to access "..ngx.var.uri)
+        user = user or "A visitor"
+        logger.debug(user.." tries to access "..ngx.var.uri)
         return permission["public"]
     end
 
-    logger.debug("User "..user.." try to access "..ngx.var.uri)
+    logger.debug("User "..user.." tries to access "..ngx.var.uri)
 
     -- All user in this permission
     allowed_users = permission["users"]
