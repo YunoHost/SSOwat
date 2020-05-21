@@ -82,7 +82,7 @@ function get_config()
 
 
     -- Always skip the portal to avoid redirection looping.
-    table.insert(conf["skipped_urls"], conf["portal_domain"]..conf["portal_path"])
+    table.insert(conf["permissions"]["core_skipped"]["uris"], conf["portal_domain"]..conf["portal_path"])
 
 
     -- Set the prefered language from the `Accept-Language` header
