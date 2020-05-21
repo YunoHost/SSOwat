@@ -1,10 +1,32 @@
+ssowat (3.8.0.1) stable; urgency=low
+
+  - [i18n] Improved translations for Chinese (Simplified), Dutch, Greek, Nepali, Polish, Spanish
+
+  Thanks to all contributors (amirale qt) <3 !
+
+ -- Kay0u <pierre@kayou.io>  Wed, 20 May 2020 19:04:19 +0000
+
+ssowat (3.8.0) testing; urgency=low
+
+  - Avoid unnecessarily reloading the config file (#159)
+
+  Thanks to all contributors <3 ! (Kay0u)
+
+ -- Kay0u <pierre@kayou.io>  Thu, 09 Apr 2020 20:24:15 +0000
+
+ssowat (3.7.1.1) stable; urgency=low
+
+  - [fix] Fix an error 500 when accessing SSO through http
+
+ -- Alexandre Aubin <alex.aubin@mailoo.org>  Wed, 15 Apr 2020 01:45:00  +0000
+
 ssowat (3.7.1) stable; urgency=low
 
   - [fix] Don't set auth headers if user don't have access (#158)
 
   Thanks to all contributors <3 ! (Josue)
 
- -- Alexandre Aubin <alex.aubin@mailoo.org>  Thu, 9 April 2020 15:23:00  +0000
+ -- Alexandre Aubin <alex.aubin@mailoo.org>  Thu, 9 Apr 2020 15:23:00  +0000
 
 ssowat (3.7.0.3) stable; urgency=low
 

@@ -76,7 +76,6 @@ then
 
         -- Force portal scheme
         if ngx.var.scheme ~= conf["portal_scheme"] then
-            logger.debug("Redirecting to "..conf.portal_url.."Cross-domain authentication: "..user.." connected on "..ngx.var.host)
             return hlp.redirect(conf.portal_url)
         end
 
