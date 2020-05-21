@@ -239,7 +239,40 @@ if conf["redirected_regex"] then
 end
 
 --
--- 4. Specific files (used in YunoHost)
+-- 4. Basic HTTP Authentication
+--
+-- If the `Authorization` header is set before reaching the SSO, we want to
+-- match user and password against the user database.
+--
+-- It allows you to bypass the cookie-based procedure with a per-request
+-- authentication. Very usefull when you are trying to reach a specific URL
+-- via cURL for example.
+--
+
+local auth_header = ngx.req.get_headers()["Authorization"]
+
+if auth_header then
+    _, _, b64_cred = string.find(auth_header, "^Basic%s+(.+)$")
+    _, _, user, password = string.find(ngx.decode_base64(b64_cred), "^(.+):(.+)$")
+    user = hlp.authenticate(user, password)
+    if user then
+        logger.debug("User got authenticated through basic auth")
+
+        -- If user has no access to this URL, redirect him to the portal
+        if not permission or not hlp.has_access(permission, user) then
+           return hlp.redirect(conf.portal_url)
+        end
+
+        if permission["auth_header"] then
+            logger.debug("Set Headers")
+            hlp.set_headers(user)
+        end
+        return hlp.pass()
+    end
+end
+
+--
+-- 5. Specific files (used in YunoHost)
 --
 -- We want to serve specific portal assets right at the root of the domain.
 --
@@ -303,41 +336,7 @@ if permission then
 end
 
 --
--- 7. Basic HTTP Authentication
---
--- If the `Authorization` header is set before reaching the SSO, we want to
--- match user and password against the user database.
---
--- It allows you to bypass the cookie-based procedure with a per-request
--- authentication. Very usefull when you are trying to reach a specific URL
--- via cURL for example.
---
-
-local auth_header = ngx.req.get_headers()["Authorization"]
-
-if auth_header then
-    _, _, b64_cred = string.find(auth_header, "^Basic%s+(.+)$")
-    _, _, user, password = string.find(ngx.decode_base64(b64_cred), "^(.+):(.+)$")
-    user = hlp.authenticate(user, password)
-    if user then
-        logger.debug("User got authenticated through basic auth")
-
-        -- If user has no access to this URL, redirect him to the portal
-        if not permission or not hlp.has_access(permission, user) then
-           return hlp.redirect(conf.portal_url)
-        end
-
-        if permission["auth_header"] then
-            logger.debug("Set Headers")
-            hlp.set_headers(user)
-        end
-        return hlp.pass()
-    end
-end
-
-
---
--- 8. Redirect to login
+-- 6. Redirect to login
 --
 -- If no previous rule has matched, just redirect to the portal login.
 -- The default is to protect every URL by default.
