@@ -1,14 +1,14 @@
 Source: ssowat
 Section: net
 Priority: extra
-Maintainer: Adrien Beudin <beudbeud@yunohost.org>
+Maintainer: YunoHost Contributors <contrib@yunohost.org>
 Build-Depends: debhelper (>=8.0.0)
 Standards-Version: 3.9.1
 
 Package: ssowat
 Architecture: all
 Depends: nginx-extras (>=1.6.2), lua-ldap, lua-json, lua-rex-pcre, whois
-Homepage: http://www.yunohost.org
-Description: SSOWAT
- Websso for yunohost 
-
+Homepage: https://yunohost.org
+Description: user portal with single sign-on designed for Yunohost
+ A minimalist user portal with single sign-on, designed to be
+ interfaced with Yunohost.
