@@ -1,3 +1,9 @@
+ssowat (4.0.1~alpha) testing; urgency=low
+
+  - Bump version number for buster release
+
+ -- Alexandre Aubin <alex.aubin@mailoo.org>  Fri, 05 Jun 2020 17:26:35 +0200
+
 ssowat (3.8.0.1) stable; urgency=low
 
   - [i18n] Improved translations for Chinese (Simplified), Dutch, Greek, Nepali, Polish, Spanish
