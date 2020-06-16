@@ -297,10 +297,7 @@ function serveYnhpanel()
     serveAsset("/ynh_portal.js", "js/ynh_portal.js")
     serveAsset("/ynh_overlay.css", "css/ynh_overlay.css")
     -- serve theme's files
-    -- FIXME? I think it would be better here not to use an absolute path
-    -- but I didn't succeed to figure out where is the current location of the script
-    -- if you call it from "portal/assets/themes/" the ls fails
-    scandir("/usr/share/ssowat/portal/assets/themes/"..conf.theme, serveThemeFile)
+    scandir("themes/"..conf.theme, serveThemeFile)
 end
 
 --
