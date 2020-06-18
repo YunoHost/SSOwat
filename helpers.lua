@@ -248,12 +248,12 @@ function refresh_logged_in()
                             user..
                             "|"..expireTime..
                             "|"..session_key)
-                    if hash ~= authHash then
+                    is_logged_in = hash == authHash
+                    if not is_logged_in then
                         logger.info("Hash "..authHash.." rejected for "..user.."@"..ngx.var.remote_addr)
                     else
                         authUser = user
                     end
-                    is_logged_in = hash == authHash
                     return is_logged_in
                 end
             end
