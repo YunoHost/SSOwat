@@ -1,3 +1,13 @@
+ssowat (3.8.0.2) stable; urgency=low
+
+  - [mod] Update author/maintainer information (6a14e78)
+  - [enh] README reworked (#165) (70c81c6)
+  - [fix] theme loading (#167, #168)
+
+  Thanks to all contributors <3 ! (Allan Nordhøy, Kay0u)
+
+ -- Alexandre Aubin <alex.aubin@mailoo.org>  Thu, 18 Jun 2020 16:10:00 +0200
+
 ssowat (3.8.0.1) stable; urgency=low
 
   - [i18n] Improved translations for Chinese (Simplified), Dutch, Greek, Nepali, Polish, Spanish
