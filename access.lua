@@ -272,7 +272,7 @@ end
 
 function scandir(directory, callback)
     -- use find (and not ls) to list only files recursively and with their full path relative to the asked directory
-    local pfile = io.popen('find "'..directory..'" -type f')
+    local pfile = io.popen('find "'..directory..'" -type f -printf \"%f\n\"')
     for filename in pfile:lines() do
         callback(filename)
     end
