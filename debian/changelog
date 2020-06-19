@@ -1,3 +1,9 @@
+ssowat (4.0.2~beta) testing; urgency=low
+
+  - Rebase on stretch-unstable and bump vrsion number for beta
+
+ -- Alexandre Aubin <alex.aubin@mailoo.org>  Fri, 19 Jun 2020 15:29:05 +0200
+
 ssowat (4.0.1~alpha) testing; urgency=low
 
   - Bump version number for buster release
