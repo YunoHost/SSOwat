@@ -1,3 +1,13 @@
+ssowat (3.8.0.3) stable; urgency=low
+
+  - [enh] Allow the user's password manager to automatically enter the password/username/new-password (1dae6e8)
+  - [fix] Closing the files when we're done reading them ([#160](https://github.com/YunoHost/SSOwat/pull/160))
+  - [fix] Clear cookies more properly ([#163](https://github.com/YunoHost/SSOwat/pull/163))
+
+  Thanks to all contributors <3 ! (Bram, E. Counasse, Kay0u, SilverViper)
+
+ -- Alexandre Aubin <alex.aubin@mailoo.org>  Mon, 27 Jul 2020 17:50:44 +0200
+
 ssowat (3.8.0.2) stable; urgency=low
 
   - [mod] Update author/maintainer information (6a14e78)
