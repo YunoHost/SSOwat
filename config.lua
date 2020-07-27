@@ -11,7 +11,9 @@ function get_config()
     -- Load the configuration file
     local conf_file = assert(io.open(conf_path, "r"), "Configuration file is missing")
     local conf = json.decode(conf_file:read("*all"))
-    conf_file:close()
+    if conf_file ~= nil then
+        conf_file:close()
+    end
 
     -- Load additional rules from the `.persistent` configuration file.
     -- The `.persistent` file contains rules that will overwrite previous rules.
