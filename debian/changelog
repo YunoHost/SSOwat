@@ -1,3 +1,41 @@
+ssowat (4.0.3) stable; urgency=low
+
+  - Bump version number for stable release
+
+ -- Alexandre Aubin <alex.aubin@mailoo.org>  Wed, 29 Jul 2020 17:00:00 +0200
+
+ssowat (4.0.2~beta) testing; urgency=low
+
+  - Rebase on stretch-unstable and bump vrsion number for beta
+
+ -- Alexandre Aubin <alex.aubin@mailoo.org>  Fri, 19 Jun 2020 15:29:05 +0200
+
+ssowat (4.0.1~alpha) testing; urgency=low
+
+  - Bump version number for buster release
+
+ -- Alexandre Aubin <alex.aubin@mailoo.org>  Fri, 05 Jun 2020 17:26:35 +0200
+
+ssowat (3.8.0.3) stable; urgency=low
+
+  - [enh] Allow the user's password manager to automatically enter the password/username/new-password (1dae6e8)
+  - [fix] Closing the files when we're done reading them ([#160](https://github.com/YunoHost/SSOwat/pull/160))
+  - [fix] Clear cookies more properly ([#163](https://github.com/YunoHost/SSOwat/pull/163))
+
+  Thanks to all contributors <3 ! (Bram, E. Counasse, Kay0u, SilverViper)
+
+ -- Alexandre Aubin <alex.aubin@mailoo.org>  Mon, 27 Jul 2020 17:50:44 +0200
+
+ssowat (3.8.0.2) stable; urgency=low
+
+  - [mod] Update author/maintainer information (6a14e78)
+  - [enh] README reworked (#165) (70c81c6)
+  - [fix] theme loading (#167, #168)
+
+  Thanks to all contributors <3 ! (Allan Nordhøy, Kay0u)
+
+ -- Alexandre Aubin <alex.aubin@mailoo.org>  Thu, 18 Jun 2020 16:10:00 +0200
+
 ssowat (3.8.0.1) stable; urgency=low
 
   - [i18n] Improved translations for Chinese (Simplified), Dutch, Greek, Nepali, Polish, Spanish

@@ -179,7 +179,7 @@ function set_auth_cookie(user, domain)
                        "; Expires="..os.date("%a, %d %b %Y %X UTC", expire)..
                        "; Secure"..
                        "; HttpOnly"..
-                       "; SameSite=Lax ;;"
+                       "; SameSite=Lax"
 
     ngx.header["Set-Cookie"] = {
         "SSOwAuthUser="..user..cookie_str,
@@ -199,7 +199,7 @@ function delete_cookie()
                            "; Expires="..expired_time..
                            "; Secure"..
                            "; HttpOnly"..
-                           "; SameSite=Lax ;;"
+                           "; SameSite=Lax"
         ngx.header["Set-Cookie"] = {
             "SSOwAuthUser="..cookie_str,
             "SSOwAuthHash="..cookie_str,
@@ -216,8 +216,8 @@ function delete_redirect_cookie()
                        "; Expires="..expired_time..
                        "; Secure"..
                        "; HttpOnly"..
-                       "; SameSite=Lax ;;"
-    ngx.header["Set-Cookie"] = "SSOwAuthRedirect=;" ..cookie_str
+                       "; SameSite=Lax"
+    ngx.header["Set-Cookie"] = "SSOwAuthRedirect=" ..cookie_str
 end
 
 
