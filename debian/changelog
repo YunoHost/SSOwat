@@ -1,3 +1,11 @@
+ssowat (4.0.4) stable; urgency=low
+
+  - Reload the conf only if files has been modified (#170)
+
+  Thanks to all contributors <3 ! (Kay0u)
+
+ -- Alexandre Aubin <alex.aubin@mailoo.org>  Fri, 04 Sep 2020 14:43:34 +0200
+
 ssowat (4.0.3) stable; urgency=low
 
   - Bump version number for stable release
