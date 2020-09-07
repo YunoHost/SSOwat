@@ -1,3 +1,11 @@
+ssowat (4.0.4.1) stable; urgency=low
+
+  - Fix a refression from last release, language not properly updated in conf
+
+  Thanks to all contributors <3 ! (Kay0u, ljf)
+
+ -- Alexandre Aubin <alex.aubin@mailoo.org> Mon, 07 Sep 2020 18:58:21 +0200
+
 ssowat (4.0.4) stable; urgency=low
 
   - Reload the conf only if files has been modified (#170)
