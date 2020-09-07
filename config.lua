@@ -20,6 +20,15 @@ function compare_attributes(file_attributes1, file_attributes2)
     return file_attributes1["modification"] == file_attributes2["modification"] and file_attributes1["size"] == file_attributes2["size"]
 end
 
+function update_language()
+    -- Set the prefered language from the `Accept-Language` header
+    conf.lang = ngx.req.get_headers()["Accept-Language"]
+
+    if conf.lang then
+        conf.lang = string.sub(conf.lang, 1, 2)
+    end
+end
+
 function get_config()
 
     -- Get config files attributes (timestamp modification and size)
@@ -27,9 +36,11 @@ function get_config()
     local new_config_persistent_attributes = lfs.attributes(conf_path..".persistent", {"modification", "size"})
 
     if compare_attributes(new_config_attributes, config_attributes) and compare_attributes(new_config_persistent_attributes, config_persistent_attributes) then
+        update_language()
         return conf
     -- If the file is being written, its size may be 0 and reloading fails, return the last valid config
     elseif new_config_attributes == nil or new_config_attributes["size"] == 0 then
+        update_language()
         return conf
     end
 
@@ -114,13 +125,7 @@ function get_config()
     -- Always skip the portal to avoid redirection looping.
     table.insert(conf["skipped_urls"], conf["portal_domain"]..conf["portal_path"])
 
-
-    -- Set the prefered language from the `Accept-Language` header
-    conf.lang = ngx.req.get_headers()["Accept-Language"]
-
-    if conf.lang then
-        conf.lang = string.sub(conf.lang, 1, 2)
-    end
+    update_language()
 
     return conf
 end
