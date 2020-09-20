@@ -308,52 +308,40 @@ end
 
 --
 --
+-- 5. APPLY PERMISSION
 --
 --
 
+-- 1st case : client has access
 
+if hlp.has_access(permission) then
 
-if permission then
     if is_logged_in then
-        serveYnhpanel()
+        -- If the user is logged in, we set some additional headers
+        hlp.set_headers()
 
-        -- If the user is authenticated and has access to the URL, set the headers
-        -- and let it be
-        if permission["auth_header"] and hlp.has_access(permission) then
-            logger.debug("Set Headers")
-            hlp.set_headers()
+        -- If Basic Authorization header are disabled for this permission,
+        -- remove them from the response
+        if not permission["auth_header"] then
+            ngx.req.clear_header("Authorization")
         end
     end
 
-    -- If user has no access to this URL, redirect him to the portal
-    if not hlp.has_access(permission) then
-        return hlp.redirect(conf.portal_url)
-    end
-
     return hlp.pass()
-end
 
---
--- 6. Redirect to login
---
--- If no previous rule has matched, just redirect to the portal login.
--- The default is to protect every URL by default.
---
-
--- Force the scheme to HTTPS. This is to avoid an issue with redirection loop
--- when trying to access http://main.domain.tld/ (SSOwat finds that user aint
--- logged in, therefore redirects to SSO, which redirects to the back_url, which
--- redirect to SSO, ..)
-logger.debug("No rule found for "..ngx.var.uri..". By default, redirecting to portal")
-if is_logged_in then
-    return hlp.redirect(conf.portal_url)
+-- 2nd case : no access ... redirect to portal / login form
 else
-    -- Only display this if HTTPS. For HTTP, we can't know if the user really is
-    -- logged in or not, because the cookie is available only in HTTP...
-    if ngx.var.scheme == "https" then
-        hlp.flash("info", hlp.t("please_login"))
-    end
 
-    local back_url = "https://" .. ngx.var.host .. ngx.var.uri .. hlp.uri_args_string()
-    return hlp.redirect(conf.portal_url.."?r="..ngx.encode_base64(back_url))
+    if is_logged_in then
+        return hlp.redirect(conf.portal_url)
+    else
+        -- Only display this if HTTPS. For HTTP, we can't know if the user really is
+        -- logged in or not, because the cookie is available only in HTTP...
+        if ngx.var.scheme == "https" then
+            hlp.flash("info", hlp.t("please_login"))
+        end
+
+        local back_url = "https://" .. ngx.var.host .. ngx.var.uri .. hlp.uri_args_string()
+        return hlp.redirect(conf.portal_url.."?r="..ngx.encode_base64(back_url))
+    end
 end
