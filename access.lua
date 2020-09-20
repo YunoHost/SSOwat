@@ -198,6 +198,32 @@ then
     end
 end
 
+--
+-- 2 ... continued : portal assets that are available on every domains
+--
+-- For example: `https://whatever.org/ynhpanel.js` will serve the
+-- `/yunohost/sso/assets/js/ynhpanel.js` file.
+--
+
+if is_logged_in then
+    assets = {}
+    assets["/ynh_portal.js"] = "js/ynh_portal.js"
+    assets["/ynh_overlay.css"] = "css/ynh_overlay.css"
+    theme_dir = "/usr/share/ssowat/portal/assets/themes/"..conf.theme
+    local pfile = io.popen('find "'..theme_dir..'" -type f -exec realpath --relative-to "'..theme_dir..'" {} \\;')
+    for filename in pfile:lines() do
+        assets["/ynhtheme/"..filename] = "themes/"..conf.theme.."/"..filename
+    end
+    pfile:close()
+
+    for shortcut, full in pairs(assets) do
+        if string.match(ngx.var.uri, "^"..shortcut.."$") then
+            logger.debug("Serving static asset "..full)
+            return hlp.serve("/yunohost/sso/assets/"..full, "static_asset")
+        end
+    end
+end
+
 
 --
 -- 3. Redirected URLs
@@ -274,46 +300,10 @@ if not is_logged_in then
 end
 
 --
--- 5. Specific files (used in YunoHost)
 --
--- We want to serve specific portal assets right at the root of the domain.
 --
--- For example: `https://mydomain.org/ynhpanel.js` will serve the
--- `/yunohost/sso/assets/js/ynhpanel.js` file.
 --
 
-function scandir(directory, callback)
-    -- use find (and not ls) to list only files recursively and with their full path relative to the asked directory
-    local pfile = io.popen('find "'..directory..'" -type f -exec realpath --relative-to "'..directory..'" {} \\;')
-    for filename in pfile:lines() do
-        callback(filename)
-    end
-    pfile:close()
-end
-
-function serveAsset(shortcut, full)
-  if string.match(ngx.var.uri, "^"..shortcut.."$") then
-      logger.debug("Serving static asset "..full)
-      hlp.serve("/yunohost/sso/assets/"..full, "static_asset")
-  end
-end
-
-function serveThemeFile(filename)
-  serveAsset("/ynhtheme/"..filename, "themes/"..conf.theme.."/"..filename)
-end
-
-function serveYnhpanel()
-    logger.debug("Serving ynhpanel")
-
-    -- serve ynhpanel files
-    serveAsset("/ynh_portal.js", "js/ynh_portal.js")
-    serveAsset("/ynh_overlay.css", "css/ynh_overlay.css")
-    -- serve theme's files
-    -- FIXME? I think it would be better here not to use an absolute path
-    -- but I didn't succeed to figure out where is the current location of the script
-    -- if you call it from "portal/assets/themes/" the ls fails
-    scandir("/usr/share/ssowat/portal/assets/themes/"..conf.theme, serveThemeFile)
-end
 
 local permission = hlp.get_best_permission()
 
