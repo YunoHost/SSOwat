@@ -226,11 +226,12 @@ end
 
 
 --
--- 3. Redirected URLs
+-- 3. REDIRECTED URLS
 --
 -- If the URL matches one of the `redirected_urls` in the configuration file,
 -- just redirect to the target URL/URI
 --
+
 function detect_redirection(redirect_url)
     if hlp.string.starts(redirect_url, "http://")
     or hlp.string.starts(redirect_url, "https://") then

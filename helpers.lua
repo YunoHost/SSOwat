@@ -232,7 +232,7 @@ function refresh_logged_in()
     local authHash = ngx.var.cookie_SSOwAuthHash
 
     authUser = nil
-    
+
     if expireTime and expireTime ~= ""
     and authHash and authHash ~= ""
     and user and user ~= ""
@@ -302,17 +302,18 @@ function has_access(permission, user)
     user = user or authUser
 
     if permission == nil then
+        logger.debug("No permission matching request for "..ngx.var.uri)
         return false
     end
 
     -- Public access
     if user == nil or permission["public"] then
         user = user or "A visitor"
-        logger.debug(user.." tries to access "..ngx.var.uri)
+        logger.debug(user.." tries to access "..ngx.var.uri.." (corresponding perm: "..permission["id"]..")")
         return permission["public"]
     end
 
-    logger.debug("User "..user.." tries to access "..ngx.var.uri)
+    logger.debug("User "..user.." tries to access "..ngx.var.uri.." (corresponding perm: "..permission["id"]..")")
 
     -- All user in this permission
     allowed_users = permission["users"]
@@ -508,7 +509,7 @@ end
 -- It is used to render the SSOwat portal *only*.
 function serve(uri, cache)
 
-    logger.debug("Serving portal uri "..uri.." (if the corresponding file exists)")
+    logger.debug("Serving portal uri "..uri)
 
     rel_path = string.gsub(uri, conf["portal_path"], "/")
 
