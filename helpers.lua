@@ -260,6 +260,30 @@ function refresh_logged_in()
         end
     end
 
+    -- If client set the `Authorization` header before reaching the SSO,
+    -- we want to match user and password against the user database.
+    --
+    -- It allows to bypass the cookie-based procedure with a per-request
+    -- authentication. This is useful to authenticate on the SSO during
+    -- curl requests for example.
+
+    local auth_header = ngx.req.get_headers()["Authorization"]
+
+    if auth_header then
+        _, _, b64_cred = string.find(auth_header, "^Basic%s+(.+)$")
+        _, _, user, password = string.find(ngx.decode_base64(b64_cred), "^(.+):(.+)$")
+        user = authenticate(user, password)
+        if user then
+            logger.debug("User got authenticated through basic auth")
+            authUser = user
+            is_logged_in = true
+        else
+            is_logged_in = false
+        end
+        return is_logged_in
+    end
+
+    is_logged_in = false
     return false
 end
 
