@@ -265,20 +265,53 @@ if conf["redirected_regex"] then
 end
 
 --
+-- 4. IDENTIFY THE RELEVANT PERMISSION
+--
+-- In particular, the conf is filled with permissions such as:
+--
+--        "foobar": {
+--            "auth_header": false,
+--            "label": "Foobar permission",
+--            "public": false,
+--            "show_tile": true,
+--            "uris": [
+--                "yolo.test/foobar",
+--                "re:^[^/]*/%.well%-known/foobar/.*$",
+--            ],
+--            "users": ["alice", "bob"]
+--        }
+--
+--
+-- And we find the best matching permission by trying to match the request uri
+-- against all the uris rules/regexes from the conf and keep the longest matching one.
+--
+
+permission = nil
+longest_url_match = ""
+
+for permission_name, permission_infos in pairs(conf["permissions"]) do
+    if next(permission_infos['uris']) ~= nil then
+        for _, url in pairs(permission_infos['uris']) do
+            if string.starts(url, "re:") then
+                url = string.sub(url, 4, string.len(url))
+            end
+
+            local m = hlp.match(ngx.var.host..ngx.var.uri..hlp.uri_args_string(), url)
+            if m ~= nil and string.len(m) > string.len(longest_url_match) then
+                longest_url_match = m
+                permission = permission_infos
+                permission["id"] = permission_name
+            end
+        end
+    end
+end
+
+--
 --
 --
 --
 
 
-
-
---
---
---
---
-
-
-local permission = hlp.get_best_permission()
 
 if permission then
     if is_logged_in then

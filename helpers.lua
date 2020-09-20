@@ -296,34 +296,6 @@ function log_access(user, uri)
   end
 end
 
-function get_best_permission()
-    if not conf["permissions"] then
-        conf["permissions"] = {}
-    end
-
-    local permission_match = nil
-    local longest_url_match = ""
-    
-    for permission_name, permission in pairs(conf["permissions"]) do
-        if next(permission['uris']) ~= nil then
-            for _, url in pairs(permission['uris']) do
-                if string.starts(url, "re:") then
-                    url = string.sub(url, 4, string.len(url))
-                end
-
-                local m = match(ngx.var.host..ngx.var.uri..uri_args_string(), url)
-                if m ~= nil and string.len(m) > string.len(longest_url_match) then
-                    longest_url_match = m
-                    permission_match = permission
-                    logger.debug("Match "..m)
-                end
-            end
-        end
-    end
-
-    return permission_match
-end
-
 -- Check whether a user is allowed to access a URL using the `permissions` directive
 -- of the configuration file
 function has_access(permission, user)

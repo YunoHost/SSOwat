@@ -60,7 +60,8 @@ function get_config()
         allow_mail_authentication = true,
         default_language          = "en",
         theme                     = "default",
-        logging                   = "fatal" -- Only log fatal messages by default (so apriori nothing)
+        logging                   = "fatal", -- Only log fatal messages by default (so apriori nothing)
+        permissions               = {}
     }
 
 
