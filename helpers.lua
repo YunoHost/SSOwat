@@ -315,21 +315,26 @@ function has_access(permission, user)
 
     logger.debug("User "..user.." tries to access "..ngx.var.uri.." (corresponding perm: "..permission["id"]..")")
 
-    -- All user in this permission
-    allowed_users = permission["users"]
+    -- The user has permission to access the content if he is in the list of allowed users
+    if element_is_in_table(user, permission["users"]) then
+        logger.debug("User "..user.." can access "..ngx.var.host..ngx.var.uri..uri_args_string())
+        log_access(user, ngx.var.host..ngx.var.uri..uri_args_string())
+        return true
+    else
+        logger.debug("User "..user.." cannot access "..ngx.var.uri)
+        return false
+    end
+end
 
-    -- The user has permission to access the content if he is in the list of this one
-    if allowed_users then
-        for _, u in pairs(allowed_users) do
-            if u == user then
-                logger.debug("User "..user.." can access "..ngx.var.host..ngx.var.uri..uri_args_string())
-                log_access(user, ngx.var.host..ngx.var.uri..uri_args_string())
+function element_is_in_table(element, table)
+    if table then
+        for _, el in pairs(table) do
+            if el == element then
                 return true
             end
         end
     end
 
-    logger.debug("User "..user.." cannot access "..ngx.var.uri)
     return false
 end
 
@@ -646,7 +651,7 @@ function get_data_for(view)
             -- It is typically used to build the app list.
             for permission_name, permission in pairs(conf["permissions"]) do
                 -- We want to display a tile, and uris is not empty
-                if permission['show_tile'] and next(permission['uris']) ~= nil and has_access(permission, user) then
+                if permission['show_tile'] and next(permission['uris']) ~= nil and element_is_in_table(user, permission["users"]) then
                     url = permission['uris'][1]
                     name = permission['label']
 
