@@ -198,13 +198,41 @@ then
     end
 end
 
+--
+-- 2 ... continued : portal assets that are available on every domains
+--
+-- For example: `https://whatever.org/ynhpanel.js` will serve the
+-- `/yunohost/sso/assets/js/ynhpanel.js` file.
+--
+
+if is_logged_in then
+    assets = {
+                   ["/ynh_portal.js"] = "js/ynh_portal.js",
+                   ["/ynh_overlay.css"] = "css/ynh_overlay.css"
+             }
+    theme_dir = "/usr/share/ssowat/portal/assets/themes/"..conf.theme
+    local pfile = io.popen('find "'..theme_dir..'" -type f -exec realpath --relative-to "'..theme_dir..'" {} \\;')
+    for filename in pfile:lines() do
+        assets["/ynhtheme/"..filename] = "themes/"..conf.theme.."/"..filename
+    end
+    pfile:close()
+
+    for shortcut, full in pairs(assets) do
+        if string.match(ngx.var.uri, "^"..shortcut.."$") then
+            logger.debug("Serving static asset "..full)
+            return hlp.serve("/yunohost/sso/assets/"..full, "static_asset")
+        end
+    end
+end
+
 
 --
--- 3. Redirected URLs
+-- 3. REDIRECTED URLS
 --
 -- If the URL matches one of the `redirected_urls` in the configuration file,
 -- just redirect to the target URL/URI
 --
+
 function detect_redirection(redirect_url)
     if hlp.string.starts(redirect_url, "http://")
     or hlp.string.starts(redirect_url, "https://") then
@@ -239,125 +267,83 @@ if conf["redirected_regex"] then
 end
 
 --
--- 4. Basic HTTP Authentication
+-- 4. IDENTIFY THE RELEVANT PERMISSION
 --
--- If the `Authorization` header is set before reaching the SSO, we want to
--- match user and password against the user database.
+-- In particular, the conf is filled with permissions such as:
 --
--- It allows you to bypass the cookie-based procedure with a per-request
--- authentication. Very usefull when you are trying to reach a specific URL
--- via cURL for example.
+--        "foobar": {
+--            "auth_header": false,
+--            "label": "Foobar permission",
+--            "public": false,
+--            "show_tile": true,
+--            "uris": [
+--                "yolo.test/foobar",
+--                "re:^[^/]*/%.well%-known/foobar/.*$",
+--            ],
+--            "users": ["alice", "bob"]
+--        }
+--
+--
+-- And we find the best matching permission by trying to match the request uri
+-- against all the uris rules/regexes from the conf and keep the longest matching one.
 --
 
-if not is_logged_in then
-    local auth_header = ngx.req.get_headers()["Authorization"]
+permission = nil
+longest_url_match = ""
 
-    if auth_header then
-        _, _, b64_cred = string.find(auth_header, "^Basic%s+(.+)$")
-        _, _, user, password = string.find(ngx.decode_base64(b64_cred), "^(.+):(.+)$")
-        user = hlp.authenticate(user, password)
-        if user then
-            logger.debug("User got authenticated through basic auth")
-
-            -- If user has no access to this URL, redirect him to the portal
-            if not permission or not hlp.has_access(permission, user) then
-            return hlp.redirect(conf.portal_url)
+for permission_name, permission_infos in pairs(conf["permissions"]) do
+    if next(permission_infos['uris']) ~= nil then
+        for _, url in pairs(permission_infos['uris']) do
+            if string.starts(url, "re:") then
+                url = string.sub(url, 4, string.len(url))
             end
 
-            if permission["auth_header"] then
-                logger.debug("Set Headers")
-                hlp.set_headers(user)
+            local m = hlp.match(ngx.var.host..ngx.var.uri..hlp.uri_args_string(), url)
+            if m ~= nil and string.len(m) > string.len(longest_url_match) then
+                longest_url_match = m
+                permission = permission_infos
+                permission["id"] = permission_name
             end
-            return hlp.pass()
         end
     end
 end
 
 --
--- 5. Specific files (used in YunoHost)
 --
--- We want to serve specific portal assets right at the root of the domain.
+-- 5. APPLY PERMISSION
 --
--- For example: `https://mydomain.org/ynhpanel.js` will serve the
--- `/yunohost/sso/assets/js/ynhpanel.js` file.
 --
 
-function scandir(directory, callback)
-    -- use find (and not ls) to list only files recursively and with their full path relative to the asked directory
-    local pfile = io.popen('find "'..directory..'" -type f -exec realpath --relative-to "'..directory..'" {} \\;')
-    for filename in pfile:lines() do
-        callback(filename)
-    end
-    pfile:close()
-end
+-- 1st case : client has access
 
-function serveAsset(shortcut, full)
-  if string.match(ngx.var.uri, "^"..shortcut.."$") then
-      logger.debug("Serving static asset "..full)
-      hlp.serve("/yunohost/sso/assets/"..full, "static_asset")
-  end
-end
+if hlp.has_access(permission) then
 
-function serveThemeFile(filename)
-  serveAsset("/ynhtheme/"..filename, "themes/"..conf.theme.."/"..filename)
-end
-
-function serveYnhpanel()
-    logger.debug("Serving ynhpanel")
-
-    -- serve ynhpanel files
-    serveAsset("/ynh_portal.js", "js/ynh_portal.js")
-    serveAsset("/ynh_overlay.css", "css/ynh_overlay.css")
-    -- serve theme's files
-    -- FIXME? I think it would be better here not to use an absolute path
-    -- but I didn't succeed to figure out where is the current location of the script
-    -- if you call it from "portal/assets/themes/" the ls fails
-    scandir("/usr/share/ssowat/portal/assets/themes/"..conf.theme, serveThemeFile)
-end
-
-local permission = hlp.get_best_permission()
-
-if permission then
     if is_logged_in then
-        serveYnhpanel()
+        -- If the user is logged in, we set some additional headers
+        hlp.set_headers()
 
-        -- If the user is authenticated and has access to the URL, set the headers
-        -- and let it be
-        if permission["auth_header"] and hlp.has_access(permission) then
-            logger.debug("Set Headers")
-            hlp.set_headers()
+        -- If Basic Authorization header are disabled for this permission,
+        -- remove them from the response
+        if not permission["auth_header"] then
+            ngx.req.clear_header("Authorization")
         end
-    end
-
-    -- If user has no access to this URL, redirect him to the portal
-    if not hlp.has_access(permission) then
-        return hlp.redirect(conf.portal_url)
     end
 
     return hlp.pass()
-end
 
---
--- 6. Redirect to login
---
--- If no previous rule has matched, just redirect to the portal login.
--- The default is to protect every URL by default.
---
-
--- Force the scheme to HTTPS. This is to avoid an issue with redirection loop
--- when trying to access http://main.domain.tld/ (SSOwat finds that user aint
--- logged in, therefore redirects to SSO, which redirects to the back_url, which
--- redirect to SSO, ..)
-logger.debug("No rule found for "..ngx.var.uri..". By default, redirecting to portal")
-if is_logged_in then
-    return hlp.redirect(conf.portal_url)
+-- 2nd case : no access ... redirect to portal / login form
 else
-    -- Only display this if HTTPS. For HTTP, we can't know if the user really is
-    -- logged in or not, because the cookie is available only in HTTP...
-    if ngx.var.scheme == "https" then
-        hlp.flash("info", hlp.t("please_login"))
-    end
 
-    local back_url = "https://" .. ngx.var.host .. ngx.var.uri .. hlp.uri_args_string()
-    return hlp.redirect(conf.portal_url.."?r="..ngx.encode_base64(back_url))
+    if is_logged_in then
+        return hlp.redirect(conf.portal_url)
+    else
+        -- Only display this if HTTPS. For HTTP, we can't know if the user really is
+        -- logged in or not, because the cookie is available only in HTTP...
+        if ngx.var.scheme == "https" then
+            hlp.flash("info", hlp.t("please_login"))
+        end
+
+        local back_url = "https://" .. ngx.var.host .. ngx.var.uri .. hlp.uri_args_string()
+        return hlp.redirect(conf.portal_url.."?r="..ngx.encode_base64(back_url))
+    end
 end

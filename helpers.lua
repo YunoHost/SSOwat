@@ -232,7 +232,7 @@ function refresh_logged_in()
     local authHash = ngx.var.cookie_SSOwAuthHash
 
     authUser = nil
-    
+
     if expireTime and expireTime ~= ""
     and authHash and authHash ~= ""
     and user and user ~= ""
@@ -260,6 +260,30 @@ function refresh_logged_in()
         end
     end
 
+    -- If client set the `Authorization` header before reaching the SSO,
+    -- we want to match user and password against the user database.
+    --
+    -- It allows to bypass the cookie-based procedure with a per-request
+    -- authentication. This is useful to authenticate on the SSO during
+    -- curl requests for example.
+
+    local auth_header = ngx.req.get_headers()["Authorization"]
+
+    if auth_header then
+        _, _, b64_cred = string.find(auth_header, "^Basic%s+(.+)$")
+        _, _, user, password = string.find(ngx.decode_base64(b64_cred), "^(.+):(.+)$")
+        user = authenticate(user, password)
+        if user then
+            logger.debug("User got authenticated through basic auth")
+            authUser = user
+            is_logged_in = true
+        else
+            is_logged_in = false
+        end
+        return is_logged_in
+    end
+
+    is_logged_in = false
     return false
 end
 
@@ -272,67 +296,45 @@ function log_access(user, uri)
   end
 end
 
-function get_best_permission()
-    if not conf["permissions"] then
-        conf["permissions"] = {}
-    end
-
-    local permission_match = nil
-    local longest_url_match = ""
-    
-    for permission_name, permission in pairs(conf["permissions"]) do
-        if next(permission['uris']) ~= nil then
-            for _, url in pairs(permission['uris']) do
-                if string.starts(url, "re:") then
-                    url = string.sub(url, 4, string.len(url))
-                end
-
-                local m = match(ngx.var.host..ngx.var.uri..uri_args_string(), url)
-                if m ~= nil and string.len(m) > string.len(longest_url_match) then
-                    longest_url_match = m
-                    permission_match = permission
-                    logger.debug("Match "..m)
-                end
-            end
-        end
-    end
-
-    return permission_match
-end
-
 -- Check whether a user is allowed to access a URL using the `permissions` directive
 -- of the configuration file
 function has_access(permission, user)
     user = user or authUser
 
     if permission == nil then
+        logger.debug("No permission matching request for "..ngx.var.uri)
         return false
     end
 
     -- Public access
     if user == nil or permission["public"] then
         user = user or "A visitor"
-        logger.debug(user.." tries to access "..ngx.var.uri)
+        logger.debug(user.." tries to access "..ngx.var.uri.." (corresponding perm: "..permission["id"]..")")
         return permission["public"]
     end
 
-    logger.debug("User "..user.." tries to access "..ngx.var.uri)
+    logger.debug("User "..user.." tries to access "..ngx.var.uri.." (corresponding perm: "..permission["id"]..")")
 
-    -- All user in this permission
-    allowed_users = permission["users"]
+    -- The user has permission to access the content if he is in the list of allowed users
+    if element_is_in_table(user, permission["users"]) then
+        logger.debug("User "..user.." can access "..ngx.var.host..ngx.var.uri..uri_args_string())
+        log_access(user, ngx.var.host..ngx.var.uri..uri_args_string())
+        return true
+    else
+        logger.debug("User "..user.." cannot access "..ngx.var.uri)
+        return false
+    end
+end
 
-    -- The user has permission to access the content if he is in the list of this one
-    if allowed_users then
-        for _, u in pairs(allowed_users) do
-            if u == user then
-                logger.debug("User "..user.." can access "..ngx.var.host..ngx.var.uri..uri_args_string())
-                log_access(user, ngx.var.host..ngx.var.uri..uri_args_string())
+function element_is_in_table(element, table)
+    if table then
+        for _, el in pairs(table) do
+            if el == element then
                 return true
             end
         end
     end
 
-    logger.debug("User "..user.." cannot access "..ngx.var.uri)
     return false
 end
 
@@ -512,7 +514,7 @@ end
 -- It is used to render the SSOwat portal *only*.
 function serve(uri, cache)
 
-    logger.debug("Serving portal uri "..uri.." (if the corresponding file exists)")
+    logger.debug("Serving portal uri "..uri)
 
     rel_path = string.gsub(uri, conf["portal_path"], "/")
 
@@ -649,7 +651,7 @@ function get_data_for(view)
             -- It is typically used to build the app list.
             for permission_name, permission in pairs(conf["permissions"]) do
                 -- We want to display a tile, and uris is not empty
-                if permission['show_tile'] and next(permission['uris']) ~= nil and has_access(permission, user) then
+                if permission['show_tile'] and next(permission['uris']) ~= nil and element_is_in_table(user, permission["users"]) then
                     url = permission['uris'][1]
                     name = permission['label']
 
