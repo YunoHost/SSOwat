@@ -97,7 +97,8 @@ function get_config()
         allow_mail_authentication = true,
         default_language          = "en",
         theme                     = "default",
-        logging                   = "fatal" -- Only log fatal messages by default (so apriori nothing)
+        logging                   = "fatal", -- Only log fatal messages by default (so apriori nothing)
+        permissions               = {}
     }
 
 
@@ -123,7 +124,7 @@ function get_config()
 
 
     -- Always skip the portal to avoid redirection looping.
-    table.insert(conf["skipped_urls"], conf["portal_domain"]..conf["portal_path"])
+    table.insert(conf["permissions"]["core_skipped"]["uris"], conf["portal_domain"]..conf["portal_path"])
 
     update_language()
 

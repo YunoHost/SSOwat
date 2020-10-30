@@ -29,6 +29,7 @@ local logger = require("log")
 -- Just a note for the client to know that he passed through the SSO
 ngx.header["X-SSO-WAT"] = "You've just been SSOed"
 
+local is_logged_in = hlp.refresh_logged_in()
 
 --
 -- 1. LOGIN
@@ -66,7 +67,7 @@ end
 -- If the URL matches the portal URL, serve a portal file or proceed to a
 -- portal operation
 --
-if (ngx.var.host == conf["portal_domain"] or hlp.is_logged_in())
+if (ngx.var.host == conf["portal_domain"] or is_logged_in)
    and hlp.string.starts(ngx.var.uri, string.sub(conf["portal_path"], 1, -2))
 then
 
@@ -94,7 +95,7 @@ then
 
         -- If the `r` URI argument is set, it means that we want to
         -- be redirected (typically after a login phase)
-        elseif hlp.is_logged_in() and uri_args.r then
+        elseif is_logged_in and uri_args.r then
             -- Decode back url
             back_url = ngx.decode_base64(uri_args.r)
 
@@ -145,7 +146,7 @@ then
 
         -- In case we want to serve portal login or assets for portal, just
         -- serve it
-        elseif hlp.is_logged_in()
+        elseif is_logged_in
             or ngx.var.uri == conf["portal_path"]
             or (hlp.string.starts(ngx.var.uri, conf["portal_path"].."assets")
                and (not ngx.var.http_referer
@@ -197,13 +198,41 @@ then
     end
 end
 
+--
+-- 2 ... continued : portal assets that are available on every domains
+--
+-- For example: `https://whatever.org/ynhpanel.js` will serve the
+-- `/yunohost/sso/assets/js/ynhpanel.js` file.
+--
+
+if is_logged_in then
+    assets = {
+                   ["/ynh_portal.js"] = "js/ynh_portal.js",
+                   ["/ynh_overlay.css"] = "css/ynh_overlay.css"
+             }
+    theme_dir = "/usr/share/ssowat/portal/assets/themes/"..conf.theme
+    local pfile = io.popen('find "'..theme_dir..'" -type f -exec realpath --relative-to "'..theme_dir..'" {} \\;')
+    for filename in pfile:lines() do
+        assets["/ynhtheme/"..filename] = "themes/"..conf.theme.."/"..filename
+    end
+    pfile:close()
+
+    for shortcut, full in pairs(assets) do
+        if string.match(ngx.var.uri, "^"..shortcut.."$") then
+            logger.debug("Serving static asset "..full)
+            return hlp.serve("/yunohost/sso/assets/"..full, "static_asset")
+        end
+    end
+end
+
 
 --
--- 3. Redirected URLs
+-- 3. REDIRECTED URLS
 --
 -- If the URL matches one of the `redirected_urls` in the configuration file,
 -- just redirect to the target URL/URI
 --
+
 function detect_redirection(redirect_url)
     if hlp.string.starts(redirect_url, "http://")
     or hlp.string.starts(redirect_url, "https://") then
@@ -237,159 +266,84 @@ if conf["redirected_regex"] then
     end
 end
 
-
-local longest_protected_match = hlp.longest_url_path(hlp.get_matches("protected")) or ""
-local longest_skipped_match = hlp.longest_url_path(hlp.get_matches("skipped")) or ""
-local longest_unprotected_match = hlp.longest_url_path(hlp.get_matches("unprotected")) or ""
-
-logger.debug("Longest skipped     : "..longest_skipped_match)
-logger.debug("Longest unprotected : "..longest_unprotected_match)
-logger.debug("Longest protected   : "..longest_protected_match)
-
 --
--- 4. Skipped URLs
+-- 4. IDENTIFY THE RELEVANT PERMISSION
 --
--- If the URL matches one of the `skipped_urls` in the configuration file,
--- it means that the URL should not be protected by the SSO and no header
--- has to be sent, even if the user is already authenticated.
+-- In particular, the conf is filled with permissions such as:
 --
-
-if longest_skipped_match ~= ""
-and string.len(longest_skipped_match) >= string.len(longest_protected_match) 
-and string.len(longest_skipped_match) > string.len(longest_unprotected_match) then
-    logger.debug("Skipping "..ngx.var.uri)
-    return hlp.pass()
-end
-
+--        "foobar": {
+--            "auth_header": false,
+--            "label": "Foobar permission",
+--            "public": false,
+--            "show_tile": true,
+--            "uris": [
+--                "yolo.test/foobar",
+--                "re:^[^/]*/%.well%-known/foobar/.*$",
+--            ],
+--            "users": ["alice", "bob"]
+--        }
 --
--- 5. Specific files (used in YunoHost)
 --
--- We want to serve specific portal assets right at the root of the domain.
---
--- For example: `https://mydomain.org/ynhpanel.js` will serve the
--- `/yunohost/sso/assets/js/ynhpanel.js` file.
+-- And we find the best matching permission by trying to match the request uri
+-- against all the uris rules/regexes from the conf and keep the longest matching one.
 --
 
-function scandir(directory, callback)
-    -- use find (and not ls) to list only files recursively and with their full path relative to the asked directory
-    local pfile = io.popen('find "'..directory..'" -type f -exec realpath --relative-to "'..directory..'" {} \\;')
-    for filename in pfile:lines() do
-        callback(filename)
-    end
-    pfile:close()
-end
+permission = nil
+longest_url_match = ""
 
-function serveAsset(shortcut, full)
-  if string.match(ngx.var.uri, "^"..shortcut.."$") then
-      logger.debug("Serving static asset "..full)
-      hlp.serve("/yunohost/sso/assets/"..full, "static_asset")
-  end
-end
+for permission_name, permission_infos in pairs(conf["permissions"]) do
+    if next(permission_infos['uris']) ~= nil then
+        for _, url in pairs(permission_infos['uris']) do
+            if string.starts(url, "re:") then
+                url = string.sub(url, 4, string.len(url))
+            end
 
-function serveThemeFile(filename)
-  serveAsset("/ynhtheme/"..filename, "themes/"..conf.theme.."/"..filename)
-end
-
-function serveYnhpanel()
-    logger.debug("Serving ynhpanel")
-
-    -- serve ynhpanel files
-    serveAsset("/ynh_portal.js", "js/ynh_portal.js")
-    serveAsset("/ynh_overlay.css", "css/ynh_overlay.css")
-    -- serve theme's files
-    -- FIXME? I think it would be better here not to use an absolute path
-    -- but I didn't succeed to figure out where is the current location of the script
-    -- if you call it from "portal/assets/themes/" the ls fails
-    scandir("/usr/share/ssowat/portal/assets/themes/"..conf.theme, serveThemeFile)
-end
-
---
--- 6. Unprotected URLs
---
--- If the URL matches one of the `unprotected_urls` in the configuration file,
--- it means that the URL should not be protected by the SSO *but* headers have
--- to be sent if the user is already authenticated.
---
--- It means that you can let anyone access to an app, but if a user has already
--- been authenticated on the portal, he can have his authentication headers
--- passed to the app.
---
-
-if longest_unprotected_match ~= ""
-and string.len(longest_unprotected_match) > string.len(longest_protected_match) then
-    if hlp.is_logged_in() then
-        serveYnhpanel()
-        if hlp.has_access() then
-            hlp.set_headers()
+            local m = hlp.match(ngx.var.host..ngx.var.uri..hlp.uri_args_string(), url)
+            if m ~= nil and string.len(m) > string.len(longest_url_match) then
+                longest_url_match = m
+                permission = permission_infos
+                permission["id"] = permission_name
+            end
         end
     end
-    logger.debug(ngx.var.uri.." is in unprotected_urls")
-    return hlp.pass()
 end
 
-if hlp.is_logged_in() then
-    serveYnhpanel()
+--
+--
+-- 5. APPLY PERMISSION
+--
+--
 
-    -- If user has no access to this URL, redirect him to the portal
-    if not hlp.has_access() then
+-- 1st case : client has access
+
+if hlp.has_access(permission) then
+
+    if is_logged_in then
+        -- If the user is logged in, we set some additional headers
+        hlp.set_headers()
+
+        -- If Basic Authorization header are disabled for this permission,
+        -- remove them from the response
+        if not permission["auth_header"] then
+            ngx.req.clear_header("Authorization")
+        end
+    end
+
+    return hlp.pass()
+
+-- 2nd case : no access ... redirect to portal / login form
+else
+
+    if is_logged_in then
         return hlp.redirect(conf.portal_url)
-    end
-
-    -- If the user is authenticated and has access to the URL, set the headers
-    -- and let it be
-    hlp.set_headers()
-    return hlp.pass()
-end
-
-
---
--- 7. Basic HTTP Authentication
---
--- If the `Authorization` header is set before reaching the SSO, we want to
--- match user and password against the user database.
---
--- It allows you to bypass the cookie-based procedure with a per-request
--- authentication. Very usefull when you are trying to reach a specific URL
--- via cURL for example.
---
-
-local auth_header = ngx.req.get_headers()["Authorization"]
-
-if auth_header then
-    _, _, b64_cred = string.find(auth_header, "^Basic%s+(.+)$")
-    _, _, user, password = string.find(ngx.decode_base64(b64_cred), "^(.+):(.+)$")
-    user = hlp.authenticate(user, password)
-    if user then
-        logger.debug("User got authenticated through basic auth")
-
-        -- If user has no access to this URL, redirect him to the portal
-        if not hlp.has_access(user) then
-           return hlp.redirect(conf.portal_url)
+    else
+        -- Only display this if HTTPS. For HTTP, we can't know if the user really is
+        -- logged in or not, because the cookie is available only in HTTP...
+        if ngx.var.scheme == "https" then
+            hlp.flash("info", hlp.t("please_login"))
         end
 
-        hlp.set_headers(user)
-        return hlp.pass()
+        local back_url = "https://" .. ngx.var.host .. ngx.var.uri .. hlp.uri_args_string()
+        return hlp.redirect(conf.portal_url.."?r="..ngx.encode_base64(back_url))
     end
 end
-
-
---
--- 8. Redirect to login
---
--- If no previous rule has matched, just redirect to the portal login.
--- The default is to protect every URL by default.
---
-
--- Only display this if HTTPS. For HTTP, we can't know if the user really is
--- logged in or not, because the cookie is available only in HTTP...
-if ngx.var.scheme == "https" then
-    hlp.flash("info", hlp.t("please_login"))
-end
-
--- Force the scheme to HTTPS. This is to avoid an issue with redirection loop
--- when trying to access http://main.domain.tld/ (SSOwat finds that user aint
--- logged in, therefore redirects to SSO, which redirects to the back_url, which
--- redirect to SSO, ..)
-logger.debug("No rule found for "..ngx.var.uri..". By default, redirecting to portal")
-local back_url = "https://" .. ngx.var.host .. ngx.var.uri .. hlp.uri_args_string()
-return hlp.redirect(conf.portal_url.."?r="..ngx.encode_base64(back_url))

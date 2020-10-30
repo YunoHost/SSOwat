@@ -17,6 +17,8 @@ local url_parser = require "socket.url"
 -- Import Perl regular expressions library
 local rex = require "rex_pcre"
 
+local is_logged_in = false
+
 function refresh_config()
     conf = config.get_config()
 end
@@ -224,10 +226,12 @@ end
 -- Check if the session cookies are set, and rehash server + client information
 -- to match the session hash.
 --
-function is_logged_in()
+function refresh_logged_in()
     local expireTime = ngx.var.cookie_SSOwAuthExpire
     local user = ngx.var.cookie_SSOwAuthUser
     local authHash = ngx.var.cookie_SSOwAuthHash
+
+    authUser = nil
 
     if expireTime and expireTime ~= ""
     and authHash and authHash ~= ""
@@ -240,20 +244,46 @@ function is_logged_in()
             if session_key and session_key ~= "" then
                 -- Check cache
                 if cache:get(user.."-password") then
-                    authUser = user
                     local hash = hmac_sha512(srvkey,
-                            authUser..
+                            user..
                             "|"..expireTime..
                             "|"..session_key)
-                    if hash ~= authHash then
+                    is_logged_in = hash == authHash
+                    if not is_logged_in then
                         logger.info("Hash "..authHash.." rejected for "..user.."@"..ngx.var.remote_addr)
+                    else
+                        authUser = user
                     end
-                    return hash == authHash
+                    return is_logged_in
                 end
             end
         end
     end
 
+    -- If client set the `Authorization` header before reaching the SSO,
+    -- we want to match user and password against the user database.
+    --
+    -- It allows to bypass the cookie-based procedure with a per-request
+    -- authentication. This is useful to authenticate on the SSO during
+    -- curl requests for example.
+
+    local auth_header = ngx.req.get_headers()["Authorization"]
+
+    if auth_header then
+        _, _, b64_cred = string.find(auth_header, "^Basic%s+(.+)$")
+        _, _, user, password = string.find(ngx.decode_base64(b64_cred), "^(.+):(.+)$")
+        user = authenticate(user, password)
+        if user then
+            logger.debug("User got authenticated through basic auth")
+            authUser = user
+            is_logged_in = true
+        else
+            is_logged_in = false
+        end
+        return is_logged_in
+    end
+
+    is_logged_in = false
     return false
 end
 
@@ -266,112 +296,47 @@ function log_access(user, uri)
   end
 end
 
-
 -- Check whether a user is allowed to access a URL using the `permissions` directive
 -- of the configuration file
-function has_access(user)
+function has_access(permission, user)
     user = user or authUser
 
-    logger.debug("User "..user.." try to access "..ngx.var.uri)
-    
-    -- Get the longest url permission
-    longest_permission_match = longest_url_path(permission_matches()) or ""
-
-    logger.debug("Longest permission match : "..longest_permission_match)
-
-    -- If no permission matches, it means that there is no permission defined for this url.
-    if longest_permission_match == "" then
-        logger.debug("No access rules defined for user "..user..", assuming it cannot access.")
+    if permission == nil then
+        logger.debug("No permission matching request for "..ngx.var.uri)
         return false
     end
 
-    -- All user in this permission
-    allowed_users = conf["permissions"][longest_permission_match]
+    -- Public access
+    if user == nil or permission["public"] then
+        user = user or "A visitor"
+        logger.debug(user.." tries to access "..ngx.var.uri.." (corresponding perm: "..permission["id"]..")")
+        return permission["public"]
+    end
 
-    -- The user has permission to access the content if he is in the list of this one
-    if allowed_users then
-        for _, u in pairs(allowed_users) do
-            if u == user then
-                logger.debug("User "..user.." can access "..ngx.var.uri)
-                log_access(user, longest_permission_match)
+    logger.debug("User "..user.." tries to access "..ngx.var.uri.." (corresponding perm: "..permission["id"]..")")
+
+    -- The user has permission to access the content if he is in the list of allowed users
+    if element_is_in_table(user, permission["users"]) then
+        logger.debug("User "..user.." can access "..ngx.var.host..ngx.var.uri..uri_args_string())
+        log_access(user, ngx.var.host..ngx.var.uri..uri_args_string())
+        return true
+    else
+        logger.debug("User "..user.." cannot access "..ngx.var.uri)
+        return false
+    end
+end
+
+function element_is_in_table(element, table)
+    if table then
+        for _, el in pairs(table) do
+            if el == element then
                 return true
             end
         end
     end
 
-    logger.debug("User "..user.." cannot access "..ngx.var.uri)
     return false
 end
-
-function permission_matches()
-    if not conf["permissions"] then
-        conf["permissions"] = {}
-    end
-
-    local url_matches = {}
-
-    for url, permission in pairs(conf["permissions"]) do
-        if string.starts(ngx.var.host..ngx.var.uri..uri_args_string(), url) then
-            logger.debug("Url permission match current uri : "..url)
-
-            table.insert(url_matches, url)
-        end
-    end
-
-    return url_matches
-end
-
-function get_matches(section)
-    if not conf[section.."_urls"] then
-        conf[section.."_urls"] = {}
-    end
-    if not conf[section.."_regex"] then
-        conf[section.."_regex"] = {}
-    end
-
-    local url_matches = {}
-
-    for _, url in ipairs(conf[section.."_urls"]) do
-        if string.starts(ngx.var.host..ngx.var.uri..uri_args_string(), url)
-        or string.starts(ngx.var.uri..uri_args_string(), url) then
-            logger.debug(section.."_url match current uri : "..url)
-            table.insert(url_matches, url)
-        end
-    end
-    for _, regex in ipairs(conf[section.."_regex"]) do
-        local m1 = match(ngx.var.host..ngx.var.uri..uri_args_string(), regex)
-        local m2 = match(ngx.var.uri..uri_args_string(), regex)
-        if m1 then
-            logger.debug(section.."_regex match current uri : "..regex.." with "..m1)
-            table.insert(url_matches, m1)
-        end
-        if m2 then
-            logger.debug(section.."_regex match current uri : "..regex.." with "..m2)
-            table.insert(url_matches, m2)
-        end
-    end
-
-    return url_matches
-end
-
-function longest_url_path(urls)
-    local longest = nil
-    for _, url in ipairs(urls) do
-        -- Turn the url into a path, e.g.:
-        -- /foo/bar -> /foo/bar
-        -- domain.tld/foo/bar -> /foo/bar
-        -- https://domain.tld:1234/foo/bar -> /foo/bar
-        current = url_parser.parse(url).path
-        if not longest or string.len(longest) < string.len(current) then
-            longest = current
-        end
-    end
-    if longest and string.ends(longest, "/") then
-        longest = string.sub(longest, 1, -2)
-    end
-    return longest
-end
-
 
 -- Authenticate a user against the LDAP database using a username or an email
 -- address.
@@ -549,13 +514,13 @@ end
 -- It is used to render the SSOwat portal *only*.
 function serve(uri, cache)
 
-    logger.debug("Serving portal uri "..uri.." (if the corresponding file exists)")
+    logger.debug("Serving portal uri "..uri)
 
     rel_path = string.gsub(uri, conf["portal_path"], "/")
 
     -- Load login.html as index
     if rel_path == "/" then
-        if is_logged_in() then
+        if is_logged_in then
             rel_path = "/portal.html"
         else
             rel_path = "/login.html"
@@ -656,40 +621,49 @@ function get_data_for(view)
         -- Needed if the LDAP db is changed outside ssowat (from the cli for example).
         -- Not doing it for ynhpanel.json only for performance reasons,
         --   so the panel could show wrong first name, last name or main email address
-        if view ~= "ynhpanel.json" then
-            delete_user_info_cache(user)
-        end
+        -- TODO: What if we remove info during logout?
+        --if view ~= "ynhpanel.json" then
+        --    delete_user_info_cache(user)
+        --end
 
         -- Be sure cache is loaded
-        set_headers(user)
+        if user then
+            set_headers(user)
 
-        local mails = get_mails(user)
-        data = {
-            connected  = true,
-            theme      = conf.theme,
-            portal_url = conf.portal_url,
-            uid        = user,
-            cn         = cache:get(user.."-cn"),
-            sn         = cache:get(user.."-sn"),
-            givenName  = cache:get(user.."-givenName"),
-            mail       = mails["mail"],
-            mailalias  = mails["mailalias"],
-            maildrop   = mails["maildrop"],
-            app = {}
-        }
+            local mails = get_mails(user)
+            data = {
+                connected  = true,
+                theme      = conf.theme,
+                portal_url = conf.portal_url,
+                uid        = user,
+                cn         = cache:get(user.."-cn"),
+                sn         = cache:get(user.."-sn"),
+                givenName  = cache:get(user.."-givenName"),
+                mail       = mails["mail"],
+                mailalias  = mails["mailalias"],
+                maildrop   = mails["maildrop"],
+                app = {}
+            }
 
-        local sorted_apps = {}
+            local sorted_apps = {}
 
-        -- Add user's accessible URLs using the ACLs.
-        -- It is typically used to build the app list.
-        for url, name in pairs(conf["users"][user]) do
+            -- Add user's accessible URLs using the ACLs.
+            -- It is typically used to build the app list.
+            for permission_name, permission in pairs(conf["permissions"]) do
+                -- We want to display a tile, and uris is not empty
+                if permission['show_tile'] and next(permission['uris']) ~= nil and element_is_in_table(user, permission["users"]) then
+                    url = permission['uris'][1]
+                    name = permission['label']
 
-            if ngx.var.host == conf["local_portal_domain"] then
-                url = string.gsub(url, conf["original_portal_domain"], conf["local_portal_domain"])
+                    if ngx.var.host == conf["local_portal_domain"] then
+                        url = string.gsub(url, conf["original_portal_domain"], conf["local_portal_domain"])
+                    end
+
+                    table.insert(sorted_apps, name)
+                    table.sort(sorted_apps)
+                    table.insert(data["app"], index_of(sorted_apps, name), { url = url, name = name })
+                end
             end
-            table.insert(sorted_apps, name)
-            table.sort(sorted_apps)
-            table.insert(data["app"], index_of(sorted_apps, name), { url = url, name = name })
         end
     end
 
@@ -768,7 +742,7 @@ function edit_user()
 
     -- Ensure that user is logged in and has passed information
     -- before continuing.
-    if is_logged_in() and args
+    if is_logged_in and args
     then
 
         -- Set HTTP status to 201
@@ -1061,12 +1035,14 @@ function logout()
     local args = ngx.req.get_uri_args()
 
     -- Delete user cookie if logged in (that should always be the case)
-    if is_logged_in() then
+    if is_logged_in then
         delete_cookie()
         cache:delete("session_"..authUser)
         cache:delete(authUser.."-"..conf["ldap_identifier"]) -- Ugly trick to reload cache
         cache:delete(authUser.."-password")
+        delete_user_info_cache(authUser)
         flash("info", t("logged_out"))
+        is_logged_in = false
     end
 
     -- Redirect with the `r` URI argument if it exists or redirect to portal
