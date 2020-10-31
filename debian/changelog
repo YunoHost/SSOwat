@@ -1,3 +1,9 @@
+ssowat (4.0.5) stable; urgency=low
+
+  - Fix a refression from 3.7 which removed the logging message used by fail2ban to identify failed logging attempts
+
+ -- Alexandre Aubin <alex.aubin@mailoo.org> Sat, 31 Oct 2020 13:57:02 +0100
+
 ssowat (4.0.4.1) stable; urgency=low
 
   - Fix a refression from last release, language not properly updated in conf
