@@ -416,11 +416,15 @@ function authenticate(user, password)
             ensure_user_password_uses_strong_hash(connected, user, password)
         end
         cache:add(user.."-password", password, conf["session_timeout"])
+        ngx.log(ngx.NOTICE, "Connected as: "..user)
         logger.info("User "..user.." succesfully authenticated from "..ngx.var.remote_addr)
         return user
 
     -- Else, the username/email or the password is wrong
     else
+        -- N.B. : the ngx.log is important and is related to the regex used by
+        -- the fail2ban rule to detect (and ban) failed login attempts
+        ngx.log(ngx.ERR, "Connection failed for: "..user)
         logger.error("Authentication failure for user "..user.." from "..ngx.var.remote_addr)
         return false
     end
