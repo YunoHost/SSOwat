@@ -1,0 +1,12 @@
+{
+    "add_mail": "Přidat e-mail alias",
+    "new_forward": "newforward@myforeigndomain.org",
+    "new_mail": "newmail@mydomain.org",
+    "mail_forward": "E-mail pro přeposílání",
+    "mail_addresses": "E-mailová adresa",
+    "fullname": "Jméno a příjmení",
+    "password": "Heslo",
+    "username": "Uživatelské jméno",
+    "information": "Vaše údaje",
+    "portal": "YunoHost Portál"
+}
