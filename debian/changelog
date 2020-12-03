@@ -1,3 +1,12 @@
+ssowat (4.1.0) testing; urgency=low
+
+  - [enh] Extends permission feature (SSOwat#161)
+  - Update translations for Czech, French (SSOwat#173, SSOwat#174)
+
+  Thanks to all contributors <3 ! (ericgaspar, miloskroulik, Aleks, Josué, Kay0u, miloskroulik)
+
+ -- Kay0u <pierre@kayou.io> Thu, 03 Dec 2020 16:19:03 +0100
+
 ssowat (4.0.5) stable; urgency=low
 
   - Fix a refression from 3.7 which removed the logging message used by fail2ban to identify failed logging attempts
