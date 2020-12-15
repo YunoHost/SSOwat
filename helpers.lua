@@ -271,6 +271,10 @@ function refresh_logged_in()
 
     if auth_header then
         _, _, b64_cred = string.find(auth_header, "^Basic%s+(.+)$")
+        if b64_cred == nil then
+            is_logged_in = false
+            return is_logged_in
+        end
         _, _, user, password = string.find(ngx.decode_base64(b64_cred), "^(.+):(.+)$")
         user = authenticate(user, password)
         if user then
