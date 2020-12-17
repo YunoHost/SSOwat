@@ -1,31 +1,69 @@
 {
-   "portal_scheme": "https",
-   "portal_domain": "example.com",
-   "portal_path": "/ssowat/",
-   "theme": "default",
-   "domains": [
-        "example.com",
+    "additional_headers": {
+        "Auth-User": "uid",
+        "Email": "mail",
+        "Name": "cn",
+        "Remote-User": "uid"
+    },
+    "domains": [
+        "example.tld",
         "example.org"
     ],
-   "skipped_urls": [
-       "example.com/megusta",
-       "example.org/somuchwin"
-    ],
-   "unprotected_urls": ["example.com/yunoprotect"],
-   "additional_headers": {
-       "Auth-User": "uid",
-       "Remote-User": "uid",
-       "Email": "mail",
-       "Name": "cn"
-   },
-   "users": {
-       "myuser": {
-          "example.com/myapp": "My App",
-          "example.com/myapp2": "My second App"
-       },
-       "myuser2": {
-          "example.org/myapp": "My other domain App",
-          "example.com/myapp2": "My second App"
-       }
-   }
+    "permissions": {
+        "core_skipped": {
+            "auth_header": false,
+            "label": "Core permissions - skipped",
+            "public": true,
+            "show_tile": false,
+            "uris": [
+                "example.tld/yunohost/admin",
+                "example.tld/yunohost/api",
+                "re:^[^/]*/%.well%-known/ynh%-diagnosis/.*$",
+                "re:^[^/]*/%.well%-known/acme%-challenge/.*$",
+                "re:^[^/]*/%.well%-known/autoconfig/mail/config%-v1%.1%.xml.*$"
+            ],
+            "users": []
+        },
+        "myapp.admin": {
+            "auth_header": true,
+            "label": "MyApp (api)",
+            "public": false,
+            "show_tile": false,
+            "uris": [
+               "example.tld/myapp/admin"
+            ],
+            "users": [
+                "JaneDoe"
+            ]
+        },
+        "myapp.api": {
+            "auth_header": false,
+            "label": "MyApp (api)",
+            "public": true,
+            "show_tile": false,
+            "uris": [
+                "re:domain%.tld/%.well%-known/.*"
+            ],
+            "users": []
+        },
+        "myapp.main": {
+            "auth_header": true,
+            "label": "MyApp",
+            "public": true,
+            "show_tile": true,
+            "uris": [
+                "example.tld/myapp"
+            ],
+            "users": [
+                "JaneDoe",
+                "JohnDoe"
+            ]
+        }
+    },
+    "portal_domain": "example.tld",
+    "portal_path": "/yunohost/sso/",
+    "redirected_regex": {
+        "example.tld/yunohost[\\/]?$": "https://example.tld/yunohost/sso/"
+    },
+    "redirected_urls": {}
 }
