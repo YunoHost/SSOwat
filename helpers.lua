@@ -416,7 +416,21 @@ end
 -- Set the authentication headers in order to pass credentials to the
 -- application underneath.
 function set_headers(user)
+    local user = user or authUser
+    -- Set `authorization` header to enable HTTP authentification
+    ngx.req.set_header("Authorization", "Basic "..ngx.encode_base64(
+      user..":"..cache:get(user.."-password")
+    ))
 
+    -- Set optionnal additional headers (typically to pass email address)
+    for k, v in pairs(conf["additional_headers"]) do
+        ngx.req.set_header(k, cache:get(user.."-"..v))
+    end
+
+end
+
+
+function refresh_user_cache(user)
     -- We definitely don't want to pass credentials on a non-encrypted
     -- connection.
     if ngx.var.scheme ~= "https" then
@@ -473,17 +487,6 @@ function set_headers(user)
         password = cache:get(user.."-password")
         cache:set(user.."-password", password, conf["session_timeout"])
     end
-
-    -- Set `authorization` header to enable HTTP authentification
-    ngx.req.set_header("Authorization", "Basic "..ngx.encode_base64(
-      user..":"..cache:get(user.."-password")
-    ))
-
-    -- Set optionnal additional headers (typically to pass email address)
-    for k, v in pairs(conf["additional_headers"]) do
-        ngx.req.set_header(k, cache:get(user.."-"..v))
-    end
-
 end
 
 
@@ -636,7 +639,7 @@ function get_data_for(view)
 
         -- Be sure cache is loaded
         if user then
-            set_headers(user)
+            refresh_user_cache(user)
 
             local mails = get_mails(user)
             data = {
@@ -973,7 +976,7 @@ function edit_user()
                  then
                      delete_user_info_cache(user)
                      -- Ugly trick to force cache reloading
-                     set_headers(user)
+                     refresh_user_cache(user)
                      flash("win", t("information_updated"))
                      return redirect(conf.portal_url.."portal.html")
 

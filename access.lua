@@ -319,13 +319,13 @@ end
 if hlp.has_access(permission) then
 
     if is_logged_in then
-        -- If the user is logged in, we set some additional headers
-        hlp.set_headers()
+        -- If the user is logged in, refresh_cache
+        hlp.refresh_user_cache()
 
-        -- If Basic Authorization header are disabled for this permission,
-        -- remove them from the response
-        if not permission["auth_header"] then
-            ngx.req.clear_header("Authorization")
+        -- If Basic Authorization header are enable for this permission,
+        -- add it to the response
+        if permission["auth_header"] then
+            hlp.set_headers()
         end
     end
 
