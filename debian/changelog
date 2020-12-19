@@ -1,3 +1,13 @@
+ssowat (4.1.1) testing; urgency=low
+
+  - [fix] Skip Autorization Header that are not Basic ([#175](https://github.com/yunohost/ssowat/pull/175))
+  - [doc] Update example config (fec1e4c)
+  - [fix] Don't set header if auth_header is false ([#176](https://github.com/yunohost/ssowat/pull/176))
+
+  Thanks to all contributors <3 ! (Kay0u, Titoko)
+
+ -- Alexandre Aubin <alex.aubin@mailoo.org>  Sat, 19 Dec 2020 01:53:55 +0100
+
 ssowat (4.1.0) testing; urgency=low
 
   - [enh] Extends permission feature (SSOwat#161)
