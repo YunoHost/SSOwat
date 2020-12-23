@@ -429,8 +429,8 @@ end
 -- application underneath.
 function set_headers(user)
     local user = user or authUser
-    -- Set `Proxy-Authorization` header to enable HTTP authentification
-    ngx.req.set_header("Proxy-Authorization", "Basic "..ngx.encode_base64(
+    -- Set `Authorization` header to enable HTTP authentification
+    ngx.req.set_header("Authorization", "Basic "..ngx.encode_base64(
       user..":"..cache:get(user.."-password")
     ))
 
