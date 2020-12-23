@@ -263,14 +263,14 @@ function refresh_logged_in()
     return false
 end
 
--- If client set the `Authorization` header before reaching the SSO,
+-- If client set the `Proxy-Authorization` header before reaching the SSO,
 -- we want to match user and password against the user database.
 --
 -- It allows to bypass the cookie-based procedure with a per-request
 -- authentication. This is useful to authenticate on the SSO during
 -- curl requests for example.
 function parse_auth_header()
-    local auth_header = ngx.req.get_headers()["Authorization"]
+    local auth_header = ngx.req.get_headers()["Proxy-Authorization"]
 
     if auth_header then
         _, _, b64_cred = string.find(auth_header, "^Basic%s+(.+)$")
@@ -295,6 +295,9 @@ function parse_auth_header()
                 else
                     return redirect(conf.portal_url)
                 end
+            else
+                -- https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/407
+                ngx.status = 407
             end
         end
     end
@@ -426,8 +429,8 @@ end
 -- application underneath.
 function set_headers(user)
     local user = user or authUser
-    -- Set `authorization` header to enable HTTP authentification
-    ngx.req.set_header("Authorization", "Basic "..ngx.encode_base64(
+    -- Set `Proxy-Authorization` header to enable HTTP authentification
+    ngx.req.set_header("Proxy-Authorization", "Basic "..ngx.encode_base64(
       user..":"..cache:get(user.."-password")
     ))
 
