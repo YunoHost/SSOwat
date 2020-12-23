@@ -331,12 +331,15 @@ if hlp.has_access(permission) then
 
     return hlp.pass()
 
--- 2nd case : no access ... redirect to portal / login form
+-- 2nd case : no access ... check Authorization header, redirect to portal / login form
 else
 
     if is_logged_in then
         return hlp.redirect(conf.portal_url)
     else
+        -- Check if there is `Authorization` header, and redirect if we have successfully logged in
+        hlp.parse_auth_header()
+
         -- Only display this if HTTPS. For HTTP, we can't know if the user really is
         -- logged in or not, because the cookie is available only in HTTP...
         if ngx.var.scheme == "https" then
