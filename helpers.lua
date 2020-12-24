@@ -255,52 +255,39 @@ function refresh_logged_in()
                     else
                         authUser = user
                     end
+                    return is_logged_in
                 end
             end
         end
     end
 
-    return is_logged_in
-end
+    -- If client set the `Proxy-Authorization` header before reaching the SSO,
+    -- we want to match user and password against the user database.
+    --
+    -- It allows to bypass the cookie-based procedure with a per-request
+    -- authentication. This is useful to authenticate on the SSO during
+    -- curl requests for example.
 
--- If client set the `Proxy-Authorization` header before reaching the SSO,
--- we want to match user and password against the user database.
---
--- It allows to bypass the cookie-based procedure with a per-request
--- authentication. This is useful to authenticate on the SSO during
--- curl requests for example.
-function parse_auth_header()
     local auth_header = ngx.req.get_headers()["Proxy-Authorization"]
 
     if auth_header then
         _, _, b64_cred = string.find(auth_header, "^Basic%s+(.+)$")
-        if b64_cred ~= nil then
-            _, _, user, password = string.find(ngx.decode_base64(b64_cred), "^(.+):(.+)$")
-            user = authenticate(user, password)
-            if user then
-                logger.debug("User got authenticated through basic auth")
-                is_logged_in = true
-                authUser = user
-
-                if has_access(permission, user) then
-                    refresh_user_cache(user)
-
-                    -- If Basic Authorization header are enable for this permission,
-                    -- add it to the response
-                    if permission["auth_header"] then
-                        set_headers(user)
-                    end
-
-                    return pass()
-                else
-                    return redirect(conf.portal_url)
-                end
-            else
-                -- https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/407
-                ngx.status = 407
-            end
+        if b64_cred == nil then
+            return is_logged_in
+        end
+        _, _, user, password = string.find(ngx.decode_base64(b64_cred), "^(.+):(.+)$")
+        user = authenticate(user, password)
+        if user then
+            logger.debug("User got authenticated through basic auth")
+            authUser = user
+            is_logged_in = true
+        else
+            -- https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/407
+            ngx.status = 407
         end
     end
+
+    return is_logged_in
 end
 
 function log_access(user, uri)
