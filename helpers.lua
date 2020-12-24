@@ -232,6 +232,7 @@ function refresh_logged_in()
     local authHash = ngx.var.cookie_SSOwAuthHash
 
     authUser = nil
+    is_logged_in = false
 
     if expireTime and expireTime ~= ""
     and authHash and authHash ~= ""
@@ -254,13 +255,12 @@ function refresh_logged_in()
                     else
                         authUser = user
                     end
-                    return is_logged_in
                 end
             end
         end
     end
 
-    return false
+    return is_logged_in
 end
 
 -- If client set the `Proxy-Authorization` header before reaching the SSO,
