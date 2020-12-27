@@ -232,6 +232,7 @@ function refresh_logged_in()
     local authHash = ngx.var.cookie_SSOwAuthHash
 
     authUser = nil
+    is_logged_in = false
 
     if expireTime and expireTime ~= ""
     and authHash and authHash ~= ""
@@ -260,19 +261,18 @@ function refresh_logged_in()
         end
     end
 
-    -- If client set the `Authorization` header before reaching the SSO,
+    -- If client set the `Proxy-Authorization` header before reaching the SSO,
     -- we want to match user and password against the user database.
     --
     -- It allows to bypass the cookie-based procedure with a per-request
     -- authentication. This is useful to authenticate on the SSO during
     -- curl requests for example.
 
-    local auth_header = ngx.req.get_headers()["Authorization"]
+    local auth_header = ngx.req.get_headers()["Proxy-Authorization"]
 
     if auth_header then
         _, _, b64_cred = string.find(auth_header, "^Basic%s+(.+)$")
         if b64_cred == nil then
-            is_logged_in = false
             return is_logged_in
         end
         _, _, user, password = string.find(ngx.decode_base64(b64_cred), "^(.+):(.+)$")
@@ -282,13 +282,12 @@ function refresh_logged_in()
             authUser = user
             is_logged_in = true
         else
-            is_logged_in = false
+            -- https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/407
+            ngx.status = 407
         end
-        return is_logged_in
     end
 
-    is_logged_in = false
-    return false
+    return is_logged_in
 end
 
 function log_access(user, uri)
@@ -417,7 +416,7 @@ end
 -- application underneath.
 function set_headers(user)
     local user = user or authUser
-    -- Set `authorization` header to enable HTTP authentification
+    -- Set `Authorization` header to enable HTTP authentification
     ngx.req.set_header("Authorization", "Basic "..ngx.encode_base64(
       user..":"..cache:get(user.."-password")
     ))
