@@ -1,3 +1,11 @@
+ssowat (4.1.1.1) testing; urgency=low
+
+  - [fix] Change SSOwat auth header to "Proxy-Authorization" to prevent conflict with the app auth header
+
+  Thanks to all contributors <3 ! (Kay0u)
+
+ -- Alexandre Aubin <alex.aubin@mailoo.org>  Sun, 27 Dec 2020 14:06:30 +0100
+
 ssowat (4.1.1) testing; urgency=low
 
   - [fix] Skip Autorization Header that are not Basic ([#175](https://github.com/yunohost/ssowat/pull/175))
