@@ -26,7 +26,7 @@
         },
         "myapp.admin": {
             "auth_header": true,
-            "label": "MyApp (api)",
+            "label": "MyApp (admin)",
             "public": false,
             "show_tile": false,
             "uris": [
