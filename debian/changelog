@@ -1,3 +1,12 @@
+ssowat (4.1.2) stable; urgency=low
+
+  - [doc] Update the sso doc with the new permissions system ([#178](https://github.com/yunohost/ssowat/pull/178))
+  - Stable release
+
+  Thanks to all contributors <3 ! (Kay0u)
+
+ -- Alexandre Aubin <alex.aubin@mailoo.org>  Fri, 08 Jan 2021 03:16:11 +0100
+
 ssowat (4.1.1.1) testing; urgency=low
 
   - [fix] Change SSOwat auth header to "Proxy-Authorization" to prevent conflict with the app auth header
