@@ -1,3 +1,11 @@
+ssowat (4.1.3) stable; urgency=low
+
+  - [fix] Regression where users are not redirected to the ynh portal ([#179](https://github.com/YunoHost/ssowat/pull/179))
+
+  Thanks to all contributors <3 ! (Kayou)
+
+ -- Kay0u <pierre@kayou.io>  Wed, 20 Jan 2021 01:54:06 +0100
+
 ssowat (4.1.2) stable; urgency=low
 
   - [doc] Update the sso doc with the new permissions system ([#178](https://github.com/yunohost/ssowat/pull/178))
