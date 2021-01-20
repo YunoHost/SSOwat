@@ -291,14 +291,20 @@ end
 permission = nil
 longest_url_match = ""
 
+ngx_full_url = ngx.var.host..ngx.var.uri
+
 for permission_name, permission_infos in pairs(conf["permissions"]) do
     if next(permission_infos['uris']) ~= nil then
         for _, url in pairs(permission_infos['uris']) do
             if string.starts(url, "re:") then
                 url = string.sub(url, 4, string.len(url))
             end
+            -- We want to match the beginning of the url
+            if not string.starts(url, "^") then
+                url = "^"..url
+            end
 
-            local m = hlp.match(ngx.var.host..ngx.var.uri..hlp.uri_args_string(), url)
+            local m = hlp.match(ngx_full_url, url)
             if m ~= nil and string.len(m) > string.len(longest_url_match) then
                 longest_url_match = m
                 permission = permission_infos
