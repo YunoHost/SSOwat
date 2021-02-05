@@ -2,7 +2,7 @@ Source: ssowat
 Section: net
 Priority: extra
 Maintainer: YunoHost Contributors <contrib@yunohost.org>
-Build-Depends: debhelper (>=8.0.0)
+Build-Depends: debhelper (>=8.0.0), debhelper-compat (= 13)
 Standards-Version: 3.9.1
 
 Package: ssowat
