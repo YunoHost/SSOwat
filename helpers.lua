@@ -299,6 +299,46 @@ function log_access(user, uri)
   end
 end
 
+-- Check if the request contains the admin token
+function is_admin()
+
+  local admin_token_header = ngx.req.get_headers()["SSOwat-Admin-Token"]
+
+  if admin_token_header == nil then
+      return false
+  end
+
+  -- FIXME : ideally we should also be checking that the permissions for this file are something like 600 + appropriate owner...
+  local admin_token_file = io.open(admin_token_path, "r")
+  if admin_token_file == nil then
+      -- N.B. these messages should use the same syntax as in authenticate()
+      ngx.log(ngx.ERR, "Connection failed for: admin")
+      logger.error("Authentication failure for user admin from "..ngx.var.remote_addr)
+      return false
+  end
+  local token = admin_token_file:read("*all")
+  if token == nil then
+      -- N.B. these messages should use the same syntax as in authenticate()
+      ngx.log(ngx.ERR, "Connection failed for: admin")
+      logger.error("Authentication failure for user admin from "..ngx.var.remote_addr)
+      return false
+  end
+  io.close(admin_token_file)
+
+  local token = token:gsub("\n","")
+
+  -- FIXME FIXME FIXME - this is a really stupid and time-attack-prone way to validate the token
+  if admin_token_header == token then
+      return true
+  else
+      ngx.log(ngx.ERR, "Connection failed for: admin")
+      logger.error("Authentication failure for user admin from "..ngx.var.remote_addr)
+      return false
+  end
+
+end
+
+
 -- Check whether a user is allowed to access a URL using the `permissions` directive
 -- of the configuration file
 function has_access(permission, user)
@@ -307,6 +347,12 @@ function has_access(permission, user)
     if permission == nil then
         logger.debug("No permission matching request for "..ngx.var.uri)
         return false
+    end
+
+    if user == nil and not permission["public"] and is_admin()
+    then
+        logger.debug("Admin accesses "..ngx.var.host..ngx.var.uri..uri_args_string())
+        return true
     end
 
     -- Public access

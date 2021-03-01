@@ -11,6 +11,7 @@
 -- Path of the configuration
 conf_path = "/etc/ssowat/conf.json"
 log_file = "/var/log/nginx/ssowat.log"
+admin_token_path = "/etc/ssowat/admin_token"
 
 -- Remove prepending '@' & trailing 'init.lua'
 script_path = string.sub(debug.getinfo(1).source, 2, -9)
