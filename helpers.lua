@@ -327,7 +327,9 @@ function is_admin()
 
   local token = token:gsub("\n","")
 
-  -- FIXME FIXME FIXME - this is a really stupid and time-attack-prone way to validate the token
+  -- LUA comparison are made in constant time thanks to interned string mechanism
+  -- It compare pointers and not char by char. SO no risk of timing attack here :)
+  -- See https://poprocks.dev/constant-time-string-comparison-in-lua/
   if admin_token_header == token then
       return true
   else
