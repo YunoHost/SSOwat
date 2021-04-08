@@ -176,7 +176,7 @@ function set_auth_cookie(user, domain)
                "|"..session_key)
     local cookie_str = "; Domain=."..domain..
                        "; Path=/"..
-                       "; Expires="..os.date("%a, %d %b %Y %X UTC", expire)..
+                       "; Expires="..ngx.cookie_time(expire)..
                        "; Secure"..
                        "; HttpOnly"..
                        "; SameSite=Lax"
@@ -192,11 +192,10 @@ end
 
 -- Expires the 3 session cookies
 function delete_cookie()
-    local expired_time = "Thu, 01 Jan 1970 00:00:00 UTC"
     for _, domain in ipairs(conf["domains"]) do
         local cookie_str = "; Domain=."..domain..
                            "; Path=/"..
-                           "; Expires="..expired_time..
+                           "; Expires="..ngx.cookie_time(0)..
                            "; Secure"..
                            "; HttpOnly"..
                            "; SameSite=Lax"
