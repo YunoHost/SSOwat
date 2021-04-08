@@ -209,18 +209,6 @@ function delete_cookie()
 end
 
 
--- Expires the redirection cookie
-function delete_redirect_cookie()
-    local expired_time = "Thu, 01 Jan 1970 00:00:00 UTC"
-    local cookie_str = "; Path="..conf["portal_path"]..
-                       "; Expires="..expired_time..
-                       "; Secure"..
-                       "; HttpOnly"..
-                       "; SameSite=Lax"
-    ngx.header["Set-Cookie"] = "SSOwAuthRedirect=" ..cookie_str
-end
-
-
 -- Validate authentification
 --
 -- Check if the session cookies are set, and rehash server + client information
@@ -1073,7 +1061,6 @@ end
 
 -- Set cookie and go on with the response (needed to properly set cookie)
 function pass()
-    delete_redirect_cookie()
     logger.debug("Allowing to pass through "..ngx.var.uri)
 
     -- When we are in the SSOwat portal, we need a default `content-type`
