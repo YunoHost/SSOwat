@@ -1,3 +1,12 @@
+ssowat (4.2.1) testing; urgency=low
+
+  - Remove SSOwAuthRedirect ([#182](https://github.com/yunohost/ssowat/pull/182))
+  - Avoid a syscall for cookies ([#183](https://github.com/yunohost/ssowat/pull/183))
+
+  Thanks to all contributors <3 ! (Kay0u)
+
+ -- Alexandre Aubin <alex.aubin@mailoo.org>  Sat, 17 Apr 2021 03:44:14 +0200
+
 ssowat (4.2.0) testing; urgency=low
 
   - Bump version number for testing release
