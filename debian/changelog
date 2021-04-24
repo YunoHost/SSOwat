@@ -1,3 +1,9 @@
+ssowat (3.8.0.4) testing; urgency=low
+
+  - Add obsolete disclaimer on user portal ([#184](https://github.com/yunohost/ssowat/pull/184))
+
+ -- Alexandre Aubin <alex.aubin@mailoo.org>  Sat, 24 Apr 2021 17:38:20 +0200
+
 ssowat (3.8.0.3) stable; urgency=low
 
   - [enh] Allow the user's password manager to automatically enter the password/username/new-password (1dae6e8)
