@@ -1,3 +1,11 @@
+ssowat (4.2.2) stable; urgency=low
+
+  - [i18n] Translations updated for Czech, Dutch, French, German, Occitan, Russian
+
+  Thanks to all contributors <3 ! (Christian Wehrli, Mathieu Massaviol, Miloš Kroulík, panomaki, ppr, Quentí, Tymur Valiiev)
+
+ -- Alexandre Aubin <alex.aubin@mailoo.org>  Sat, 08 May 2021 15:13:04 +0200
+
 ssowat (4.2.1) testing; urgency=low
 
   - Remove SSOwAuthRedirect ([#182](https://github.com/yunohost/ssowat/pull/182))
