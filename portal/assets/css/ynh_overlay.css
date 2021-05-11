@@ -20,9 +20,12 @@
 html.ynh-panel-active {
   /* Disable any scrolling on app */
   overflow: hidden;
+
 }
 
-body {/*overflow-y: scroll;*/}
+body {
+  overflow-y: auto;
+}
 
 #ynh-overlay-switch,
 #ynh-overlay-switch *,
@@ -70,14 +73,14 @@ body {/*overflow-y: scroll;*/}
 
 /* Background */
 #ynh-overlay {
-  visibility: hidden;
+  overflow-y: hidden;
   position: fixed;
   top:0;
   left: 0;
   width: 100%;
   height: 100%;
   z-index: 9999999;
-  display: block;
+  display: none;
   border: none;
   color:#fff;
   background: #41444F;

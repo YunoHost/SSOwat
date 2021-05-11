@@ -265,8 +265,8 @@ function init_portal_button_and_overlay()
   var portalOverlay = document.createElement('iframe');
   portalOverlay.src = "/yunohost/sso/portal.html";
   portalOverlay.setAttribute("id","ynh-overlay");
-  portalOverlay.setAttribute("style","visibility: hidden;"); // make sure the overlay is invisible already when loading it
-  portalOverlay.setAttribute("class","ynh-fadeOut"); // set overlay as masked when loading it
+  portalOverlay.setAttribute("style","display: none;"); // make sure the overlay is invisible already when loading it
+  // portalOverlay.setAttribute("class","ynh-fadeOut"); // set overlay as masked when loading it
   document.body.insertBefore(portalOverlay, null);
 
   // Inject portal button
@@ -287,10 +287,12 @@ function init_portal_button_and_overlay()
       Element.toggleClass(portalOverlay, 'ynh-active');
 
       if (Element.hasClass(portalOverlay, 'ynh-active')) {
+          portalOverlay.setAttribute("style","display: block;");
           meta_viewport.setAttribute('content', meta_viewport_content);
           Element.addClass(portalOverlay, 'ynh-fadeIn');
           Element.removeClass(portalOverlay, 'ynh-fadeOut');
       } else {
+          portalOverlay.setAttribute("style","display: none;");
           meta_viewport.setAttribute('content', "width=device-width");
           Element.removeClass(portalOverlay, 'ynh-fadeIn');
           Element.addClass(portalOverlay, 'ynh-fadeOut');
@@ -342,6 +344,7 @@ function init_portal()
   });
 }
 
+
 function tweak_portal_when_in_iframe()
 {
     // Set class to body to show we're in overlay
@@ -371,3 +374,27 @@ function tweak_portal_when_in_iframe()
         });
     }
 }
+
+var lastY = 0; // Needed in order to determine direction of scroll.
+$(".scroll-container").on('touchstart', function(event) {
+    lastY = event.touches[0].clientY;
+});
+
+$('.scroller').on('touchmove', function(event) {
+    var top = event.touches[0].clientY;
+
+    // Determine scroll position and direction.
+    var scrollTop = $(event.currentTarget).scrollTop();
+    var direction = (lastY - top) < 0 ? "up" : "down";
+
+    // FIX IT!
+    if (scrollTop == 0 && direction == "up") {
+      // Prevent scrolling up when already at top as this introduces a freeze.
+      event.preventDefault();
+    } else if (scrollTop >= (event.currentTarget.scrollHeight - event.currentTarget.outerHeight()) && direction == "down") {
+      // Prevent scrolling down when already at bottom as this also introduces a freeze.
+      event.preventDefault();
+    }
+
+    lastY = top;
+});
