@@ -266,6 +266,7 @@ function init_portal_button_and_overlay()
   portalOverlay.src = "/yunohost/sso/portal.html";
   portalOverlay.setAttribute("id","ynh-overlay");
   portalOverlay.setAttribute("style","visibility: hidden;"); // make sure the overlay is invisible already when loading it
+  portalOverlay.setAttribute("class","ynh-fadeOut"); // set overlay as masked when loading it
   document.body.insertBefore(portalOverlay, null);
 
   // Inject portal button
