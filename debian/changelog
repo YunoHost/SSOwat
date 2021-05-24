@@ -1,3 +1,11 @@
+ssowat (4.2.3) stable; urgency=low
+
+  - [i18n] Translations updated for Galician
+
+  Thanks to all contributors <3 ! (José M)
+
+ -- Alexandre Aubin <alex.aubin@mailoo.org>  Mon, 24 May 2021 17:39:12 +0200
+
 ssowat (4.2.2) stable; urgency=low
 
   - [i18n] Translations updated for Czech, Dutch, French, German, Occitan, Russian
