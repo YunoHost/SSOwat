@@ -208,6 +208,7 @@ end
 if is_logged_in then
     assets = {
                    ["/ynh_portal.js"] = "js/ynh_portal.js",
+                   ["/ynh_userinfo.js"] = "ynh_userinfo.json",
                    ["/ynh_overlay.css"] = "css/ynh_overlay.css"
              }
     theme_dir = "/usr/share/ssowat/portal/assets/themes/"..conf.theme
@@ -218,7 +219,7 @@ if is_logged_in then
     pfile:close()
 
     for shortcut, full in pairs(assets) do
-        if string.match(ngx.var.uri, "^"..shortcut.."$") then
+        if ngx.var.uri == shortcut then
             logger.debug("Serving static asset "..full)
             return hlp.serve("/yunohost/sso/assets/"..full, "static_asset")
         end

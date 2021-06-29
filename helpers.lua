@@ -550,13 +550,24 @@ function serve(uri, cache)
         png  = "image/png",
         svg  = "image/svg+xml",
         ico  = "image/vnd.microsoft.icon",
-        woff = "application/x-font-woff",
+        woff = "font/woff",
+        woff2 = "font/woff2",
+        ttf = "font/ttf",
         json = "application/json"
     }
 
+    -- Allow .ms to specify mime type
+    mime = ext
+    if ext == "ms" then
+        subext = string.match(file, "^.+%.(.+)%.ms$")
+        if subext then
+            mime = subext
+        end
+    end
+
     -- Set Content-Type
-    if mime_types[ext] then
-        ngx.header["Content-Type"] = mime_types[ext]
+    if mime_types[mime] then
+        ngx.header["Content-Type"] = mime_types[mime]
     else
         ngx.header["Content-Type"] = "text/plain"
     end
@@ -570,9 +581,10 @@ function serve(uri, cache)
     elseif ext == "ms" then
         local data = get_data_for(file)
         content = lustache:render(content, data)
-    elseif ext == "json" then
+    elseif uri == "/ynh_userinfo.json" then
         local data = get_data_for(file)
         content = json.encode(data)
+        cache = "dynamic"
     end
 
     -- Reset flash messages
@@ -612,7 +624,7 @@ function get_data_for(view)
     elseif view == "portal.html"
         or view == "edit.html"
         or view == "password.html"
-        or view == "ynhpanel.json" then
+        or view == "ynh_userinfo.json" then
 
         -- Invalidate cache before loading these views.
         -- Needed if the LDAP db is changed outside ssowat (from the cli for example).
