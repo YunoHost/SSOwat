@@ -208,7 +208,7 @@ end
 if is_logged_in then
     assets = {
                    ["/ynh_portal.js"] = "js/ynh_portal.js",
-                   ["/ynh_userinfo.js"] = "ynh_userinfo.json",
+                   ["/ynh_userinfo.json"] = "ynh_userinfo.json",
                    ["/ynh_overlay.css"] = "css/ynh_overlay.css"
              }
     theme_dir = "/usr/share/ssowat/portal/assets/themes/"..conf.theme
