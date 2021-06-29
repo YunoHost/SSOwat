@@ -212,7 +212,7 @@ if is_logged_in then
                    ["/ynh_overlay.css"] = "css/ynh_overlay.css"
              }
     theme_dir = "/usr/share/ssowat/portal/assets/themes/"..conf.theme
-    local pfile = io.popen('find "'..theme_dir..'" -type f -exec realpath --relative-to "'..theme_dir..'" {} \\;')
+    local pfile = io.popen('find "'..theme_dir..'" -not -path "*/\\.*" -type f -exec realpath --relative-to "'..theme_dir..'" {} \\;')
     for filename in pfile:lines() do
         assets["/ynhtheme/"..filename] = "themes/"..conf.theme.."/"..filename
     end
