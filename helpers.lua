@@ -461,7 +461,7 @@ function refresh_user_cache(user)
     else
         -- Else, just revalidate session for another day by default
         password = cache:get(user.."-password")
-        cache:set(user.."-password", password, conf["session_timeout"])
+        cache:replace(user.."-password", password, conf["session_timeout"])
     end
 end
 
