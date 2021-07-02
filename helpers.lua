@@ -461,6 +461,8 @@ function refresh_user_cache(user)
     else
         -- Else, just revalidate session for another day by default
         password = cache:get(user.."-password")
+        -- Here we don't use set method to avoid strange logout
+        -- See https://github.com/YunoHost/issues/issues/1830
         cache:replace(user.."-password", password, conf["session_timeout"])
     end
 end
