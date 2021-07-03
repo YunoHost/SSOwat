@@ -208,17 +208,18 @@ end
 if is_logged_in then
     assets = {
                    ["/ynh_portal.js"] = "js/ynh_portal.js",
+                   ["/ynh_userinfo.json"] = "ynh_userinfo.json",
                    ["/ynh_overlay.css"] = "css/ynh_overlay.css"
              }
     theme_dir = "/usr/share/ssowat/portal/assets/themes/"..conf.theme
-    local pfile = io.popen('find "'..theme_dir..'" -type f -exec realpath --relative-to "'..theme_dir..'" {} \\;')
+    local pfile = io.popen('find "'..theme_dir..'" -not -path "*/\\.*" -type f -exec realpath --relative-to "'..theme_dir..'" {} \\;')
     for filename in pfile:lines() do
         assets["/ynhtheme/"..filename] = "themes/"..conf.theme.."/"..filename
     end
     pfile:close()
 
     for shortcut, full in pairs(assets) do
-        if string.match(ngx.var.uri, "^"..shortcut.."$") then
+        if ngx.var.uri == shortcut then
             logger.debug("Serving static asset "..full)
             return hlp.serve("/yunohost/sso/assets/"..full, "static_asset")
         end

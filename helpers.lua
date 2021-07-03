@@ -277,15 +277,6 @@ function refresh_logged_in()
     return is_logged_in
 end
 
-function log_access(user, uri)
-  local key = "ACC|"..user.."|"..uri
-  local block = cache:get(key)
-  if block == nil then
-    logger.info("User "..user.."@"..ngx.var.remote_addr.." accesses "..uri)
-    cache:set(key, "block", 60)
-  end
-end
-
 -- Check whether a user is allowed to access a URL using the `permissions` directive
 -- of the configuration file
 function has_access(permission, user)
@@ -308,7 +299,6 @@ function has_access(permission, user)
     -- The user has permission to access the content if he is in the list of allowed users
     if element_is_in_table(user, permission["users"]) then
         logger.debug("User "..user.." can access "..ngx.var.host..ngx.var.uri..uri_args_string())
-        log_access(user, ngx.var.host..ngx.var.uri..uri_args_string())
         return true
     else
         logger.debug("User "..user.." cannot access "..ngx.var.uri)
@@ -471,7 +461,9 @@ function refresh_user_cache(user)
     else
         -- Else, just revalidate session for another day by default
         password = cache:get(user.."-password")
-        cache:set(user.."-password", password, conf["session_timeout"])
+        -- Here we don't use set method to avoid strange logout
+        -- See https://github.com/YunoHost/issues/issues/1830
+        cache:replace(user.."-password", password, conf["session_timeout"])
     end
 end
 
@@ -550,13 +542,24 @@ function serve(uri, cache)
         png  = "image/png",
         svg  = "image/svg+xml",
         ico  = "image/vnd.microsoft.icon",
-        woff = "application/x-font-woff",
+        woff = "font/woff",
+        woff2 = "font/woff2",
+        ttf = "font/ttf",
         json = "application/json"
     }
 
+    -- Allow .ms to specify mime type
+    mime = ext
+    if ext == "ms" then
+        subext = string.match(file, "^.+%.(.+)%.ms$")
+        if subext then
+            mime = subext
+        end
+    end
+
     -- Set Content-Type
-    if mime_types[ext] then
-        ngx.header["Content-Type"] = mime_types[ext]
+    if mime_types[mime] then
+        ngx.header["Content-Type"] = mime_types[mime]
     else
         ngx.header["Content-Type"] = "text/plain"
     end
@@ -570,9 +573,10 @@ function serve(uri, cache)
     elseif ext == "ms" then
         local data = get_data_for(file)
         content = lustache:render(content, data)
-    elseif ext == "json" then
+    elseif uri == "/ynh_userinfo.json" then
         local data = get_data_for(file)
         content = json.encode(data)
+        cache = "dynamic"
     end
 
     -- Reset flash messages
@@ -612,7 +616,7 @@ function get_data_for(view)
     elseif view == "portal.html"
         or view == "edit.html"
         or view == "password.html"
-        or view == "ynhpanel.json" then
+        or view == "ynh_userinfo.json" then
 
         -- Invalidate cache before loading these views.
         -- Needed if the LDAP db is changed outside ssowat (from the cli for example).
