@@ -713,8 +713,7 @@ end
 -- Read result of a command after given it securely the password
 function secure_cmd_password(cmd, password, start)
     -- Check password validity
-    math.randomseed( os.time() )
-    local tmp_file = "/tmp/ssowat_"..math.random()
+    local tmp_file = os.tmpname()
     local w_pwd = io.popen("("..cmd..") | tee -a "..tmp_file, 'w')
     w_pwd:write(password)
     -- This second write is just to validate the password question
