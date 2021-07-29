@@ -1012,14 +1012,6 @@ function login()
     -- Forward the `r` URI argument if it exists to redirect
     -- the user properly after a successful login.
     if uri_args.r then
-        -- If `uri_args.r` contains line break, someone is probably trying to
-        -- pass some additional headers
-        if string.match(uri_args.r, "(.*)\n") then
-            flash("fail", t("redirection_error_invalid_url"))
-            logger.debug("Redirection url is invalid")
-            return redirect(conf.portal_url)
-        end
-
         return redirect(conf.portal_url.."?r="..uri_args.r)
     else
         return redirect(conf.portal_url)
@@ -1058,6 +1050,15 @@ end
 -- Set cookie and redirect (needed to properly set cookie)
 function redirect(url)
     logger.debug("Redirecting to "..url)
+    -- For security reason we don't allow to redirect onto unknown domain
+    -- And if `uri_args.r` contains line break, someone is probably trying to
+    -- pass some additional headers
+    local domain = url:match("^https?://([%w%.]*)/?")
+    if string.match(url, "(.*)\n") or not is_in_table(conf["domains"], domain) then
+        logger.debug("Unauthorized redirection to "..url)
+        flash("fail", t("redirection_error_invalid_url"))
+        url = conf.portal_url
+    end
     return ngx.redirect(url)
 end
 
