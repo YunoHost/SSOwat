@@ -18,6 +18,23 @@ if (typeof(console) === 'undefined') {
     console.log = console.error = console.info = console.debug = console.warn = console.trace = console.dir = console.dirxml = console.group = console.groupEnd = console.time = console.timeEnd = console.assert = console.profile = function() {};
 }
 
+/* Cookies utilities */
+function setCookie(cName, cValue, expDays) {
+        let date = new Date();
+        date.setTime(date.getTime() + (expDays * 24 * 60 * 60 * 1000));
+        const expires = "expires=" + date.toUTCString();
+        document.cookie = cName + "=" + cValue + "; " + expires + "; path=/";
+}
+function getCookie(cName) {
+      const name = cName + "=";
+      const cDecoded = decodeURIComponent(document.cookie); //to be careful
+      const cArr = cDecoded .split('; ');
+      let res;
+      cArr.forEach(val => {
+          if (val.indexOf(name) === 0) res = val.substring(name.length);
+      })
+      return res;
+}
 
 /* Array utilities
   https://github.com/Darklg/JavaScriptUtilities/blob/master/assets/js/vanilla-js/libs/vanilla-arrays.js
@@ -179,6 +196,9 @@ function make_element_draggable(id) {
       dragged = true;
       selected.style.left = (x_pos - x_elem) + 'px';
       selected.style.top = (y_pos - y_elem) + 'px';
+      // Store positions in cookies
+      setCookie('ynh_overlay_top', selected.style.top, 30);
+      setCookie('ynh_overlay_left', selected.style.left, 30);
     }
   };
 
@@ -274,6 +294,11 @@ function init_portal_button_and_overlay()
   portalButton.setAttribute('id', 'ynh-overlay-switch');
   portalButton.setAttribute('href', '/yunohost/sso/');
   portalButton.setAttribute('class', 'disableAjax');
+  // Checks if cookies exist and apply positioning
+  if (getCookie('ynh_overlay_top') != null && getCookie('ynh_overlay_left') != null) {
+      portalButton.style.top = getCookie('ynh_overlay_top');
+      portalButton.style.left = getCookie('ynh_overlay_left');
+  }
   document.body.insertBefore(portalButton, null);
   // Make portal button draggable, for user convenience
   make_element_draggable('ynh-overlay-switch');
