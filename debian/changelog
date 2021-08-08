@@ -1,3 +1,15 @@
+ssowat (4.2.4) stable; urgency=low
+
+  - [fix] Misc issues regarding dash filename, mime types, ynh_userinfo.json ([#189](https://github.com/yunohost/ssowat/pull/189))
+  - [fix] Broken Yunohost tile/overlay on iPhone ([#186](https://github.com/yunohost/ssowat/pull/186))
+  - [enh] Save overlay positions accross navigation ([#187](https://github.com/yunohost/ssowat/pull/187))
+  - [enh] security: Improve randomness of tmp filename ([#190](https://github.com/yunohost/ssowat/pull/190))
+  - [i18n] Translations updated for Esperanto, Finnish, Galician, German, Italian
+
+  Thanks to all contributors <3 ! (amirale qt, Christian Wehrli, Flavio Cristoforetti, José M, ljf, Luca, Mico Hauataluoma)
+
+ -- Alexandre Aubin <alex.aubin@mailoo.org>  Sun, 08 Aug 2021 21:58:14 +0200
+
 ssowat (4.2.3) stable; urgency=low
 
   - [i18n] Translations updated for Galician
