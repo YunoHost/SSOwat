@@ -265,7 +265,8 @@ function init_portal_button_and_overlay()
   var portalOverlay = document.createElement('iframe');
   portalOverlay.src = "/yunohost/sso/portal.html";
   portalOverlay.setAttribute("id","ynh-overlay");
-  portalOverlay.setAttribute("style","visibility: hidden;"); // make sure the overlay is invisible already when loading it
+  portalOverlay.setAttribute("style","display: none;"); // make sure the overlay is invisible already when loading it
+  // portalOverlay.setAttribute("class","ynh-fadeOut"); // set overlay as masked when loading it
   document.body.insertBefore(portalOverlay, null);
 
   // Inject portal button
@@ -286,10 +287,12 @@ function init_portal_button_and_overlay()
       Element.toggleClass(portalOverlay, 'ynh-active');
 
       if (Element.hasClass(portalOverlay, 'ynh-active')) {
+          portalOverlay.setAttribute("style","display: block;");
           meta_viewport.setAttribute('content', meta_viewport_content);
           Element.addClass(portalOverlay, 'ynh-fadeIn');
           Element.removeClass(portalOverlay, 'ynh-fadeOut');
       } else {
+          portalOverlay.setAttribute("style","display: none;");
           meta_viewport.setAttribute('content', "width=device-width");
           Element.removeClass(portalOverlay, 'ynh-fadeIn');
           Element.addClass(portalOverlay, 'ynh-fadeOut');
@@ -340,6 +343,7 @@ function init_portal()
         });
   });
 }
+
 
 function tweak_portal_when_in_iframe()
 {
