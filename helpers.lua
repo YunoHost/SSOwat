@@ -237,15 +237,23 @@ function refresh_logged_in()
                             "|"..expireTime..
                             "|"..session_key)
                     is_logged_in = hash == authHash
-                    if not is_logged_in then
-                        logger.info("Hash "..authHash.." rejected for "..user.."@"..ngx.var.remote_addr)
-                    else
+                    if is_logged_in then
                         authUser = user
+                        return true
+                    else
+                        failReason = "Hash not matching"
                     end
-                    return is_logged_in
+                else
+                    failReason = "No {user}-password entry in cache"
                 end
+            else
+                failReason = "No session key"
             end
+        else
+            failReason = "Cookie expired"
         end
+        logger.debug("SSOwat cookies rejected for "..user.."@"..ngx.var.remote_addr.." : "..failReason)
+        return false
     end
 
     -- If client set the `Proxy-Authorization` header before reaching the SSO,
