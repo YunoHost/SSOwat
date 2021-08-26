@@ -768,7 +768,7 @@ function edit_user()
                 -- and the new password against the confirmation field's content
                 if args.newpassword == args.confirm then
                     -- Check password validity
-                    local result_msg = secure_cmd_password("python /usr/lib/moulinette/yunohost/utils/password.py", args.newpassword)
+                    local result_msg = secure_cmd_password("python3 /usr/lib/moulinette/yunohost/utils/password.py", args.newpassword)
                     validation_error = true
                     if result_msg == nil or result_msg == "" then
                         validation_error = nil
