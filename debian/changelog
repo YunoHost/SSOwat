@@ -4,6 +4,57 @@ ssowat (11.0.0~alpha) unstable; urgency=low
 
  -- Alexandre Aubin <alex.aubin@mailoo.org>  Fri, 05 Feb 2021 00:02:38 +0100
 
+ssowat (4.2.4) stable; urgency=low
+
+  - [fix] Misc issues regarding dash filename, mime types, ynh_userinfo.json ([#189](https://github.com/yunohost/ssowat/pull/189))
+  - [fix] Broken Yunohost tile/overlay on iPhone ([#186](https://github.com/yunohost/ssowat/pull/186))
+  - [enh] Save overlay positions accross navigation ([#187](https://github.com/yunohost/ssowat/pull/187))
+  - [enh] security: Improve randomness of tmp filename ([#190](https://github.com/yunohost/ssowat/pull/190))
+  - [i18n] Translations updated for Esperanto, Finnish, Galician, German, Italian
+
+  Thanks to all contributors <3 ! (amirale qt, Christian Wehrli, Flavio Cristoforetti, José M, ljf, Luca, Mico Hauataluoma)
+
+ -- Alexandre Aubin <alex.aubin@mailoo.org>  Sun, 08 Aug 2021 21:58:14 +0200
+
+ssowat (4.2.3) stable; urgency=low
+
+  - [i18n] Translations updated for Galician
+
+  Thanks to all contributors <3 ! (José M)
+
+ -- Alexandre Aubin <alex.aubin@mailoo.org>  Mon, 24 May 2021 17:39:12 +0200
+
+ssowat (4.2.2) stable; urgency=low
+
+  - [i18n] Translations updated for Czech, Dutch, French, German, Occitan, Russian
+
+  Thanks to all contributors <3 ! (Christian Wehrli, Mathieu Massaviol, Miloš Kroulík, panomaki, ppr, Quentí, Tymur Valiiev)
+
+ -- Alexandre Aubin <alex.aubin@mailoo.org>  Sat, 08 May 2021 15:13:04 +0200
+
+ssowat (4.2.1) testing; urgency=low
+
+  - Remove SSOwAuthRedirect ([#182](https://github.com/yunohost/ssowat/pull/182))
+  - Avoid a syscall for cookies ([#183](https://github.com/yunohost/ssowat/pull/183))
+
+  Thanks to all contributors <3 ! (Kay0u)
+
+ -- Alexandre Aubin <alex.aubin@mailoo.org>  Sat, 17 Apr 2021 03:44:14 +0200
+
+ssowat (4.2.0) testing; urgency=low
+
+  - Bump version number for testing release
+
+ -- Alexandre Aubin <alex.aubin@mailoo.org>  Thu, 25 Mar 2021 01:00:00 +0100
+
+ssowat (4.1.3) stable; urgency=low
+
+  - [fix] Regression where users are not redirected to the ynh portal ([#179](https://github.com/YunoHost/ssowat/pull/179))
+
+  Thanks to all contributors <3 ! (Kayou)
+
+ -- Kay0u <pierre@kayou.io>  Wed, 20 Jan 2021 01:54:06 +0100
+
 ssowat (4.1.2) stable; urgency=low
 
   - [doc] Update the sso doc with the new permissions system ([#178](https://github.com/yunohost/ssowat/pull/178))

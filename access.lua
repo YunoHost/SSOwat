@@ -208,17 +208,18 @@ end
 if is_logged_in then
     assets = {
                    ["/ynh_portal.js"] = "js/ynh_portal.js",
+                   ["/ynh_userinfo.json"] = "ynh_userinfo.json",
                    ["/ynh_overlay.css"] = "css/ynh_overlay.css"
              }
     theme_dir = "/usr/share/ssowat/portal/assets/themes/"..conf.theme
-    local pfile = io.popen('find "'..theme_dir..'" -type f -exec realpath --relative-to "'..theme_dir..'" {} \\;')
+    local pfile = io.popen('find "'..theme_dir..'" -not -path "*/\\.*" -type f -exec realpath --relative-to "'..theme_dir..'" {} \\;')
     for filename in pfile:lines() do
         assets["/ynhtheme/"..filename] = "themes/"..conf.theme.."/"..filename
     end
     pfile:close()
 
     for shortcut, full in pairs(assets) do
-        if string.match(ngx.var.uri, "^"..shortcut.."$") then
+        if ngx.var.uri == shortcut then
             logger.debug("Serving static asset "..full)
             return hlp.serve("/yunohost/sso/assets/"..full, "static_asset")
         end
@@ -291,14 +292,20 @@ end
 permission = nil
 longest_url_match = ""
 
+ngx_full_url = ngx.var.host..ngx.var.uri
+
 for permission_name, permission_infos in pairs(conf["permissions"]) do
     if next(permission_infos['uris']) ~= nil then
         for _, url in pairs(permission_infos['uris']) do
             if string.starts(url, "re:") then
                 url = string.sub(url, 4, string.len(url))
             end
+            -- We want to match the beginning of the url
+            if not string.starts(url, "^") then
+                url = "^"..url
+            end
 
-            local m = hlp.match(ngx.var.host..ngx.var.uri..hlp.uri_args_string(), url)
+            local m = hlp.match(ngx_full_url, url)
             if m ~= nil and string.len(m) > string.len(longest_url_match) then
                 longest_url_match = m
                 permission = permission_infos

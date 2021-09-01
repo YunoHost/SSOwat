@@ -45,5 +45,5 @@
     "password_too_simple_2": "Lo senhal deu conténer almens 8 caractèrs e nombres, majusculas e minusculas",
     "password_too_simple_3": "Lo senhal deu conténer almens 8 caractèrs e nombres, majusculas e minusculas e caractèrs especials",
     "password_too_simple_4": "Lo senhal deu conténer almens 12 caractèrs, de nombre, majusculas, minusculas e caractèrs especials",
-    "good_practices_about_user_password": "Causissètz un senhal d’almens 8 caractèrs, es de bon far d’utilizar un senhal mai long (es a dire una frasa de senhal) e/o utilizar mantuns tipes de caractèrs (majusculas, minusculas, nombres e caractèrs especials)."
+    "good_practices_about_user_password": "Causissètz un senhal d’almens 8 caractèrs, es de bon far d’utilizar un senhal mai long (es a dire una frasa de senhal) e/o utilizar mantun tipe de caractèrs (majusculas, minusculas, nombres e caractèrs especials)."
 }

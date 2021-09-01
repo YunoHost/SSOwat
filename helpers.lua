@@ -176,7 +176,7 @@ function set_auth_cookie(user, domain)
                "|"..session_key)
     local cookie_str = "; Domain=."..domain..
                        "; Path=/"..
-                       "; Expires="..os.date("%a, %d %b %Y %X UTC", expire)..
+                       "; Expires="..ngx.cookie_time(expire)..
                        "; Secure"..
                        "; HttpOnly"..
                        "; SameSite=Lax"
@@ -192,11 +192,10 @@ end
 
 -- Expires the 3 session cookies
 function delete_cookie()
-    local expired_time = "Thu, 01 Jan 1970 00:00:00 UTC"
     for _, domain in ipairs(conf["domains"]) do
         local cookie_str = "; Domain=."..domain..
                            "; Path=/"..
-                           "; Expires="..expired_time..
+                           "; Expires="..ngx.cookie_time(0)..
                            "; Secure"..
                            "; HttpOnly"..
                            "; SameSite=Lax"
@@ -206,18 +205,6 @@ function delete_cookie()
             "SSOwAuthExpire="..cookie_str
         }
     end
-end
-
-
--- Expires the redirection cookie
-function delete_redirect_cookie()
-    local expired_time = "Thu, 01 Jan 1970 00:00:00 UTC"
-    local cookie_str = "; Path="..conf["portal_path"]..
-                       "; Expires="..expired_time..
-                       "; Secure"..
-                       "; HttpOnly"..
-                       "; SameSite=Lax"
-    ngx.header["Set-Cookie"] = "SSOwAuthRedirect=" ..cookie_str
 end
 
 
@@ -250,15 +237,23 @@ function refresh_logged_in()
                             "|"..expireTime..
                             "|"..session_key)
                     is_logged_in = hash == authHash
-                    if not is_logged_in then
-                        logger.info("Hash "..authHash.." rejected for "..user.."@"..ngx.var.remote_addr)
-                    else
+                    if is_logged_in then
                         authUser = user
+                        return true
+                    else
+                        failReason = "Hash not matching"
                     end
-                    return is_logged_in
+                else
+                    failReason = "No {user}-password entry in cache"
                 end
+            else
+                failReason = "No session key"
             end
+        else
+            failReason = "Cookie expired"
         end
+        logger.debug("SSOwat cookies rejected for "..user.."@"..ngx.var.remote_addr.." : "..failReason)
+        return false
     end
 
     -- If client set the `Proxy-Authorization` header before reaching the SSO,
@@ -290,15 +285,6 @@ function refresh_logged_in()
     return is_logged_in
 end
 
-function log_access(user, uri)
-  local key = "ACC|"..user.."|"..uri
-  local block = cache:get(key)
-  if block == nil then
-    logger.info("User "..user.."@"..ngx.var.remote_addr.." accesses "..uri)
-    cache:set(key, "block", 60)
-  end
-end
-
 -- Check whether a user is allowed to access a URL using the `permissions` directive
 -- of the configuration file
 function has_access(permission, user)
@@ -321,7 +307,6 @@ function has_access(permission, user)
     -- The user has permission to access the content if he is in the list of allowed users
     if element_is_in_table(user, permission["users"]) then
         logger.debug("User "..user.." can access "..ngx.var.host..ngx.var.uri..uri_args_string())
-        log_access(user, ngx.var.host..ngx.var.uri..uri_args_string())
         return true
     else
         logger.debug("User "..user.." cannot access "..ngx.var.uri)
@@ -484,7 +469,9 @@ function refresh_user_cache(user)
     else
         -- Else, just revalidate session for another day by default
         password = cache:get(user.."-password")
-        cache:set(user.."-password", password, conf["session_timeout"])
+        -- Here we don't use set method to avoid strange logout
+        -- See https://github.com/YunoHost/issues/issues/1830
+        cache:replace(user.."-password", password, conf["session_timeout"])
     end
 end
 
@@ -563,13 +550,24 @@ function serve(uri, cache)
         png  = "image/png",
         svg  = "image/svg+xml",
         ico  = "image/vnd.microsoft.icon",
-        woff = "application/x-font-woff",
+        woff = "font/woff",
+        woff2 = "font/woff2",
+        ttf = "font/ttf",
         json = "application/json"
     }
 
+    -- Allow .ms to specify mime type
+    mime = ext
+    if ext == "ms" then
+        subext = string.match(file, "^.+%.(.+)%.ms$")
+        if subext then
+            mime = subext
+        end
+    end
+
     -- Set Content-Type
-    if mime_types[ext] then
-        ngx.header["Content-Type"] = mime_types[ext]
+    if mime_types[mime] then
+        ngx.header["Content-Type"] = mime_types[mime]
     else
         ngx.header["Content-Type"] = "text/plain"
     end
@@ -583,9 +581,10 @@ function serve(uri, cache)
     elseif ext == "ms" then
         local data = get_data_for(file)
         content = lustache:render(content, data)
-    elseif ext == "json" then
+    elseif uri == "/ynh_userinfo.json" then
         local data = get_data_for(file)
         content = json.encode(data)
+        cache = "dynamic"
     end
 
     -- Reset flash messages
@@ -625,7 +624,7 @@ function get_data_for(view)
     elseif view == "portal.html"
         or view == "edit.html"
         or view == "password.html"
-        or view == "ynhpanel.json" then
+        or view == "ynh_userinfo.json" then
 
         -- Invalidate cache before loading these views.
         -- Needed if the LDAP db is changed outside ssowat (from the cli for example).
@@ -722,8 +721,7 @@ end
 -- Read result of a command after given it securely the password
 function secure_cmd_password(cmd, password, start)
     -- Check password validity
-    math.randomseed( os.time() )
-    local tmp_file = "/tmp/ssowat_"..math.random()
+    local tmp_file = os.tmpname()
     local w_pwd = io.popen("("..cmd..") | tee -a "..tmp_file, 'w')
     w_pwd:write(password)
     -- This second write is just to validate the password question
@@ -770,7 +768,7 @@ function edit_user()
                 -- and the new password against the confirmation field's content
                 if args.newpassword == args.confirm then
                     -- Check password validity
-                    local result_msg = secure_cmd_password("python /usr/lib/moulinette/yunohost/utils/password.py", args.newpassword)
+                    local result_msg = secure_cmd_password("python3 /usr/lib/moulinette/yunohost/utils/password.py", args.newpassword)
                     validation_error = true
                     if result_msg == nil or result_msg == "" then
                         validation_error = nil
@@ -1073,7 +1071,6 @@ end
 
 -- Set cookie and go on with the response (needed to properly set cookie)
 function pass()
-    delete_redirect_cookie()
     logger.debug("Allowing to pass through "..ngx.var.uri)
 
     -- When we are in the SSOwat portal, we need a default `content-type`
