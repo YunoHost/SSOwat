@@ -237,15 +237,23 @@ function refresh_logged_in()
                             "|"..expireTime..
                             "|"..session_key)
                     is_logged_in = hash == authHash
-                    if not is_logged_in then
-                        logger.info("Hash "..authHash.." rejected for "..user.."@"..ngx.var.remote_addr)
-                    else
+                    if is_logged_in then
                         authUser = user
+                        return true
+                    else
+                        failReason = "Hash not matching"
                     end
-                    return is_logged_in
+                else
+                    failReason = "No {user}-password entry in cache"
                 end
+            else
+                failReason = "No session key"
             end
+        else
+            failReason = "Cookie expired"
         end
+        logger.debug("SSOwat cookies rejected for "..user.."@"..ngx.var.remote_addr.." : "..failReason)
+        return false
     end
 
     -- If client set the `Proxy-Authorization` header before reaching the SSO,
@@ -713,8 +721,7 @@ end
 -- Read result of a command after given it securely the password
 function secure_cmd_password(cmd, password, start)
     -- Check password validity
-    math.randomseed( os.time() )
-    local tmp_file = "/tmp/ssowat_"..math.random()
+    local tmp_file = os.tmpname()
     local w_pwd = io.popen("("..cmd..") | tee -a "..tmp_file, 'w')
     w_pwd:write(password)
     -- This second write is just to validate the password question
@@ -761,7 +768,7 @@ function edit_user()
                 -- and the new password against the confirmation field's content
                 if args.newpassword == args.confirm then
                     -- Check password validity
-                    local result_msg = secure_cmd_password("python /usr/lib/moulinette/yunohost/utils/password.py", args.newpassword)
+                    local result_msg = secure_cmd_password("python3 /usr/lib/moulinette/yunohost/utils/password.py", args.newpassword)
                     validation_error = true
                     if result_msg == nil or result_msg == "" then
                         validation_error = nil
