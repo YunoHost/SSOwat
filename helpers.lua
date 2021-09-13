@@ -1061,7 +1061,7 @@ function redirect(url)
     -- And if `uri_args.r` contains line break, someone is probably trying to
     -- pass some additional headers
     local domain = url:match("^https?://([%w%.]*)/?")
-    if string.match(url, "(.*)\n") or not is_in_table(conf["domains"], domain) then
+    if string.match(url, "(.*)\n") or (domain ~= nil and not is_in_table(conf["domains"], domain)) then
         logger.debug("Unauthorized redirection to "..url)
         flash("fail", t("redirection_error_invalid_url"))
         url = conf.portal_url
