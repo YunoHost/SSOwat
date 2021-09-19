@@ -1,3 +1,16 @@
+ssowat (4.3.0) testing; urgency=low
+
+  - [enh] Improve logging when failing to authenticate ssowat cookies (b28788d)
+  - [fix] python -> python3 in password check (07378df)
+  - [enh] Add new theme "Clouds" ([#139](https://github.com/YunoHost/ssowat/pull/139))
+  - [fix] ynh_portal.css: fix font urls ([#193](https://github.com/YunoHost/ssowat/pull/193))
+  - [fix] Prevent attacker from crafting redirections to external domains ([#193](https://github.com/YunoHost/ssowat/pull/193))
+  - [i18n] Translations updated for Indonesian, Persian, Portuguese, Ukrainian
+
+  Thanks to all contributors <3 ! (Cyril Romain, Éric Gaspar, Geoff Montel, liimee, ljf, Parviz Homayun, Tymofii-Lytvynenko)
+
+ -- Alexandre Aubin <alex.aubin@mailoo.org>  Sun, 19 Sep 2021 21:16:49 +0200
+
 ssowat (4.2.4) stable; urgency=low
 
   - [fix] Misc issues regarding dash filename, mime types, ynh_userinfo.json ([#189](https://github.com/yunohost/ssowat/pull/189))
