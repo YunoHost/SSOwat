@@ -1060,6 +1060,16 @@ function redirect(url)
     -- For security reason we don't allow to redirect onto unknown domain
     -- And if `uri_args.r` contains line break, someone is probably trying to
     -- pass some additional headers
+
+    -- This should cover the following cases:
+    -- https://malicious.domain.tld/foo/bar
+    -- http://malicious.domain.tld/foo/bar
+    -- https://malicious.domain.tld:1234/foo
+    -- malicious.domain.tld/foo/bar
+    -- (/foo/bar, in which case no need to make sure it's prefixed with https://)
+    if not string.starts(url, "/") and not string.starts(url, "http://") and not string.starts(url, "https://") then
+        url = "https://"..url
+    end
     local domain = url:match("^https?://([%w%.]*)/?")
     if string.match(url, "(.*)\n") or (domain ~= nil and not is_in_table(conf["domains"], domain)) then
         logger.debug("Unauthorized redirection to "..url)
