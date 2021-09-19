@@ -40,7 +40,7 @@
     "wrong_username_password": "Nome de utilizador e senha errados",
     "redirection_error_invalid_url": "Erro de redirecionamento: URL inválido",
     "redirection_error_unmanaged_domain": "Erro de redirecionamento: Dominio não gerenciado",
-    "good_practices_about_user_password": "Escolha uma senha de usuário com pelo menos 8 caracteres - embora seja uma boa prática usar palavras mais longas (ou seja, uma senha) e / ou usar vários tipos de caracteres (maiúsculas, minúsculas, dígitos e caracteres especiais).",
+    "good_practices_about_user_password": "Escolha uma senha de usuário com pelo menos 8 caracteres - embora seja uma boa prática usar palavras mais longas (ou seja, uma senha) e/ou usar vários tipos de caracteres (maiúsculas, minúsculas, dígitos e caracteres especiais).",
     "password_too_simple_4": "A senha precisa ter pelo menos 12 caracteres e conter dígitos, caracteres superior, inferior e caracteres especiais",
     "password_too_simple_3": "A senha precisa ter pelo menos 8 caracteres e conter dígitos, caracteres superior, inferior e caracteres especiais",
     "password_too_simple_2": "A senha precisa ter pelo menos 8 caracteres e conter dígitos, caracteres superior e inferior",
