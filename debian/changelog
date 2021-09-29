@@ -1,3 +1,11 @@
+ssowat (4.3.1) testing; urgency=low
+
+  - [i18n] Translations updated for Indonesian
+
+  Thanks to all contributors <3 ! (liimee)
+
+ -- Alexandre Aubin <alex.aubin@mailoo.org>  Wed, 29 Sep 2021 22:39:28 +0200
+
 ssowat (4.3.0) testing; urgency=low
 
   - [enh] Improve logging when failing to authenticate ssowat cookies (b28788d)
