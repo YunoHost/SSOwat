@@ -39,11 +39,11 @@
     "add_mail": "Gehitu e-posta ezizen bat",
     "new_forward": "birbidalketaberria@nirekanpokodomeinua.eus",
     "new_mail": "postaberria@niredomeinua.eus",
-    "mail_forward": "Posta elektronikoa birbidaltzeko helbidea",
+    "mail_forward": "Birbidalketarako posta elektronikoa",
     "mail_addresses": "Helbide elektronikoak",
     "fullname": "Izen osoa",
     "password": "Pasahitza",
-    "username": "Erabiltzaile izena",
+    "username": "Erabiltzaile-izena",
     "information": "Zure informazioa",
     "portal": "YunoHost ataria"
 }
