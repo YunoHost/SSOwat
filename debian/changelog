@@ -1,3 +1,11 @@
+ssowat (4.3.1.1) testing; urgency=low
+
+  - [i18n] Translations updated for Basque, Russian, Slovenian, Spanish
+
+  Thanks to all contributors <3 ! (Jurij Podgoršek, Page Asgardius, punkrockgirl, Semen Turchikhin)
+
+ -- Alexandre Aubin <alex.aubin@mailoo.org>  Wed, 03 Nov 2021 18:46:10 +0100
+
 ssowat (4.3.1) testing; urgency=low
 
   - [i18n] Translations updated for Indonesian
