@@ -1,3 +1,9 @@
+ssowat (4.3.2) stable; urgency=low
+
+  - Bump version for stable release
+
+ -- Alexandre Aubin <alex.aubin@mailoo.org>  Fri, 05 Nov 2021 02:39:22 +0100
+
 ssowat (4.3.1.1) testing; urgency=low
 
   - [i18n] Translations updated for Basque, Russian, Slovenian, Spanish
