@@ -1070,7 +1070,7 @@ function redirect(url)
     if not string.starts(url, "/") and not string.starts(url, "http://") and not string.starts(url, "https://") then
         url = "https://"..url
     end
-    local domain = url:match("^https?://([%w%.]*)/?")
+    local domain = url:match("^https?://([^/]+)/?")
     if string.match(url, "(.*)\n") or (domain ~= nil and not is_in_table(conf["domains"], domain)) then
         logger.debug("Unauthorized redirection to "..url)
         flash("fail", t("redirection_error_invalid_url"))
