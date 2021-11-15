@@ -1,0 +1,78 @@
+/*
+===============================================================================
+ This file contain extra CSS rules to customize the YunoHost user portal and
+ can be used to customize app tiles, buttons, etc...
+===============================================================================
+*/
+
+/* Make page texts white */
+.user-container h2,
+.user-container small,
+.user-container .user-mail,
+.user-container .user-mail,
+.content .footer a,
+a.app-tile,
+#ynh-logout {
+  color: white !important;
+}
+
+body {
+  color: white !important;
+  text-shadow: 3px 4px 4px rgba(0,0,0,.4), -1px -1px 6px rgba(0,0,0,0.2);
+}
+
+.ynh-user-portal {
+  background-image: url('https://source.unsplash.com/random/featured/?nature') !important;
+  background-repeat: no-repeat;
+  background-size: cover;
+  width: 100%;
+  height: 100%;
+}
+
+/* Apps colors */
+.app-tile {
+  background-color: rgba(255, 255, 255, 0.5) !important;
+}
+
+.app-tile:hover:after,
+.app-tile:focus:after,
+.app-tile:hover:before,
+.app-tile:focus:before {
+    background: rgba(255, 255, 255, 0.5) !important;
+}
+
+/* Use a custom logo image */
+#ynh-logo {
+  z-index: 10;
+  background-image: url("./cloud.png");
+}
+
+/* Round the form */
+.login-form label:before {
+	border-top-left-radius: 5em ;
+	border-bottom-left-radius: 5em ;
+}
+
+.login-form * {
+	border-radius: 5em;
+}
+
+/* Make form black */
+
+.login-form label::before {
+	background: #000; 
+	color: #FFF;
+}
+
+.login-form .form-group * {
+	background: #000; 
+	color: #FFF;
+}
+
+.icon {
+	background: #000;
+}
+
+.messages {
+	border-radius: .5em;
+}
