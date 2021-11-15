@@ -1070,8 +1070,11 @@ function redirect(url)
     if not string.starts(url, "/") and not string.starts(url, "http://") and not string.starts(url, "https://") then
         url = "https://"..url
     end
-    local domain = url:match("^https?://([^/]+)/?")
-    if string.match(url, "(.*)\n") or (domain ~= nil and not is_in_table(conf["domains"], domain)) then
+    local is_known_domain = false
+    for _, domain in ipairs(conf["domains"]) do
+        is_known_domain = is_known_domain or url:match("^https?://"..domain.."/?") ~= nil
+    end
+    if string.match(url, "(.*)\n") or not is_known_domain then
         logger.debug("Unauthorized redirection to "..url)
         flash("fail", t("redirection_error_invalid_url"))
         url = conf.portal_url
