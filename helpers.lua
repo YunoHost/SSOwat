@@ -1070,8 +1070,13 @@ function redirect(url)
     if not string.starts(url, "/") and not string.starts(url, "http://") and not string.starts(url, "https://") then
         url = "https://"..url
     end
-    local is_known_domain = false
+    local is_known_domain = string.starts(url, "/")
     for _, domain in ipairs(conf["domains"]) do
+        if is_known_domain then
+          break
+        end
+        -- Replace - character to %- because - is a special char for regex in lua
+        domain = string.gsub(domain, "%-","%%-")
         is_known_domain = is_known_domain or url:match("^https?://"..domain.."/?") ~= nil
     end
     if string.match(url, "(.*)\n") or not is_known_domain then
