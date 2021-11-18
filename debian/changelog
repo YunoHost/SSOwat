@@ -1,3 +1,11 @@
+ssowat (4.3.2.2) stable; urgency=low
+
+  - [fix] Another fix for the redirect url check (981960f)
+
+  Thanks to all contributors <3 ! (Kay0u)
+
+ -- Alexandre Aubin <alex.aubin@mailoo.org>  Thu, 18 Nov 2021 01:09:53 +0100
+
 ssowat (4.3.2.1) stable; urgency=low
 
   - [fix] unauthorized redirect url check not matching non-alphanumeric chars in domain name ([#197](https://github.com/YunoHost/ssowat/pull/197))
