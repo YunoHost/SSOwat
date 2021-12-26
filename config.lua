@@ -6,10 +6,29 @@
 
 module('config', package.seeall)
 
+local lfs = require "lfs"
+local json = require "json"
+
 local config_attributes = nil
 local config_persistent_attributes = nil
 
 local conf = {}
+
+function get_cookie_secret()
+
+    local conf_file = assert(io.open(conf_path, "r"), "Configuration file is missing")
+    local conf_ = json.decode(conf_file:read("*all"))
+    conf_file:close()
+
+    local cookie_secret_path = conf_["cookie_secret_file"]
+    local cookie_secret_file = assert(io.open(cookie_secret_path, "r"), "Cookie secret file is missing")
+    local cookie_secret = cookie_secret_file:read("*all")
+    cookie_secret_file:close()
+
+    return cookie_secret
+end
+
+
 
 function compare_attributes(file_attributes1, file_attributes2)
     if file_attributes1 == nil and file_attributes2 == nil then
@@ -20,15 +39,6 @@ function compare_attributes(file_attributes1, file_attributes2)
     return file_attributes1["modification"] == file_attributes2["modification"] and file_attributes1["size"] == file_attributes2["size"]
 end
 
-function update_language()
-    -- Set the prefered language from the `Accept-Language` header
-    conf.lang = ngx.req.get_headers()["Accept-Language"]
-
-    if conf.lang then
-        conf.lang = string.sub(conf.lang, 1, 2)
-    end
-end
-
 function get_config()
 
     -- Get config files attributes (timestamp modification and size)
@@ -36,11 +46,9 @@ function get_config()
     local new_config_persistent_attributes = lfs.attributes(conf_path..".persistent", {"modification", "size"})
 
     if compare_attributes(new_config_attributes, config_attributes) and compare_attributes(new_config_persistent_attributes, config_persistent_attributes) then
-        update_language()
         return conf
     -- If the file is being written, its size may be 0 and reloading fails, return the last valid config
     elseif new_config_attributes == nil or new_config_attributes["size"] == 0 then
-        update_language()
         return conf
     end
 
@@ -81,22 +89,10 @@ function get_config()
 
     -- Default configuration values
     default_conf = {
-        portal_scheme             = "https",
         portal_path               = "/ssowat/",
         local_portal_domain       = "yunohost.local",
         domains                   = { conf["portal_domain"], "yunohost.local" },
-        session_timeout           = 60 * 60 * 24,     -- one day
-        session_max_timeout       = 60 * 60 * 24 * 7, -- one week
-        login_arg                 = "sso_login",
-        ldap_host                 = "localhost",
-        ldap_group                = "ou=users,dc=yunohost,dc=org",
-        ldap_identifier           = "uid",
-        ldap_enforce_crypt        = true,
         skipped_urls              = {},
-        ldap_attributes           = {"uid", "givenname", "sn", "cn", "homedirectory", "mail", "maildrop"},
-        allow_mail_authentication = true,
-        default_language          = "en",
-        theme                     = "default",
         logging                   = "fatal", -- Only log fatal messages by default (so apriori nothing)
         permissions               = {}
     }
@@ -108,25 +104,21 @@ function get_config()
     end
 
 
-
     -- If you access the SSO by a local domain, change the portal domain to
     -- avoid unwanted redirections.
     if ngx.var.host == conf["local_portal_domain"] then
-        conf["original_portal_domain"] = conf["portal_domain"]
         conf["portal_domain"] = conf["local_portal_domain"]
     end
 
 
     -- Build portal full URL out of the configuration values
-    conf.portal_url = conf["portal_scheme"].."://"..
+    conf.portal_url = "https://"..
                       conf["portal_domain"]..
                       conf["portal_path"]
 
 
     -- Always skip the portal to avoid redirection looping.
     table.insert(conf["permissions"]["core_skipped"]["uris"], conf["portal_domain"]..conf["portal_path"])
-
-    update_language()
 
     return conf
 end

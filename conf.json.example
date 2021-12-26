@@ -1,10 +1,4 @@
 {
-    "additional_headers": {
-        "Auth-User": "uid",
-        "Email": "mail",
-        "Name": "cn",
-        "Remote-User": "uid"
-    },
     "domains": [
         "example.tld",
         "example.org"
