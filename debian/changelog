@@ -1,3 +1,11 @@
+ssowat (4.3.3) stable; urgency=low
+
+  - [i18n] Translations updated for Dutch, German
+
+  Thanks to all contributors <3 ! (Boudewijn, Valentin von Guttenberg)
+
+ -- Alexandre Aubin <alex.aubin@mailoo.org>  Wed, 29 Dec 2021 01:11:41 +0100
+
 ssowat (4.3.2.2) stable; urgency=low
 
   - [fix] Another fix for the redirect url check (981960f)
