@@ -4,6 +4,30 @@ ssowat (11.0.0~alpha) unstable; urgency=low
 
  -- Alexandre Aubin <alex.aubin@mailoo.org>  Fri, 05 Feb 2021 00:02:38 +0100
 
+ssowat (4.3.3) stable; urgency=low
+
+  - [i18n] Translations updated for Dutch, German
+
+  Thanks to all contributors <3 ! (Boudewijn, Valentin von Guttenberg)
+
+ -- Alexandre Aubin <alex.aubin@mailoo.org>  Wed, 29 Dec 2021 01:11:41 +0100
+
+ssowat (4.3.2.2) stable; urgency=low
+
+  - [fix] Another fix for the redirect url check (981960f)
+
+  Thanks to all contributors <3 ! (Kay0u)
+
+ -- Alexandre Aubin <alex.aubin@mailoo.org>  Thu, 18 Nov 2021 01:09:53 +0100
+
+ssowat (4.3.2.1) stable; urgency=low
+
+  - [fix] unauthorized redirect url check not matching non-alphanumeric chars in domain name ([#197](https://github.com/YunoHost/ssowat/pull/197))
+
+  Thanks to all contributors <3 ! (Kayou)
+
+ -- Alexandre Aubin <alex.aubin@mailoo.org>  Mon, 15 Nov 2021 19:54:43 +0100
+
 ssowat (4.3.2) stable; urgency=low
 
   - Bump version for stable release
