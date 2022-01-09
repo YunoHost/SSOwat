@@ -40,7 +40,7 @@
     "wrong_username_password": "Verkeerde gebruikersnaam of wachtwoord",
     "password_too_simple_2": "Het wachtwoord moet minimaal 8 tekens lang zijn en moet cijfers, hoofdletters en kleine letters bevatten",
     "password_too_simple_1": "Het wachtwoord moet minimaal 8 tekens lang zijn",
-    "password_listed": "Dit wachtwoord is een van de meest gebruikte wachtwoorden ter wereld. Kies alstublieft iets uniekers.",
+    "password_listed": "Dit wachtwoord is een van de meest gebruikte wachtwoorden ter wereld. Kies alstublieft iets wat minder voor de hand ligt.",
     "redirection_error_unmanaged_domain": "Omleidingsfout: onbeheerd domein",
     "redirection_error_invalid_url": "Omleidingsfout: ongeldige URL",
     "good_practices_about_user_password": "Kies een gebruikerswachtwoord van minimaal 8 tekens - hoewel het een goede gewoonte is om langere (bijvoorbeeld een wachtwoordzin) te gebruiken en/of verschillende soorten tekens te gebruiken (hoofdletters, kleine letters, cijfers en speciale tekens).",
