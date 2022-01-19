@@ -1,8 +1,8 @@
-ssowat (11.0.0~alpha) unstable; urgency=low
+ssowat (11.0.2) testing; urgency=low
 
-  - Placeholder for 11.0
+  - [mod] debian: Misc updates in control file for bullseye (136e4f2)
 
- -- Alexandre Aubin <alex.aubin@mailoo.org>  Fri, 05 Feb 2021 00:02:38 +0100
+ -- Alexandre Aubin <alex.aubin@mailoo.org>  Wed, 19 Jan 2022 21:24:38 +0100
 
 ssowat (4.4.0) testing; urgency=low
 
