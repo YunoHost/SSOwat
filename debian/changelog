@@ -1,3 +1,11 @@
+ssowat (4.3.3.1) stable; urgency=low
+
+  - [i18n] Translations updated for Dutch, Finnish
+
+  Thanks to all contributors <3 ! (Boudewijn, Mico Hauataluoma)
+
+ -- Alexandre Aubin <alex.aubin@mailoo.org>  Wed, 19 Jan 2022 21:20:37 +0100
+
 ssowat (4.3.3) stable; urgency=low
 
   - [i18n] Translations updated for Dutch, German
