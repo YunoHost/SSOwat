@@ -4,6 +4,20 @@ ssowat (11.0.0~alpha) unstable; urgency=low
 
  -- Alexandre Aubin <alex.aubin@mailoo.org>  Fri, 05 Feb 2021 00:02:38 +0100
 
+ssowat (4.4.0) testing; urgency=low
+
+  - Bump version for 4.4.0
+
+ -- Alexandre Aubin <alex.aubin@mailoo.org>  Wed, 19 Jan 2022 21:20:37 +0100
+
+ssowat (4.3.3.1) stable; urgency=low
+
+  - [i18n] Translations updated for Dutch, Finnish
+
+  Thanks to all contributors <3 ! (Boudewijn, Mico Hauataluoma)
+
+ -- Alexandre Aubin <alex.aubin@mailoo.org>  Wed, 19 Jan 2022 21:20:37 +0100
+
 ssowat (4.3.3) stable; urgency=low
 
   - [i18n] Translations updated for Dutch, German

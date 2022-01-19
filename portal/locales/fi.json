@@ -1,3 +1,6 @@
 {
-    "cancel": "Peruuta"
+    "cancel": "Peruuta",
+    "portal": "YunoHost-portaali",
+    "password": "Salasana",
+    "ok": "OK"
 }
