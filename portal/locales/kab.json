@@ -1,1 +1,18 @@
-{}
+{
+    "username": "Nom d'utilisateur",
+    "password": "Awal n uɛeddi",
+    "fullname": "Isem inek ummid",
+    "ok": "Ih",
+    "cancel": "Sefsex",
+    "change_password": "Beddel awal n uffir",
+    "edit": "Édition",
+    "current_password": "Awal n uɛeddi amiran",
+    "new_password": "Awal uffir amaynut",
+    "confirm": "Sentem",
+    "login": "Qqen",
+    "logout": "Senser",
+    "logged_out": "Yeffeɣ",
+    "footerlink_documentation": "Tasemlit",
+    "footerlink_support": "Tallalt",
+    "footerlink_administration": "Tadbelt"
+}
