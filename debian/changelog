@@ -1,3 +1,11 @@
+ssowat (11.0.6) testing; urgency=low
+
+  - [i18n] Translations updated for Finnish, French, Galician, German, Kabyle, Turkish
+
+  Thanks to all contributors <3 ! (3ole, Alexandre Aubin, Eylul Dogruel, José M, Kayou, Mico Hauataluoma, Selyan Slimane Amiri, Tagada)
+
+ -- Kay0u <pierre@kayou.io>  Tue, 29 Mar 2022 14:26:27 +0200
+
 ssowat (11.0.2) testing; urgency=low
 
   - [mod] debian: Misc updates in control file for bullseye (136e4f2)
