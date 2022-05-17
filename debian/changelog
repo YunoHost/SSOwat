@@ -1,3 +1,11 @@
+ssowat (11.0.7) testing; urgency=low
+
+  - [i18n] Translations updated for Spanish
+
+  Thanks to all contributors <3 ! (JimScope, Alexandre Aubin)
+
+ -- tituspijean <titus+yunohost@pijean.ovh>  Tue, 17 May 2022 23:59:32 +0200
+
 ssowat (11.0.6) testing; urgency=low
 
   - [i18n] Translations updated for Finnish, French, Galician, German, Kabyle, Turkish
