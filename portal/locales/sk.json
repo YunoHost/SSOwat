@@ -1,1 +1,25 @@
-{}
+{
+    "information": "Vaše údaje",
+    "username": "Meno používateľa",
+    "password": "Heslo",
+    "fullname": "Meno a priezvisko",
+    "mail_forward": "E-mail pre preposielanie",
+    "new_mail": "novymail@mojadomena.org",
+    "new_forward": "novepreposielanie@mojadalsiadomena.org",
+    "add_mail": "Pridať e-mailovú prezývku/alias",
+    "add_forward": "Pridat e-mailovú adresu pre preposielanie",
+    "ok": "OK",
+    "cancel": "Zrušiť",
+    "change_password": "Zmeniť heslo",
+    "edit": "Upraviť",
+    "current_password": "Aktuálne heslo",
+    "new_password": "Nové heslo",
+    "confirm": "Potvrdiť",
+    "login": "Prihlásiť sa",
+    "logout": "Odhlásiť sa",
+    "password_changed": "Heslo bolo zmenené",
+    "password_changed_error": "Heslo nebolo zmenené",
+    "password_not_match": "Heslá sa nezhodujú",
+    "portal": "Portál YunoHost",
+    "mail_addresses": "E-mailová adresa"
+}
