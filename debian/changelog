@@ -1,3 +1,11 @@
+ssowat (11.0.8) testing; urgency=low
+
+  - [i18n] Translations updated for Polish, Slovak, Telugu
+
+  Thanks to all contributors <3 ! (Alice Kile, Jose Riha, Radek Raczkowski)
+
+ -- Alexandre Aubin <alex.aubin@mailoo.org>  Sun, 07 Aug 2022 12:19:38 +0200
+
 ssowat (11.0.7) testing; urgency=low
 
   - [i18n] Translations updated for Spanish
