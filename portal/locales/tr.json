@@ -40,9 +40,9 @@
     "wrong_username_password": "Yanlış kullanıcı adı veya parola",
     "redirection_error_unmanaged_domain": "Yönlendirme hatası: Yönetilmeyen alan",
     "redirection_error_invalid_url": "Yönlendirme hatası: Geçersiz URL",
-    "good_practices_about_user_password": "En az 8 karakterden oluşan bir kullanıcı şifresi seçin - daha uzun olanları (örneğin bir şifre) ve / veya çeşitli karakterleri (büyük harf, küçük harf, rakam ve özel karakterler) kullanmak iyi bir uygulamadır.",
-    "password_too_simple_4": "Şifrenin en az 12 karakter uzunluğunda olması ve rakam, üst, alt ve özel karakterler içermesi gerekir",
-    "password_too_simple_3": "Şifrenin en az 8 karakter uzunluğunda olması ve rakam, üst, alt ve özel karakterler içermesi gerekir",
+    "good_practices_about_user_password": "En az 8 karakterden oluşan bir kullanıcı şifresi seçin - daha uzun olanları (örneğin bir şifre) ve / veya çeşitli karakterleri (büyük harf, küçük harf, rakam ve özel karakterler) kullanmak daha iyidir.",
+    "password_too_simple_4": "Şifrenin en az 12 karakter uzunluğunda olması ve rakam, büyük ve küçük harfler, özel karakterler içermesi gerekir",
+    "password_too_simple_3": "Şifrenin en az 8 karakter uzunluğunda olması ve rakam, büyük ve küçük harfler, özel karakterler içermesi gerekir",
     "password_too_simple_2": "Şifrenin en az 8 karakter uzunluğunda olması ve rakam, üst ve alt karakterler içermesi gerekir",
     "password_too_simple_1": "Şifre en az 8 karakter uzunluğunda olmalı",
     "password_listed": "Bu şifre dünyada en çok kullanılan şifreler arasındadır. Lütfen biraz daha benzersiz bir şey seçin."
