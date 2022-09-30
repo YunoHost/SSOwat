@@ -36,7 +36,7 @@
     "missing_required_fields": "Vyplňte požadované údaje",
     "wrong_username_password": "Chybné meno používateľa alebo heslo",
     "logged_out": "Boli ste odhlásený",
-    "please_login": "Prihláste sa, prosím, aby ste získali prístup k údajom na tejto stránke",
+    "please_login": "Pre zobrazenie obsahu sa, prosím, prihláste",
     "please_login_from_portal": "Prosím, prihláste sa z portálu",
     "redirection_error_invalid_url": "Chyba presmerovania: Neplatná adresa URL",
     "redirection_error_unmanaged_domain": "Chyba presmerovania: Neregistrovaná doména",

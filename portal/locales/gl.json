@@ -43,7 +43,7 @@
     "mail_addresses": "Enderezos de email",
     "fullname": "Nome completo",
     "password": "Contrasinal",
-    "username": "Nome de usuaria",
+    "username": "Identificador",
     "information": "A túa info",
     "portal": "Portal YunoHost"
 }
