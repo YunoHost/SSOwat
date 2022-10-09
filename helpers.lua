@@ -966,6 +966,7 @@ function edit_user()
 
                  -- No problem so far, we can write modifications to the LDAP
                  if ldap:modify(dn, {'=', cn = cn,
+                                          displayName = cn,
                                           givenName = args.givenName,
                                           sn = args.sn,
                                           mail = mails,
