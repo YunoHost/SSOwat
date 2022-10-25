@@ -1,3 +1,12 @@
+ssowat (11.1.0) testing; urgency=low
+
+  - User info self-edit would not update displayName (which is supposed to be the same as cn) resulting in inconsistencies (e2996f1)
+  - [i18n] Translations updated for Basque, Galician, Slovak, Turkish
+
+  Thanks to all contributors <3 ! (José M, Jose Riha, Sedat Albayrak, xabirequejo)
+
+ -- Alexandre Aubin <alex.aubin@mailoo.org>  Tue, 25 Oct 2022 22:47:20 +0200
+
 ssowat (11.0.9) stable; urgency=low
 
   - Bump version for stable release
