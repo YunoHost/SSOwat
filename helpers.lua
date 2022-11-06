@@ -112,14 +112,15 @@ function hmac_sha512(key, message)
         -- this is really dirty and probably leak the key and the message in the process list
         -- but if someone got there I guess we really have other problems so this is acceptable
         -- and also this is way better than the previous situation
-        local pipe = io.popen("echo -n '" ..message:gsub("'", "'\\''").. "' | openssl sha512 -hmac '" ..key:gsub("'", "'\\''").. "'")
+        local pipe = io.popen("echo -n '" ..message:gsub("'", "'\\''").. "' | openssl dgst -sha512 -hmac '" ..key:gsub("'", "'\\''").. "'")
 
         -- openssl returns something like this:
         -- root@yunohost:~# echo -n "qsd" | openssl sha512 -hmac "key"
-        -- (stdin)= f1c2b1658fe64c5a3d16459f2f4eea213e4181905c190235b060ab2a4e7d6a41c15ea2c246828537a1e32ae524b7a7ed309e6d296089194c3e3e3efb98c1fbe3
+        -- SHA2-512(stdin)= f1c2b1658fe64c5a3d16459f2f4eea213e4181905c190235b060ab2a4e7d6a41c15ea2c246828537a1e32ae524b7a7ed309e6d296089194c3e3e3efb98c1fbe3
         --
-        -- so we need to remove the "(stdin)= " at the beginning
-        local hash = pipe:read():sub(string.len("(stdin)= ") + 1)
+        -- so we need to remove the "SHA2-512(stdin)= " at the beginning ("(stdin)= " on older openssl version)
+        local line = pipe:read()
+        local hash = line:sub(line:find("=") + 2)
         pipe:close()
 
         cache:set(cache_key, hash, conf["session_timeout"])
@@ -370,7 +371,7 @@ function authenticate(user, password)
         end
         cache:add(user.."-password", password, conf["session_timeout"])
         ngx.log(ngx.NOTICE, "Connected as: "..user)
-        logger.info("User "..user.." succesfully authenticated from "..ngx.var.remote_addr)
+        logger.info("User "..user.." successfully authenticated from "..ngx.var.remote_addr)
         return user
 
     -- Else, the username/email or the password is wrong
