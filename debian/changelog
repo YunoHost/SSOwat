@@ -1,3 +1,13 @@
+ssowat (11.1.2) testing; urgency=low
+
+  - [fix] helpers.lua: openssl v3 support for hmac_sha512 ([#208](https://github.com/yunohost/ssowat/pull/208))
+  - [fix] password check, path to yunohost lib changed in 11.x (71f68b0)
+  - [i18n] Translations updated for Basque, German, Polish, Slovak, Spanish, Ukrainian
+
+  Thanks to all contributors <3 ! (Christian Wehrli, Cyril Romain, Grzegorz Cichocki, Jose Riha, quiwy, Tymofii-Lytvynenko, xabirequejo)
+
+ -- Alexandre Aubin <alex.aubin@mailoo.org>  Fri, 06 Jan 2023 00:40:30 +0100
+
 ssowat (11.1.0) testing; urgency=low
 
   - User info self-edit would not update displayName (which is supposed to be the same as cn) resulting in inconsistencies (e2996f1)
