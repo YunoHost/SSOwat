@@ -422,7 +422,7 @@ function clear_headers()
     -- Clear auth header only if it's a 'Basic' auth stuff, not 'Bearer' stuff
     -- Also ignore PROPFIND routes used by Nextcloud (et al.?)
     if ngx.var.request_method ~= "PROPFIND" and ngx.req.get_headers()["Authorization"] then
-        _, _, b64_cred = string.find(auth_header, "^Basic%s+(.+)$")
+        _, _, b64_cred = string.find(ngx.req.get_headers()["Authorization"], "^Basic%s+(.+)$")
         if b64_cred ~= nil then
             ngx.req.clear_header("Authorization")
         end
