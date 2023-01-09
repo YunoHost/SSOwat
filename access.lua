@@ -333,7 +333,11 @@ if hlp.has_access(permission) then
         -- add it to the response
         if permission["auth_header"] then
             hlp.set_headers()
+        else
+            hlp.clear_headers()
         end
+    else
+        hlp.clear_headers()
     end
 
     return hlp.pass()
