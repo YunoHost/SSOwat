@@ -1,3 +1,12 @@
+ssowat (11.1.2.1) testing; urgency=low
+
+  - security: clear custom ssowat headers when user is not logged in ([#209](https://github.com/yunohost/ssowat/pull/209))
+  - security: Also check client-provided auth headers to prevent impersonation (7a2d0ed)
+
+  Thanks to all contributors <3 ! (selfhoster1312)
+
+ -- Alexandre Aubin <alex.aubin@mailoo.org>  Mon, 09 Jan 2023 18:32:46 +0100
+
 ssowat (11.1.2) testing; urgency=low
 
   - [fix] helpers.lua: openssl v3 support for hmac_sha512 ([#208](https://github.com/yunohost/ssowat/pull/208))
