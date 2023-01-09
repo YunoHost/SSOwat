@@ -1,3 +1,9 @@
+ssowat (11.1.2.4) testing; urgency=low
+
+  - security: rework previous fixes to use the new use_remote_user_var_in_nginx_conf in ssowat conf introduced in yunohost 11.1.2 (8faa805)
+
+ -- Alexandre Aubin <alex.aubin@mailoo.org>  Tue, 10 Jan 2023 00:03:31 +0100
+
 ssowat (11.1.2.3) testing; urgency=low
 
   - Stupid typo (4e92965)
