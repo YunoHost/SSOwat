@@ -265,7 +265,9 @@ function refresh_logged_in()
 
     local auth_header = ngx.req.get_headers()["Authorization"] or ngx.req.get_headers()["Proxy-Authorization"]
 
-    if auth_header then
+    -- Ignore this for PROPFIND routes used by Nextcloud (et al.?) which also rely on basic auth with totally yunohost-unrelated credentials ...
+    if auth_header and ngx.var.request_method ~= "PROPFIND" then
+        logger.debug(auth_header)
         _, _, b64_cred = string.find(auth_header, "^Basic%s+(.+)$")
         if b64_cred == nil then
             return is_logged_in
@@ -417,7 +419,14 @@ end
 --   - app requests that no authentication headers be sent
 -- Prevents user from pretending to be someone else on public apps
 function clear_headers()
-    ngx.req.clear_header("Authorization")
+    -- Clear auth header only if it's a 'Basic' auth stuff, not 'Bearer' stuff
+    -- Also ignore PROPFIND routes used by Nextcloud (et al.?)
+    if ngx.var.request_method ~= "PROPFIND" and ngx.req.get_headers()["Authorization"] then
+        _, _, b64_cred = string.find(auth_header, "^Basic%s+(.+)$")
+        if b64_cred ~= nil then
+            ngx.req.clear_header("Authorization")
+        end
+    end
     for k, v in pairs(conf["additional_headers"]) do
         ngx.req.clear_header(k)
     end
