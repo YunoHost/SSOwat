@@ -414,6 +414,16 @@ function set_headers(user)
 
 end
 
+-- Removes the authentication headers. Call me when:
+--   - app is public and user is not authenticated
+--   - app requests that no authentication headers be sent
+-- Prevents user from pretending to be someone else on public apps
+function clear_headers()
+    ngx.req.clear_header("Authorization")
+    for k, v in pairs(conf["additional_headers"]) do
+        ngx.req.clear_header(k)
+    end
+end
 
 function refresh_user_cache(user)
     -- We definitely don't want to pass credentials on a non-encrypted
