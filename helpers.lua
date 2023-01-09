@@ -257,35 +257,39 @@ function refresh_logged_in()
         return false
     end
 
-    -- If client set the Authorization/Proxy-Authorization header before reaching the SSO,
-    -- we want to match user and password against the user database.
-    --
-    -- It allows to bypass the cookie-based procedure with a per-request
-    -- authentication. This is useful to authenticate on the SSO during
-    -- curl requests for example.
-
-    local auth_header = ngx.req.get_headers()["Authorization"] or ngx.req.get_headers()["Proxy-Authorization"]
-
-    -- Ignore this for PROPFIND routes used by Nextcloud (et al.?) which also rely on basic auth with totally yunohost-unrelated credentials ...
-    if auth_header and ngx.var.request_method ~= "PROPFIND" then
-        logger.debug(auth_header)
-        _, _, b64_cred = string.find(auth_header, "^Basic%s+(.+)$")
-        if b64_cred == nil then
-            return is_logged_in
-        end
-        _, _, user, password = string.find(ngx.decode_base64(b64_cred), "^(.+):(.+)$")
-        user = authenticate(user, password)
-        if user then
-            logger.debug("User got authenticated through basic auth")
-            authUser = user
-            is_logged_in = true
-        else
-            return ngx.exit(ngx.HTTP_UNAUTHORIZED)
-        end
-    end
-
     return is_logged_in
 end
+
+function validate_or_clear_basic_auth_header_provided_by_client()
+
+    -- Ignore if no Auth header
+    local auth_header = ngx.req.get_headers()["Authorization"]
+    if auth_header == nil then
+        return nil
+    end
+
+    -- Ignore if not a Basic auth header
+    _, _, b64_cred = string.find(auth_header, "^Basic%s+(.+)$")
+    if b64_cred == nil then
+        return nil
+    end
+
+    -- Try to authenticate the user,
+    -- or remove the Auth header if not valid
+    _, _, user, password = string.find(ngx.decode_base64(b64_cred), "^(.+):(.+)$")
+    user = authenticate(user, password)
+    if user then
+        logger.debug("User got authenticated through basic auth")
+        authUser = user
+        return true
+    else
+        ngx.req.clear_header("Authorization")
+        return false -- ngx.exit(ngx.HTTP_UNAUTHORIZED)
+    end
+
+end
+
+
 
 -- Check whether a user is allowed to access a URL using the `permissions` directive
 -- of the configuration file
@@ -420,14 +424,7 @@ end
 --   - app requests that no authentication headers be sent
 -- Prevents user from pretending to be someone else on public apps
 function clear_headers()
-    -- Clear auth header only if it's a 'Basic' auth stuff, not 'Bearer' stuff
-    -- Also ignore PROPFIND routes used by Nextcloud (et al.?)
-    if ngx.var.request_method ~= "PROPFIND" and ngx.req.get_headers()["Authorization"] then
-        _, _, b64_cred = string.find(ngx.req.get_headers()["Authorization"], "^Basic%s+(.+)$")
-        if b64_cred ~= nil then
-            ngx.req.clear_header("Authorization")
-        end
-    end
+    -- NB: Basic Auth header is cleared in validate_or_clear_basic_auth_header_provided_by_client
     for k, v in pairs(conf["additional_headers"]) do
         ngx.req.clear_header(k)
     end

@@ -315,9 +315,28 @@ for permission_name, permission_infos in pairs(conf["permissions"]) do
     end
 end
 
+
+---
+--- 5. CHECK CLIENT-PROVIDED AUTH HEADER (should almost never happen?)
+---
+
+if permission ~= nil then
+    perm_user_remote_user_var_in_nginx_conf = permission["use_remote_user_var_in_nginx_conf"]
+    if perm_user_remote_user_var_in_nginx_conf == nil or perm_user_remote_user_var_in_nginx_conf == true then
+        is_logged_in_with_basic_auth = hlp.validate_or_clear_basic_auth_header_provided_by_client()
+
+        -- NB: is_logged_in_with_basic_auth can be false, true or nil
+        if is_logged_in_with_basic_auth == false then
+            return ngx.exit(ngx.HTTP_UNAUTHORIZED)
+        elseif is_logged_in_with_basic_auth == true then
+            is_logged_in = true
+        end
+    end
+end
+
 --
 --
--- 5. APPLY PERMISSION
+-- 6. APPLY PERMISSION
 --
 --
 
