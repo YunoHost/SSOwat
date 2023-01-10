@@ -1,3 +1,12 @@
+ssowat (11.0.11) stable; urgency=low
+
+  - Authentication headers are ONLY set when user is logged in and has access to app Prevents impersonating users on public applications where the auth headers were not cleared (676f157)
+  - security: Also check client-provided auth headers to prevent impersonation, based on new use_remote_user_var_in_nginx_conf in ssowatconf (7e8b0e0, f59accd, f939b63, 56c2726)
+
+  Thanks to all contributors <3 ! (selfhoster1312)
+
+ -- Alexandre Aubin <alex.aubin@mailoo.org>  Tue, 10 Jan 2023 14:03:06 +0100
+
 ssowat (11.0.9) stable; urgency=low
 
   - Bump version for stable release
