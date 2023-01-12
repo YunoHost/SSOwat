@@ -275,7 +275,7 @@ function validate_or_clear_basic_auth_header_provided_by_client()
 
     -- Try to authenticate the user,
     -- or remove the Auth header if not valid
-    _, _, user, password = string.find(ngx.decode_base64(b64_cred), "^(.+):(.+)$")
+    _, _, user, password = string.find(ngx.decode_base64(b64_cred), "^([^:]+):(.+)$")
     user = authenticate(user, password)
     if user then
         logger.debug("User got authenticated through basic auth")
