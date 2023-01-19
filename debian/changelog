@@ -1,3 +1,11 @@
+ssowat (11.1.2.5) testing; urgency=low
+
+  - Fix auth_header parsing when password contains semicolon ([#204](https://github.com/yunohost/ssowat/pull/204))
+
+  Thanks to all contributors <3 ! (ewilly)
+
+ -- Alexandre Aubin <alex.aubin@mailoo.org>  Thu, 19 Jan 2023 17:21:40 +0100
+
 ssowat (11.1.2.4) testing; urgency=low
 
   - security: rework previous fixes to use the new use_remote_user_var_in_nginx_conf in ssowat conf introduced in yunohost 11.1.2 (8faa805)
