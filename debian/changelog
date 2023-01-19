@@ -1,3 +1,11 @@
+ssowat (11.0.11.1) stable; urgency=low
+
+  - Fix auth_header parsing when password contains semicolon ([#204](https://github.com/yunohost/ssowat/pull/204))
+
+  Thanks to all contributors <3 ! (ewilly)
+
+ -- Alexandre Aubin <alex.aubin@mailoo.org>  Thu, 19 Jan 2023 17:21:40 +0100
+
 ssowat (11.0.11) stable; urgency=low
 
   - Authentication headers are ONLY set when user is logged in and has access to app Prevents impersonating users on public applications where the auth headers were not cleared (676f157)
