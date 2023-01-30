@@ -1,3 +1,9 @@
+ssowat (11.1.3) testing; urgency=low
+
+  - debian: have a proper postinst script that reload (not restart, omg) nginx... (beed8a5)
+
+ -- Alexandre Aubin <alex.aubin@mailoo.org>  Mon, 30 Jan 2023 16:33:17 +0100
+
 ssowat (11.1.2.5) testing; urgency=low
 
   - Fix auth_header parsing when password contains semicolon ([#204](https://github.com/yunohost/ssowat/pull/204))
