@@ -1,7 +1,7 @@
 {
     "footerlink_administration": "管理",
     "footerlink_support": "支持",
-    "footerlink_documentation": "文献资料",
+    "footerlink_documentation": "文档",
     "footerlink_edit": "编辑我的个人资料",
     "redirection_error_unmanaged_domain": "重定向错误：非托管域",
     "redirection_error_invalid_url": "重定向错误：无效的 URL",
@@ -34,16 +34,16 @@
     "edit": "编辑",
     "change_password": "更改密码",
     "cancel": "取消",
-    "ok": "好",
+    "ok": "ОК",
     "add_forward": "添加电子邮件转发地址",
     "add_mail": "添加电子邮件别名",
-    "new_forward": "新前进@我的外国域名.org",
-    "new_mail": "新邮件@我的域名.org",
+    "new_forward": "新转发@我的外部域.org",
+    "new_mail": "新邮件@我的域.org",
     "mail_forward": "邮件转发地址",
     "mail_addresses": "电子邮件地址",
     "fullname": "全名",
     "password": "密码",
     "username": "用户名",
     "information": "您的资料",
-    "portal": "YunoHost门户"
+    "portal": "YunoHost 门户"
 }
