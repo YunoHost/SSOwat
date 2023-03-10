@@ -100,6 +100,12 @@ Whether authentication should use secure connection or not (**default**: `https`
 
 ---------------
 
+### err404_to_portal
+
+Wether to redirect unknown URLs to the portal or to a 404 page (**default**: `true`).
+
+---------------
+
 ### domains
 
 List of handled domains (**default**: similar to `portal_domain`).
