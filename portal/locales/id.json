@@ -23,7 +23,7 @@
     "password_changed_error": "Tidak dapat mengubah kata sandi",
     "password_not_match": "Kata sandi tidak sama",
     "password_listed": "Kata sandi ini merupakan salah satu kata sandi yang paling sering digunakan di dunia. Coba pilih sesuatu yang lebih unik.",
-    "password_too_simple_1": "Kata sandi harus memiliki sekurang-kurangnya 8 karakter",
+    "password_too_simple_1": "Panjang kata sandi harus paling tidak 8 karakter",
     "wrong_current_password": "Kata sandi saat ini salah",
     "invalid_mail": "Alamat surel tidak valid",
     "mail_already_used": "Alamat surel sudah digunakan",
