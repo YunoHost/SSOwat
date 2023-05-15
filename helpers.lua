@@ -15,7 +15,7 @@ local logger = require("log")
 local url_parser = require "socket.url"
 
 -- Import Perl regular expressions library
-local rex = require "rex_pcre"
+local rex = require "rex_pcre2"
 
 local is_logged_in = false
 
