@@ -17,7 +17,7 @@
     "logout": "ログアウト",
     "password_changed": "パスワードが変更されました",
     "password_not_match": "パスワードが一致しません",
-    "password_too_simple_1": "パスワードは少なくとも8文字必要です",
+    "password_too_simple_1": "パスワードは8文字以上である必要があります",
     "password_too_simple_2": "パスワードは8文字以上で、数字/大文字/小文字の全てを含む必要があります",
     "password_too_simple_3": "パスワードは8文字以上で、数字/大文字/小文字/特殊文字の全てを含む必要があります",
     "password_too_simple_4": "パスワードは12文字以上で、数字/大文字/小文字/特殊文字の全てを含む必要があります",
