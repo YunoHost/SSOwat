@@ -11,7 +11,8 @@ local cache = ngx.shared.cache
 local conf = config.get_config()
 local Logging = require("logging")
 local jwt = require("vendor.luajwtjitsi.luajwtjitsi")
-
+local cipher = require('openssl.cipher')
+local mime = require("mime")
 
 local appender = function(self, level, message)
 
@@ -120,15 +121,30 @@ function check_authentication()
     if err ~= nil then
         -- FIXME : log an authentication error to be caught by fail2ban ? or should it happen somewhere else ? (check the old code)
         authUser = nil
+        authPasswordEnc = nil
         is_logged_in = false
         return is_logged_in
     end
 
+    -- cf. src/authenticators/ldap_ynhuser.py in YunoHost to see how the cookie is actually created
     authUser = decoded["user"]
+    authPasswordEnc = decoded["pwd"]
     is_logged_in = true
 
     -- Gotta update authUser and is_logged_in
     return is_logged_in
+end
+
+-- Extract the user password from cookie,
+-- needed to create the basic auth header
+function decrypt_user_password()
+    -- authPasswordEnc is actually a string formatted as <password_enc_b64>|<iv_b64>
+    -- For example: ctl8kk5GevYdaA5VZ2S88Q==|yTAzCx0Gd1+MCit4EQl9lA==
+    -- The password is encoded using AES-256-CBC with the IV being the right-side data
+    local password_enc_b64, iv_b64 = authPasswordEnc:match("([^|]+)|([^|]+)")
+    local password_enc = mime.unb64(password_enc_b64)
+    local iv = mime.unb64(iv_b64)
+    return cipher.new('aes-256-cbc'):decrypt(cookie_secret, iv):final(password_enc)
 end
 
 -- Check whether a user is allowed to access a URL using the `permissions` directive
@@ -172,21 +188,14 @@ function element_is_in_table(element, table)
     return false
 end
 
-
 -- Set the authentication headers in order to pass credentials to the
 -- application underneath.
-function set_headers(user)
+function set_basic_auth_header(user)
     local user = user or authUser
     -- Set `Authorization` header to enable HTTP authentification
     ngx.req.set_header("Authorization", "Basic "..ngx.encode_base64(
-      user..":"..cache:get(user.."-password")
+      user..":"..decrypt_user_password()
     ))
-
-    -- Set optionnal additional headers (typically to pass email address)
-    for k, v in pairs(conf["additional_headers"]) do
-        ngx.req.set_header(k, cache:get(user.."-"..v))
-    end
-
 end
 
 

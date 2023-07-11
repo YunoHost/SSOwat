@@ -20,7 +20,7 @@ function get_cookie_secret()
     local conf_ = json.decode(conf_file:read("*all"))
     conf_file:close()
 
-    local cookie_secret_path = conf_["cookie_secret_file"]
+    local cookie_secret_path = conf_["cookie_secret_file"] or "/etc/yunohost/.ssowat_cookie_secret"
     local cookie_secret_file = assert(io.open(cookie_secret_path, "r"), "Cookie secret file is missing")
     local cookie_secret = cookie_secret_file:read("*all")
     cookie_secret_file:close()

@@ -126,7 +126,7 @@ if hlp.has_access(permission) then
         -- If Basic Authorization header are enable for this permission,
         -- add it to the response
         if permission["auth_header"] then
-            hlp.set_headers()
+            hlp.set_basic_auth_header()
         end
     end
 
