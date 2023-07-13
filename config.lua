@@ -6,8 +6,8 @@
 
 module('config', package.seeall)
 
-local lfs = require "lfs"
-local json = require "json"
+local lfs = require("lfs")
+local json = require("json")
 
 local config_attributes = nil
 local config_persistent_attributes = nil
@@ -27,8 +27,6 @@ function get_cookie_secret()
 
     return cookie_secret
 end
-
-
 
 function compare_attributes(file_attributes1, file_attributes2)
     if file_attributes1 == nil and file_attributes2 == nil then
@@ -92,7 +90,6 @@ function get_config()
         portal_path               = "/ssowat/",
         local_portal_domain       = "yunohost.local",
         domains                   = { conf["portal_domain"], "yunohost.local" },
-        skipped_urls              = {},
         logging                   = "fatal", -- Only log fatal messages by default (so apriori nothing)
         permissions               = {}
     }

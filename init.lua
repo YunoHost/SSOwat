@@ -19,7 +19,7 @@ script_path = string.sub(debug.getinfo(1).source, 2, -9)
 package.path = package.path .. ";"..script_path.."?.lua"
 
 -- Load libraries
-local config = require "config"
+local config = require("config")
 
 -- Load cookie secret
 cookie_secret = config.get_cookie_secret()

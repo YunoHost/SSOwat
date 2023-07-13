@@ -7,12 +7,12 @@
 
 module('helpers', package.seeall)
 
-local cache = ngx.shared.cache
 local conf = config.get_config()
 local Logging = require("logging")
 local jwt = require("vendor.luajwtjitsi.luajwtjitsi")
 local cipher = require('openssl.cipher')
 local mime = require("mime")
+local rex = require("rex_pcre")
 
 local appender = function(self, level, message)
 
@@ -28,10 +28,6 @@ end
 local logger = Logging.new(appender)
 --logger:setLevel(logger.DEBUG)   -- FIXME
 
-
--- Import Perl regular expressions library
-local rex = require "rex_pcre"
-
 local is_logged_in = false
 
 function refresh_config()
@@ -40,6 +36,18 @@ end
 
 function get_config()
     return conf
+end
+
+function element_is_in_table(element, table)
+    if table then
+        for _, el in pairs(table) do
+            if el == element then
+                return true
+            end
+        end
+    end
+
+    return false
 end
 
 -- The 'match' function uses PCRE regex as default
@@ -52,32 +60,6 @@ function match(s, regex)
         return string.match(s,regex)
     end
 end
-
--- Read a FS stored file
-function read_file(file)
-    local f = io.open(file, "rb")
-    if not f then return false end
-    local content = f:read("*all")
-    f:close()
-    return content
-end
-
-
--- Lua has no sugar :D
-function is_in_table(t, v)
-    for key, value in ipairs(t) do
-        if value == v then return key end
-    end
-end
-
-
--- Get the index of a value in a table
-function index_of(t,val)
-    for k,v in ipairs(t) do
-        if v == val then return k end
-    end
-end
-
 
 -- Test whether a string starts with another
 function string.starts(String, Start)
@@ -174,18 +156,6 @@ function has_access(permission, user)
         logger:debug("User "..user.." cannot access "..ngx.var.uri)
         return false
     end
-end
-
-function element_is_in_table(element, table)
-    if table then
-        for _, el in pairs(table) do
-            if el == element then
-                return true
-            end
-        end
-    end
-
-    return false
 end
 
 -- Set the authentication headers in order to pass credentials to the

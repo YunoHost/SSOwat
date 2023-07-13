@@ -6,11 +6,8 @@
 -- request is handled: redirected, forbidden, bypassed or served.
 --
 
--- Get the `cache` persistent shared table
-local cache = ngx.shared.cache
-
 -- Import helpers
-local hlp = require "helpers"
+local hlp = require("helpers")
 
 -- Initialize and get configuration
 hlp.refresh_config()
@@ -120,9 +117,6 @@ end
 if hlp.has_access(permission) then
 
     if is_logged_in then
-        -- If the user is logged in, refresh_cache
-        --hlp.refresh_user_cache()
-
         -- If Basic Authorization header are enable for this permission,
         -- add it to the response
         if permission["auth_header"] then
