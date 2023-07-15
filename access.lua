@@ -83,37 +83,6 @@ local is_logged_in, authUser, authPasswordEnc = check_authentication()
 --  just redirect to the target URL/URI
 -- ###########################################################################
 
-function redirect(url)
-    logger:debug("Redirecting to "..url)
-    -- For security reason we don't allow to redirect onto unknown domain
-    -- And if `uri_args.r` contains line break, someone is probably trying to
-    -- pass some additional headers
-
-    -- This should cover the following cases:
-    -- https://malicious.domain.tld/foo/bar
-    -- http://malicious.domain.tld/foo/bar
-    -- https://malicious.domain.tld:1234/foo
-    -- malicious.domain.tld/foo/bar
-    -- (/foo/bar, in which case no need to make sure it's prefixed with https://)
-    if not string.starts(url, "/") and not string.starts(url, "http://") and not string.starts(url, "https://") then
-        url = "https://"..url
-    end
-    local is_known_domain = string.starts(url, "/")
-    for _, domain in ipairs(conf["domains"]) do
-        if is_known_domain then
-          break
-        end
-        -- Replace - character to %- because - is a special char for regex in lua
-        domain = string.gsub(domain, "%-","%%-")
-        is_known_domain = is_known_domain or url:match("^https?://"..domain.."/?") ~= nil
-    end
-    if string.match(url, "(.*)\n") or not is_known_domain then
-        logger:debug("Unauthorized redirection to "..url)
-        url = conf.portal_url
-    end
-    return ngx.redirect(url)
-end
-
 function convert_to_absolute_url(redirect_url)
     if string.starts(redirect_url, "http://")
     or string.starts(redirect_url, "https://") then
@@ -130,8 +99,8 @@ if conf["redirected_urls"] then
         if url == ngx.var.host..ngx.var.uri..uri_args_string()
         or url == ngx.var.scheme.."://"..ngx.var.host..ngx.var.uri..uri_args_string()
         or url == ngx.var.uri..uri_args_string() then
-            logger:debug("Requested URI is in redirected_urls")
-            redirect(convert_to_absolute_url(redirect_url))
+            logger:debug("Found in redirected_urls, redirecting to "..url)
+            ngx.redirect(convert_to_absolute_url(redirect_url))
         end
     end
 end
@@ -141,8 +110,8 @@ if conf["redirected_regex"] then
         if match(ngx.var.host..ngx.var.uri..uri_args_string(), regex)
         or match(ngx.var.scheme.."://"..ngx.var.host..ngx.var.uri..uri_args_string(), regex)
         or match(ngx.var.uri..uri_args_string(), regex) then
-            logger:debug("Requested URI is in redirected_regex")
-            redirect(convert_to_absolute_url(redirect_url))
+            logger:debug("Found in redirected_regex, redirecting to "..url)
+            ngx.redirect(convert_to_absolute_url(redirect_url))
         end
     end
 end
@@ -220,6 +189,7 @@ function check_has_access(permission)
     if permission == nil then
         logger:debug("No permission matching request for "..ngx.var.uri)
         return false
+    end
 
     -- Public access
     if authUser == nil or permission["public"] then
@@ -241,7 +211,6 @@ function check_has_access(permission)
 end
 
 has_access = check_has_access(permission)
-
 
 -- ###########################################################################
 --     5. CLEAR USER-PROVIDED AUTH HEADER
@@ -318,6 +287,15 @@ else
         return redirect(conf.portal_url)
     else
         local back_url = "https://" .. ngx.var.host .. ngx.var.uri .. uri_args_string()
-        return redirect(conf.portal_url.."?r="..ngx.encode_base64(back_url))
+
+        -- User ain't logged in, redirect to the portal where we expect the user to login,
+        -- then be redirected to the original URL by the portal, encoded as base64
+        --
+        -- NB. for security reason, the client/app handling the callback should check
+        -- that the back URL is legit, i.e it should be on the same domain (or a subdomain)
+        -- than the portal. Otherwise, a malicious actor could create a deceptive link
+        -- that would in fact redirect to a different domain, tricking the user that may
+        -- not realize this.
+        return ngx.redirect(portal_url.."?r="..ngx.encode_base64(back_url))
     end
 end
