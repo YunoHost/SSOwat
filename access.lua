@@ -65,6 +65,8 @@ function check_authentication()
 
     decoded, err = jwt.verify(cookie, "HS256", cookie_secret)
 
+    -- FIXME : maybe also check that the cookie was delivered for the requested domain (or a parent?)
+
     -- FIXME : we might want also a way to identify expired/invalidated cookies,
     -- e.g. a user that got deleted after being logged in ...
 
@@ -283,8 +285,14 @@ if has_access then
 -- 2nd case : no access ... redirect to portal / login form
 else
 
-    if is_logged_in then
-        return redirect(conf.portal_url)
+    portal_url = conf["domain_portal_urls"][ngx.var.host]
+    if portal_url == nil then
+        ngx.status = 400
+        ngx.header.content_type = "plain/text"
+        ngx.say('Unmanaged domain')
+        return
+    elseif is_logged_in then
+        return ngx.redirect(portal_url)
     else
         local back_url = "https://" .. ngx.var.host .. ngx.var.uri .. uri_args_string()
 

@@ -87,38 +87,10 @@ function get_config()
         end
     end
 
-
-    -- Default configuration values
-    default_conf = {
-        portal_path               = "/ssowat/",
-        local_portal_domain       = "yunohost.local",
-        domains                   = { conf["portal_domain"], "yunohost.local" },
-        logging                   = "fatal", -- Only log fatal messages by default (so apriori nothing)
-        permissions               = {}
-    }
-
-
-    -- Load default values unless they are set in the configuration file.
-    for param, default_value in pairs(default_conf) do
-        conf[param] = conf[param] or default_value
+    -- Always skip the portal urls to avoid redirection looping.
+    for domain, portal_url in pairs(conf["domain_portal_urls"]) do
+        table.insert(conf["permissions"]["core_skipped"]["uris"], portal_url)
     end
-
-
-    -- If you access the SSO by a local domain, change the portal domain to
-    -- avoid unwanted redirections.
-    if ngx.var.host == conf["local_portal_domain"] then
-        conf["portal_domain"] = conf["local_portal_domain"]
-    end
-
-
-    -- Build portal full URL out of the configuration values
-    conf.portal_url = "https://"..
-                      conf["portal_domain"]..
-                      conf["portal_path"]
-
-
-    -- Always skip the portal to avoid redirection looping.
-    table.insert(conf["permissions"]["core_skipped"]["uris"], conf["portal_domain"]..conf["portal_path"])
 
     return conf
 end

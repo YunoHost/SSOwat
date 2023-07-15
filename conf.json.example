@@ -1,7 +1,8 @@
 {
-    "domains": [
-        "example.tld",
-        "example.org"
+    "domain_portal_urls": [
+        "example.tld": "example.tld/yunohost/sso",
+        "sub.example.tld": "example.tld/yunohost/sso",
+        "foobar.org": "foobar.org/yunohost/sso"
     ],
     "permissions": {
         "core_skipped": {
@@ -54,8 +55,6 @@
             ]
         }
     },
-    "portal_domain": "example.tld",
-    "portal_path": "/yunohost/sso/",
     "redirected_regex": {
         "example.tld/yunohost[\\/]?$": "https://example.tld/yunohost/sso/"
     },
