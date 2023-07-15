@@ -14,6 +14,9 @@ local config_persistent_attributes = nil
 
 local conf = {}
 
+local conf_path = "/etc/ssowat/conf.json"
+
+
 function get_cookie_secret()
 
     local conf_file = assert(io.open(conf_path, "r"), "Configuration file is missing")
