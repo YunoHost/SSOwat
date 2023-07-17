@@ -189,7 +189,7 @@ end
 function check_has_access(permission)
 
     if permission == nil then
-        logger:debug("No permission matching request for "..ngx.var.uri)
+        logger:debug("No permission matching request for "..ngx.var.uri.." ... Assuming access is denied")
         return false
     end
 
@@ -230,7 +230,8 @@ if permission ~= nil and ngx.req.get_headers()["Authorization"] ~= nil then
     if perm_user_remote_user_var_in_nginx_conf == nil or perm_user_remote_user_var_in_nginx_conf == true then
          -- Ignore if not a Basic auth header
          -- otherwise, we interpret this as a Auth header spoofing attempt and clear it
-         _, _, b64_cred = string.find(auth_header, "^Basic%s+(.+)$")
+         local auth_header_from_client = ngx.req.get_headers()["Authorization"]
+         _, _, b64_cred = string.find(auth_header_from_client, "^Basic%s+(.+)$")
          if b64_cred ~= nil then
              ngx.req.clear_header("Authorization")
          end
@@ -285,7 +286,8 @@ if has_access then
 -- 2nd case : no access ... redirect to portal / login form
 else
 
-    portal_url = conf["domain_portal_urls"][ngx.var.host]
+    portal_url = "https://" .. conf["domain_portal_urls"][ngx.var.host]
+    logger:debug("Redirecting to portal : " .. portal_url)
     if portal_url == nil then
         ngx.status = 400
         ngx.header.content_type = "plain/text"
