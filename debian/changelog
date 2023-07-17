@@ -1,3 +1,11 @@
+ssowat (11.2) stable; urgency=low
+
+  - i18n: Translations updated for Chinese (Simplified), German, Indonesian, Japanese
+
+  Thanks to all contributors <3 ! (Christian Wehrli, motcha, Neko Nekowazarashi, Poesty Li)
+
+ -- Alexandre Aubin <alex.aubin@mailoo.org>  Mon, 17 Jul 2023 16:34:25 +0200
+
 ssowat (11.1.4) stable; urgency=low
 
   - Releasing as stable
