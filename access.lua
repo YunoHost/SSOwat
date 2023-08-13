@@ -286,14 +286,18 @@ if has_access then
 -- 2nd case : no access ... redirect to portal / login form
 else
 
-    portal_url = "https://" .. conf["domain_portal_urls"][ngx.var.host]
-    logger:debug("Redirecting to portal : " .. portal_url)
-    if portal_url == nil then
+    portal_domain = conf["domain_portal_urls"][ngx.var.host]
+    if portal_domain == nil then
+        logger:debug("Domain " .. ngx.var.host .. " is not configured for SSOWat")
         ngx.status = 400
         ngx.header.content_type = "plain/text"
-        ngx.say('Unmanaged domain')
+        ngx.say("Unmanaged domain: " .. ngx.var.host)
         return
-    elseif is_logged_in then
+    end
+    portal_url = "https://" .. portal_domain
+    logger:debug("Redirecting to portal : " .. portal_url)
+
+    if is_logged_in then
         return ngx.redirect(portal_url)
     else
         local back_url = "https://" .. ngx.var.host .. ngx.var.uri .. uri_args_string()
