@@ -225,6 +225,9 @@ has_access = check_has_access(permission)
 --   the $remote_user var in nginx, typically used by PHP apps
 -- ###########################################################################
 
+-- Remove remote-user header in any case, it will be set again if needed
+ngx.req.clear_header("remote-user")
+
 if permission ~= nil and ngx.req.get_headers()["Authorization"] ~= nil then
     perm_user_remote_user_var_in_nginx_conf = permission["use_remote_user_var_in_nginx_conf"]
     if perm_user_remote_user_var_in_nginx_conf == nil or perm_user_remote_user_var_in_nginx_conf == true then
@@ -277,6 +280,8 @@ if has_access then
         if permission["auth_header"] then
             set_basic_auth_header()
         end
+        -- Set ynh-user again now we checked the user is logged in
+        ngx.req.set_header("remote-user", authUser)
     end
 
     -- Pass
