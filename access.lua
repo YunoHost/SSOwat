@@ -21,6 +21,33 @@ local rex = require("rex_pcre")
 local config = require("config")
 local conf = config.get_config()
 
+-- Cache expensive calculations
+local cache = ngx.shared.cache
+
+-- Hash a string using hmac_sha512, return a hexa string
+function cached_jwt_verify(data, method, secret)
+    res = cache:get(data)
+    if res == nil then
+        logger:debug("Result not found in cache, checking login")
+        -- Perform expensive calculation
+        decoded, err = jwt.verify(data, "HS256", cookie_secret)
+        if not decoded then
+            logger:error(err)
+            return nil, nil, err
+        end
+        -- As explained in set_basic_auth_header(), user and hashed password do not contain ':'
+        -- And cache cannot contain tables, so we use "user:password" format
+        cached = decoded["user"]..":"..decoded["pwd"]
+        cache:set(data, cached, 120)
+        logger:debug("Result saved in cache")
+        return decoded["user"], decoded["pwd"], err
+    else
+        logger:debug("Result found in cache")
+        user, pwd = res:match("([^:]+):(.*)")
+        return user, pwd, nil
+    end
+end
+
 -- The 'match' function uses PCRE regex as default
 -- If '%.' is found in the regex, we assume it's a LUA regex (legacy code)
 -- 'match' returns the matched text.
@@ -55,6 +82,9 @@ end
 -- ###########################################################################
 --     1. AUTHENTICATION
 --  Check wether or not this is a logged-in user
+--  This is not run immediately but only if:
+--  - the app is not public
+--  - and/or auth_headers is enabled for this app
 -- ###########################################################################
 
 function check_authentication()
@@ -62,22 +92,23 @@ function check_authentication()
     -- cf. src/authenticators/ldap_ynhuser.py in YunoHost to see how the cookie is actually created
 
     local cookie = ngx.var["cookie_" .. conf["cookie_name"]]
+    if cookie == nil then
+        return false, nil, nil
+    end
 
-    decoded, err = jwt.verify(cookie, "HS256", cookie_secret)
+    user, pwd, err = cached_jwt_verify(cookie, "H256", cookie_secret)
 
     -- FIXME : maybe also check that the cookie was delivered for the requested domain (or a parent?)
 
     -- FIXME : we might want also a way to identify expired/invalidated cookies,
-    -- e.g. a user that got deleted after being logged in ...
+    -- e.g. a user that got deleted after being logged in, or a user that logged out ...
 
     if err ~= nil then
         return false, nil, nil
     else
-        return true, decoded["user"], decoded["pwd"]
+        return true, user, pwd
     end
 end
-
-local is_logged_in, authUser, authPasswordEnc = check_authentication()
 
 -- ###########################################################################
 --      2. REDIRECTED URLS
@@ -110,8 +141,8 @@ end
 if conf["redirected_regex"] then
     for regex, redirect_url in pairs(conf["redirected_regex"]) do
         if match(ngx.var.host..ngx.var.uri..uri_args_string(), regex)
-        or match(ngx.var.scheme.."://"..ngx.var.host..ngx.var.uri..uri_args_string(), regex)
-        or match(ngx.var.uri..uri_args_string(), regex) then
+            or match(ngx.var.scheme.."://"..ngx.var.host..ngx.var.uri..uri_args_string(), regex)
+            or match(ngx.var.uri..uri_args_string(), regex) then
             logger:debug("Found in redirected_regex, redirecting to "..url)
             ngx.redirect(convert_to_absolute_url(redirect_url))
         end
@@ -184,14 +215,22 @@ function element_is_in_table(element, table)
     return false
 end
 
--- Check whether a user is allowed to access a URL using the `permissions` directive
--- of the configuration file
-function check_has_access(permission)
-
+-- Check whether the app is public access
+function check_public_access(permission)
     if permission == nil then
         logger:debug("No permission matching request for "..ngx.var.uri.." ... Assuming access is denied")
         return false
     end
+
+    if permission["public"] then
+        logger:debug("Someone tries to access "..ngx.var.uri.." (corresponding perm: "..permission["id"]..")")
+        return true
+    end
+end
+
+-- Check whether a user is allowed to access a URL using the `permissions` directive
+-- of the configuration file
+function check_has_access(permission)
 
     -- Public access
     if authUser == nil or permission["public"] then
@@ -212,7 +251,12 @@ function check_has_access(permission)
     end
 end
 
-has_access = check_has_access(permission)
+if check_public_access(permission) then
+    has_access = true
+else
+    is_logged_in, authUser, authPasswordEnc = check_authentication()
+    has_access = check_has_access(permission)
+end
 
 -- ###########################################################################
 --     5. CLEAR USER-PROVIDED AUTH HEADER
@@ -228,13 +272,13 @@ has_access = check_has_access(permission)
 if permission ~= nil and ngx.req.get_headers()["Authorization"] ~= nil then
     perm_user_remote_user_var_in_nginx_conf = permission["use_remote_user_var_in_nginx_conf"]
     if perm_user_remote_user_var_in_nginx_conf == nil or perm_user_remote_user_var_in_nginx_conf == true then
-         -- Ignore if not a Basic auth header
-         -- otherwise, we interpret this as a Auth header spoofing attempt and clear it
-         local auth_header_from_client = ngx.req.get_headers()["Authorization"]
-         _, _, b64_cred = string.find(auth_header_from_client, "^Basic%s+(.+)$")
-         if b64_cred ~= nil then
-             ngx.req.clear_header("Authorization")
-         end
+        -- Ignore if not a Basic auth header
+        -- otherwise, we interpret this as a Auth header spoofing attempt and clear it
+        local auth_header_from_client = ngx.req.get_headers()["Authorization"]
+        _, _, b64_cred = string.find(auth_header_from_client, "^Basic%s+(.+)$")
+        if b64_cred ~= nil then
+            ngx.req.clear_header("Authorization")
+        end
     end
 end
 
@@ -264,17 +308,22 @@ function set_basic_auth_header()
 
     -- Set `Authorization` header to enable HTTP authentification
     ngx.req.set_header("Authorization", "Basic "..ngx.encode_base64(
-      authUser..":"..password
+        authUser..":"..password
     ))
 end
 
 -- 1st case : client has access
 if has_access then
-
-    if is_logged_in then
-        -- If Basic Authorization header are enable for this permission,
-        -- add it to the response
-        if permission["auth_header"] then
+    -- If Basic Authorization header are enable for this permission,
+    -- check if the user is actually logged in...
+    if permission["auth_header"] then
+        if is_logged_in == nil then
+            -- Login check was not performed yet because the app is public
+            logger:debug("Checking authentication because the app requires auth_header")
+            is_logged_in, authUser, authPasswordEnc = check_authentication()
+        end
+        if is_logged_in then
+            -- add it to the response
             set_basic_auth_header()
         end
     end
