@@ -889,7 +889,7 @@ function edit_user()
                  end
                  ldap:close()
 
-                 local rex = require "rex_pcre"
+                 local rex = require "rex_pcre2"
                  local rex_flags = rex.flags()
                  local mail_re = rex.new([[^[\w\.\-+%]+@([^\W_A-Z]+([\-]*[^\W_A-Z]+)*\.)+([^\W\d_]{2,})$]], rex_flags.UTF8 + rex_flags.UCP)
 
