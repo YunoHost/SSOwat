@@ -25,7 +25,7 @@ local conf = config.get_config()
 local cache = ngx.shared.cache
 
 -- Hash a string using hmac_sha512, return a hexa string
-function cached_jwt_verify(data, method, secret)
+function cached_jwt_verify(data, secret)
     res = cache:get(data)
     if res == nil then
         logger:debug("Result not found in cache, checking login")
@@ -96,7 +96,7 @@ function check_authentication()
         return false, nil, nil
     end
 
-    user, pwd, err = cached_jwt_verify(cookie, "H256", cookie_secret)
+    user, pwd, err = cached_jwt_verify(cookie, cookie_secret)
 
     -- FIXME : maybe also check that the cookie was delivered for the requested domain (or a parent?)
 
