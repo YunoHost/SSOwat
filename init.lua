@@ -3,65 +3,52 @@
 --
 -- This is the initialization file of SSOwat. It is called once at the Nginx
 -- server's start.
--- Consequently, all the variables declared (along with libraries and 
+-- Consequently, all the variables declared (along with libraries and
 -- translations) in this file will be *persistent* from one HTTP request to
 -- another.
 --
 
--- Path of the configuration
-conf_path = "/etc/ssowat/conf.json"
-log_file = "/var/log/nginx/ssowat.log"
-
 -- Remove prepending '@' & trailing 'init.lua'
 script_path = string.sub(debug.getinfo(1).source, 2, -9)
-
 -- Include local libs in package.path
 package.path = package.path .. ";"..script_path.."?.lua"
 
--- Load libraries
-local json = require "json"
-local lualdap = require "lualdap"
-local math = require "math"
-local lfs = require "lfs"
-local socket = require "socket"
-local config = require "config"
-lustache = require "lustache"
+-- Load cookie secret
+-- IMPORTANT (though to be confirmed?)
+-- in this context, the code is ran as root therefore we don't have to
+-- add www-data in the file permissions, which could otherwise lead
+-- to comprised apps running with the www-data group to read the secret file?
+local config = require("config")
+cookie_secret = config.get_cookie_secret()
+
+--
+-- Init logger
+--
+
+local log_file = "/var/log/nginx/ssowat.log"
 
 -- Make sure the log file exists and we can write in it
 io.popen("touch "..log_file)
 io.popen("chown www-data "..log_file)
 io.popen("chmod u+w "..log_file)
 
--- Persistent shared table
-flashs = {}
-i18n = {}
+local Logging = require("logging")
+local appender = function(self, level, message)
 
--- convert a string to a hex
-function tohex(str)
-    return (str:gsub('.', function (c)
-        return string.format('%02X', string.byte(c))
-    end))
+  -- Output to log file
+  local fp = io.open(log_file, "a")
+  local str = string.format("[%-6s%s] %s\n", level:upper(), os.date(), message)
+  fp:write(str)
+  fp:close()
+
+  return true
 end
 
--- Efficient function to get a random string
-function random_string()
-    local length = 64
-    local random_bytes = io.open("/dev/urandom"):read(length);
-    if string.len(random_bytes) ~= length then
-        error("Not enough random bytes read")
-    end
-    return tohex(random_bytes);
-end
+logger = Logging.new(appender)
 
--- Load translations in the "i18n" above table
-local locale_dir = script_path.."portal/locales/"
-for file in lfs.dir(locale_dir) do
-    if string.sub(file, -4) == "json" then
-        local lang = string.sub(file, 1, 2)
-        local locale_file = io.open(locale_dir..file, "r")
-        i18n[lang] = json.decode(locale_file:read("*all"))
-    end
-end 
+-- FIXME : how to set logging level ?
+--logger:setLevel(logger.DEBUG)   -- FIXME
+
 
 -- You should see that in your Nginx error logs by default
 ngx.log(ngx.INFO, "SSOwat ready")
