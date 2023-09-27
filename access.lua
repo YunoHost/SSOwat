@@ -10,7 +10,7 @@ ngx.header["X-SSO-WAT"] = "You've just been SSOed"
 -- Misc imports
 local jwt = require("vendor.luajwtjitsi.luajwtjitsi")
 local cipher = require('openssl.cipher')
-local rex = require("rex_pcre")
+local rex = require("rex_pcre2")
 
 -- ###########################################################################
 --     0. Misc helpers because Lua has no sugar ...
