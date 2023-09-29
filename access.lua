@@ -325,12 +325,22 @@ else
 
     portal_domain = conf["domain_portal_urls"][ngx.var.host]
     if portal_domain == nil then
-        logger:debug("Domain " .. ngx.var.host .. " is not configured for SSOWat")
-        ngx.status = 400
-        ngx.header.content_type = "plain/text"
-        ngx.say("Unmanaged domain: " .. ngx.var.host)
-        return
+        logger:debug("Domain " .. ngx.var.host .. " is not configured for SSOWat, falling back to default")
+        portal_domain = conf["domain_portal_urls"]["default"]
+        if portal_domain ~= nil then
+	    if string.starts(portal_domain, '/') then
+	        portal_domain = ngx.var.host .. portal_domain
+	    end
+	    return ngx.redirect("https://" .. portal_domain)
+	end
     end
+    if portal_domain == nil then
+	ngx.header['Content-Type'] = "text/html"
+	ngx.status = 400
+	ngx.say("Unmanaged domain")
+	return ngx.exit(200)
+    end
+
     portal_url = "https://" .. portal_domain
     logger:debug("Redirecting to portal : " .. portal_url)
 
