@@ -79,6 +79,19 @@ function uri_args_string(args)
     return string.sub(String, 1, string.len(String) - 1)
 end
 
+function element_is_in_table(element, table)
+    if table then
+        for _, el in pairs(table) do
+            if el == element then
+                return true
+            end
+        end
+    end
+
+    return false
+end
+
+
 -- ###########################################################################
 --     1. AUTHENTICATION
 --  Check wether or not this is a logged-in user
@@ -202,18 +215,6 @@ end
 --   Either because the permission is set as "public: true",
 --   Or because the logged-in user is listed in the "users" list of the perm
 -- ###########################################################################
-
-function element_is_in_table(element, table)
-    if table then
-        for _, el in pairs(table) do
-            if el == element then
-                return true
-            end
-        end
-    end
-
-    return false
-end
 
 -- No permission object found = no access
 if permission == nil then
