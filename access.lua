@@ -215,47 +215,34 @@ function element_is_in_table(element, table)
     return false
 end
 
--- Check whether the app is public access
-function check_public_access(permission)
-    if permission == nil then
-        logger:debug("No permission matching request for "..ngx.var.uri.." ... Assuming access is denied")
-        return false
-    end
-
-    if permission["public"] then
-        logger:debug("Someone tries to access "..ngx.var.uri.." (corresponding perm: "..permission["id"]..")")
-        return true
-    end
-end
-
--- Check whether a user is allowed to access a URL using the `permissions` directive
--- of the configuration file
-function check_has_access(permission)
-
-    -- Public access
-    if authUser == nil or permission["public"] then
-        user = authUser or "A visitor"
-        logger:debug(user.." tries to access "..ngx.var.uri.." (corresponding perm: "..permission["id"]..")")
-        return permission["public"]
-    end
-
-    logger:debug("User "..authUser.." tries to access "..ngx.var.uri.." (corresponding perm: "..permission["id"]..")")
-
-    -- The user has permission to access the content if he is in the list of allowed users
-    if element_is_in_table(authUser, permission["users"]) then
-        logger:debug("User "..authUser.." can access "..ngx.var.host..ngx.var.uri..uri_args_string())
-        return true
-    else
-        logger:debug("User "..authUser.." cannot access "..ngx.var.uri)
-        return false
-    end
-end
-
-if check_public_access(permission) then
-    has_access = true
+-- No permission object found = no access
+if permission == nil then
+    logger:debug("No permission matching request for "..ngx.var.uri.." ... Assuming access is denied")
+    has_access = false
+-- permission is public = everybody has access, no need to check auth
+elseif permission["public"] then
+    logger:debug("Someone tries to access "..ngx.var.uri.." (corresponding perm: "..permission["id"]..")")
+     has_access = true
+-- Check auth header, assume the route is protected
 else
     is_logged_in, authUser, authPasswordEnc = check_authentication()
-    has_access = check_has_access(permission)
+
+    -- Unauthenticated user, deny access
+    if authUser == nil then
+        logger:debug("Denied unauthenticated access to "..ngx.var.uri.." (corresponding perm: "..permission["id"]..")")
+	has_access = false
+    else
+        logger:debug("User "..authUser.." tries to access "..ngx.var.uri.." (corresponding perm: "..permission["id"]..")")
+
+	-- The user has permission to access the content if s.he is in the list of allowed users
+	if element_is_in_table(authUser, permission["users"]) then
+	    logger:debug("User "..authUser.." can access "..ngx.var.host..ngx.var.uri..uri_args_string())
+	    has_access = true
+	else
+	    logger:debug("User "..authUser.." cannot access "..ngx.var.uri)
+	    has_access = false
+	end
+    end
 end
 
 -- ###########################################################################
