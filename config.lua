@@ -16,6 +16,10 @@ local conf = {}
 
 local conf_path = "/etc/ssowat/conf.json"
 
+function file_can_be_opened_for_reading(name)
+   local f=io.open(name,"r")
+   if f~=nil then io.close(f) return true else return false end
+end
 
 function get_cookie_secret()
 
@@ -24,11 +28,21 @@ function get_cookie_secret()
     conf_file:close()
 
     local cookie_secret_path = conf_["cookie_secret_file"] or "/etc/yunohost/.ssowat_cookie_secret"
-    local cookie_secret_file = assert(io.open(cookie_secret_path, "r"), "Cookie secret file is missing")
-    local cookie_secret = cookie_secret_file:read("*all")
-    cookie_secret_file:close()
 
-    return cookie_secret
+    if file_can_be_opened_for_reading(cookie_secret_path) then
+        ngx.log(ngx.STDERR, "Cookie secret file doesn't exist (yet?) or can't be opened for reading. Authentication will be disabled for now.")
+        return nil
+    end
+
+    local cookie_secret_file = io.open(cookie_secret_path, "r")
+    if cookie_secret_file ~= nil then
+        local cookie_secret = cookie_secret_file:read("*all")
+        cookie_secret_file:close()
+        return cookie_secret
+    else
+        ngx.log(ngx.STDERR, "Cookie secret file doesn't exist (yet?) or can't be opened for reading. Authentication will be disabled for now.")
+        return nil
+    end
 end
 
 function compare_attributes(file_attributes1, file_attributes2)

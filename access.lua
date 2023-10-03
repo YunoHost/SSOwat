@@ -105,7 +105,7 @@ function check_authentication()
     -- cf. src/authenticators/ldap_ynhuser.py in YunoHost to see how the cookie is actually created
 
     local cookie = ngx.var["cookie_" .. conf["cookie_name"]]
-    if cookie == nil then
+    if cookie == nil or cookie_secret == nil then
         return false, nil, nil
     end
 
