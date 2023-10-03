@@ -87,6 +87,15 @@ function get_config()
         end
     end
 
+    -- Define empty dict if conf file is empty~ish,
+    -- to at least avoid miserably crashing later
+    if conf["domain_portal_urls"] == nil then
+        conf["domain_portal_urls"] = {}
+    end
+    if conf["permissions"] == nil then
+        conf["permissions"] = {}
+    end
+
     -- Always skip the portal urls to avoid redirection looping.
     for domain, portal_url in pairs(conf["domain_portal_urls"]) do
         table.insert(conf["permissions"]["core_skipped"]["uris"], portal_url)
