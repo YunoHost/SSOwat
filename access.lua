@@ -151,17 +151,6 @@ if conf["redirected_urls"] then
     end
 end
 
-if conf["redirected_regex"] then
-    for regex, redirect_url in pairs(conf["redirected_regex"]) do
-        if match(ngx.var.host..ngx.var.uri..uri_args_string(), regex)
-            or match(ngx.var.scheme.."://"..ngx.var.host..ngx.var.uri..uri_args_string(), regex)
-            or match(ngx.var.uri..uri_args_string(), regex) then
-            logger:debug("Found in redirected_regex, redirecting to "..url)
-            ngx.redirect(convert_to_absolute_url(redirect_url))
-        end
-    end
-end
-
 -- ###########################################################################
 --      3. IDENTIFY PERMISSION MATCHING THE REQUESTED URL
 --
@@ -169,9 +158,7 @@ end
 --
 --        "foobar": {
 --            "auth_header": false,
---            "label": "Foobar permission",
 --            "public": false,
---            "show_tile": true,
 --            "uris": [
 --                "yolo.test/foobar",
 --                "re:^[^/]*/%.well%-known/foobar/.*$",

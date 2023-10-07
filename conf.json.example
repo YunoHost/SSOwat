@@ -55,8 +55,5 @@
             ]
         }
     },
-    "redirected_regex": {
-        "example.tld/yunohost[\\/]?$": "https://example.tld/yunohost/sso/"
-    },
     "redirected_urls": {}
 }

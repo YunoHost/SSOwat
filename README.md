@@ -55,11 +55,8 @@ Only the `portal_domain` SSOwat configuration parameters is required, but it is 
 
 - `cookie_secret_file`: Where the secret used for signing and encrypting cookie is stored. It should only be readable by root.
 - `cookie_name`: The name of the cookie used for authentication. Its content is expected to be a JWT signed with the cookie secret and should contain a key `user` and `password` (which is needed for Basic HTTP Auth). Because JWT is only encoded and signed (not encrypted), the `password` is expected to be encrypted using the cookie secret.
-- `portal_domain`: Domain of the authentication portal. It has to be a domain, IP addresses will not work with SSOwat (**Required**).
-- `portal_path`: URI of the authentication portal (**default**: `/ssowat/`). This path **must** end with “`/`”.
-- `domains`: List of handled domains (**default**: similar to `portal_domain`).
+- `domain_portal_urls`: Location of the portal to use for login and browsing apps, to redirect to when access to some route is denied
 - `redirected_urls`: Array of URLs and/or URIs to redirect and their redirect URI/URL (**example**: `{ "/": "example.org/subpath" }`).
-- `redirected_regex`: Array of regular expressions to be matched against URLs **and** URIs and their redirect URI/URL (**example**: `{ "example.org/megusta$": "example.org/subpath" }`).
 
 ### `permissions`
 
@@ -107,17 +104,9 @@ The list of permissions depicted as follows:
 
 Does the SSO add an authentication header that allows certain apps to connect automatically? (**True by default**)
 
-#### label
-
-A user-friendly name displayed in the portal and in the administration panel to manage permission. (**By convention it is of the form: Name of the app (specificity of this permission)**)
-
 #### public
 
 Can a person who is not connected to the SSO have access to this authorization?
-
-#### show_tile
-
-Display or not the tile in the user portal.
 
 #### uris
 
