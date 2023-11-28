@@ -221,18 +221,18 @@ else
     -- Unauthenticated user, deny access
     if authUser == nil then
         logger:debug("Denied unauthenticated access to "..ngx.var.uri.." (corresponding perm: "..permission["id"]..")")
-	has_access = false
+        has_access = false
     else
         logger:debug("User "..authUser.." tries to access "..ngx.var.uri.." (corresponding perm: "..permission["id"]..")")
 
-	-- The user has permission to access the content if s.he is in the list of allowed users
-	if element_is_in_table(authUser, permission["users"]) then
-	    logger:debug("User "..authUser.." can access "..ngx.var.host..ngx.var.uri..uri_args_string())
-	    has_access = true
-	else
-	    logger:debug("User "..authUser.." cannot access "..ngx.var.uri)
-	    has_access = false
-	end
+        -- The user has permission to access the content if s.he is in the list of allowed users
+        if element_is_in_table(authUser, permission["users"]) then
+            logger:debug("User "..authUser.." can access "..ngx.var.host..ngx.var.uri..uri_args_string())
+            has_access = true
+        else
+            logger:debug("User "..authUser.." cannot access "..ngx.var.uri)
+            has_access = false
+        end
     end
 end
 
@@ -318,17 +318,17 @@ else
         logger:debug("Domain " .. ngx.var.host .. " is not configured for SSOWat, falling back to default")
         portal_domain = conf["domain_portal_urls"]["default"]
         if portal_domain ~= nil then
-	    if string.starts(portal_domain, '/') then
-	        portal_domain = ngx.var.host .. portal_domain
-	    end
-	    return ngx.redirect("https://" .. portal_domain)
-	end
+            if string.starts(portal_domain, '/') then
+                portal_domain = ngx.var.host .. portal_domain
+            end
+            return ngx.redirect("https://" .. portal_domain)
+        end
     end
     if portal_domain == nil then
-	ngx.header['Content-Type'] = "text/html"
-	ngx.status = 400
-	ngx.say("Unmanaged domain")
-	return ngx.exit(200)
+        ngx.header['Content-Type'] = "text/html"
+        ngx.status = 400
+        ngx.say("Unmanaged domain")
+        return ngx.exit(200)
     end
 
     portal_url = "https://" .. portal_domain
