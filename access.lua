@@ -349,7 +349,7 @@ else
     logger:debug("Redirecting to portal : " .. portal_url)
 
     if is_logged_in then
-        return ngx.redirect(portal_url)
+        return ngx.redirect(portal_url.."?msg=access_denied")
     else
         local back_url = "https://" .. ngx.var.host .. ngx.var.uri .. uri_args_string()
 
