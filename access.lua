@@ -118,7 +118,7 @@ function check_authentication()
 
     local session_file = conf["session_folder"] .. '/' .. session_id
     local session_file_attrs = lfs.attributes(session_file, {"modification"})
-    if session_file_attrs == nil or math.abs(["modification"] - os.time()) > 3 * 24 * 3600 then
+    if session_file_attrs == nil or math.abs(session_file_attrs["modification"] - os.time()) > 3 * 24 * 3600 then
         -- session expired
         return false, nil, nil
     end
