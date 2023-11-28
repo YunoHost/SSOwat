@@ -11,6 +11,7 @@ ngx.header["X-SSO-WAT"] = "You've just been SSOed"
 local jwt = require("vendor.luajwtjitsi.luajwtjitsi")
 local cipher = require('openssl.cipher')
 local rex = require("rex_pcre2")
+local lfs = require("lfs")
 
 -- ###########################################################################
 --     0. Misc helpers because Lua has no sugar ...
@@ -33,18 +34,18 @@ function cached_jwt_verify(data, secret)
         decoded, err = jwt.verify(data, "HS256", cookie_secret)
         if not decoded then
             logger:error(err)
-            return nil, nil, err
+            return nil, nil, nil, err
         end
         -- As explained in set_basic_auth_header(), user and hashed password do not contain ':'
-        -- And cache cannot contain tables, so we use "user:password" format
-        cached = decoded["user"]..":"..decoded["pwd"]
+        -- And cache cannot contain tables, so we use "id:user:password" format
+        cached = decoded['id']..":"..decoded["user"]..":"..decoded["pwd"]
         cache:set(data, cached, 120)
         logger:debug("Result saved in cache")
-        return decoded["user"], decoded["pwd"], err
+        return decoded['id'], decoded["user"], decoded["pwd"], err
     else
         logger:debug("Result found in cache")
-        user, pwd = res:match("([^:]+):(.*)")
-        return user, pwd, nil
+        session_id, user, pwd = res:match("([^:]+):([^:]+):(.*)")
+        return session_id, user, pwd, nil
     end
 end
 
@@ -109,18 +110,20 @@ function check_authentication()
         return false, nil, nil
     end
 
-    user, pwd, err = cached_jwt_verify(cookie, cookie_secret)
-
-    -- FIXME : maybe also check that the cookie was delivered for the requested domain (or a parent?)
-
-    -- FIXME : we might want also a way to identify expired/invalidated cookies,
-    -- e.g. a user that got deleted after being logged in, or a user that logged out ...
+    session_id, user, pwd, err = cached_jwt_verify(cookie, cookie_secret)
 
     if err ~= nil then
         return false, nil, nil
-    else
-        return true, user, pwd
     end
+
+    local session_file = conf["session_folder"] .. '/' .. session_id
+    local session_file_attrs = lfs.attributes(session_file, {"modification"})
+    if session_file_attrs == nil or math.abs(["modification"] - os.time()) > 3 * 24 * 3600 then
+        -- session expired
+        return false, nil, nil
+    end
+
+    return true, user, pwd
 end
 
 -- ###########################################################################

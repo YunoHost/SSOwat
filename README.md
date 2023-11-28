@@ -55,6 +55,7 @@ Only the `portal_domain` SSOwat configuration parameters is required, but it is 
 
 - `cookie_secret_file`: Where the secret used for signing and encrypting cookie is stored. It should only be readable by root.
 - `cookie_name`: The name of the cookie used for authentication. Its content is expected to be a JWT signed with the cookie secret and should contain a key `user` and `password` (which is needed for Basic HTTP Auth). Because JWT is only encoded and signed (not encrypted), the `password` is expected to be encrypted using the cookie secret.
+- `session_folder`: A path to a folder where files exists for any valid valid session id. SSOwat will check for the last modification date to confirm that the session is not expired.
 - `domain_portal_urls`: Location of the portal to use for login and browsing apps, to redirect to when access to some route is denied
 - `redirected_urls`: Array of URLs and/or URIs to redirect and their redirect URI/URL (**example**: `{ "/": "example.org/subpath" }`).
 
