@@ -29,7 +29,7 @@ function get_cookie_secret()
 
     local cookie_secret_path = conf_["cookie_secret_file"] or "/etc/yunohost/.ssowat_cookie_secret"
 
-    if file_can_be_opened_for_reading(cookie_secret_path) then
+    if file_can_be_opened_for_reading(cookie_secret_path) == false then
         ngx.log(ngx.STDERR, "Cookie secret file doesn't exist (yet?) or can't be opened for reading. Authentication will be disabled for now.")
         return nil
     end
