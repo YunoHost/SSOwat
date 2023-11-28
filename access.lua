@@ -34,18 +34,18 @@ function cached_jwt_verify(data, secret)
         decoded, err = jwt.verify(data, "HS256", cookie_secret)
         if not decoded then
             logger:error(err)
-            return nil, nil, nil, err
+            return nil, nil, nil, nil, err
         end
         -- As explained in set_basic_auth_header(), user and hashed password do not contain ':'
         -- And cache cannot contain tables, so we use "id:user:password" format
-        cached = decoded['id']..":"..decoded["user"]..":"..decoded["pwd"]
+        cached = decoded['id']..":"..decoded['host']..":"..decoded["user"]..":"..decoded["pwd"]
         cache:set(data, cached, 120)
         logger:debug("Result saved in cache")
-        return decoded['id'], decoded["user"], decoded["pwd"], err
+        return decoded['id'], decoded['host'], decoded["user"], decoded["pwd"], err
     else
         logger:debug("Result found in cache")
-        session_id, user, pwd = res:match("([^:]+):([^:]+):(.*)")
-        return session_id, user, pwd, nil
+        session_id, host, user, pwd = res:match("([^:]+):([^:]+):([^:]+):(.*)")
+        return session_id, host, user, pwd, nil
     end
 end
 
@@ -60,12 +60,19 @@ function match(s, regex)
     end
 end
 
--- Test whether a string starts with another
+-- Test whether a string starts/ends with something
 function string.starts(String, Start)
     if not String then
         return false
     end
     return string.sub(String, 1, string.len(Start)) == Start
+end
+
+function string.ends(String, End)
+    if not String then
+        return false
+    end
+    return string.sub(String, -string.len(End)) == End
 end
 
 -- Convert a table of arguments to an URI string
@@ -110,7 +117,7 @@ function check_authentication()
         return false, nil, nil
     end
 
-    session_id, user, pwd, err = cached_jwt_verify(cookie, cookie_secret)
+    session_id, host, user, pwd, err = cached_jwt_verify(cookie, cookie_secret)
 
     if err ~= nil then
         return false, nil, nil
@@ -120,6 +127,13 @@ function check_authentication()
     local session_file_attrs = lfs.attributes(session_file, {"modification"})
     if session_file_attrs == nil or math.abs(session_file_attrs["modification"] - os.time()) > 3 * 24 * 3600 then
         -- session expired
+        return false, nil, nil
+    end
+
+    -- Check the host the cookie was meant to does match the request
+    -- (this should never happen except if somehow a malicious user manually tries
+    -- to use a cookie that was delivered from a different domain)
+    if host ~= ngx.var.host and not string.endswith(ngx.var.host, "." .. host) then
         return false, nil, nil
     end
 
