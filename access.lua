@@ -367,6 +367,11 @@ else
     if is_logged_in then
         return hlp.redirect(conf.portal_url)
     else
+
+        if permission["no_access_behaviour"] == "401" then
+            ngx.exit(ngx.HTTP_UNAUTHORIZED)
+        end
+
         -- Only display this if HTTPS. For HTTP, we can't know if the user really is
         -- logged in or not, because the cookie is available only in HTTP...
         if ngx.var.scheme == "https" then

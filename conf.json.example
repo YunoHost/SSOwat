@@ -46,6 +46,17 @@
             ],
             "users": []
         },
+        "myapp.rpc": {
+            "auth_header": false,
+            "label": "MyApp (rpc)",
+            "public": false,
+            "no_access_behaviour": "401",
+            "show_tile": false,
+            "uris": [
+                "re:domain%.tld/%.well%-known/.*"
+            ],
+            "users": []
+        },
         "myapp.main": {
             "auth_header": true,
             "label": "MyApp",
