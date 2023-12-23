@@ -49,17 +49,6 @@ function cached_jwt_verify(data, secret)
     end
 end
 
--- The 'match' function uses PCRE regex as default
--- If '%.' is found in the regex, we assume it's a LUA regex (legacy code)
--- 'match' returns the matched text.
-function match(s, regex)
-    if not string.find(regex, '%%%.') then
-        return rex.match(s, regex)
-    else
-        return string.match(s,regex)
-    end
-end
-
 -- Test whether a string starts/ends with something
 function string.starts(String, Start)
     if not String then
@@ -189,24 +178,27 @@ end
 -- ###########################################################################
 
 permission = nil
-longest_url_match = ""
+longest_match = ""
 
 ngx_full_url = ngx.var.host..ngx.var.uri
 
 for permission_name, permission_infos in pairs(conf["permissions"]) do
     if next(permission_infos['uris']) ~= nil then
-        for _, url in pairs(permission_infos['uris']) do
-            if string.starts(url, "re:") then
-                url = string.sub(url, 4, string.len(url))
-            end
-            -- We want to match the beginning of the url
-            if not string.starts(url, "^") then
-                url = "^"..url
+        for _, prefix in pairs(permission_infos['uris']) do
+            local match = nil
+            if string.starts(prefix, "re:") then
+                prefix = string.sub(prefix, 4, string.len(prefix))
+                -- Make sure we match the prefix from the beginning of the url
+                if not string.starts(prefix, "^") then
+                    prefix = "^"..prefix
+                end
+                match = rex.match(ngx_full_url, prefix)
+            elseif string.starts(ngx_full_url, prefix) then
+                match = prefix
             end
 
-            local m = match(ngx_full_url, url)
-            if m ~= nil and string.len(m) > string.len(longest_url_match) then
-                longest_url_match = m
+            if match ~= nil and string.len(match) > string.len(longest_match) then
+                longest_match = match
                 permission = permission_infos
                 permission["id"] = permission_name
             end
