@@ -9,7 +9,7 @@ ngx.header["X-SSO-WAT"] = "You've just been SSOed"
 
 -- Misc imports
 local jwt = require("vendor.luajwtjitsi.luajwtjitsi")
-local cipher = require('openssl.cipher')
+-- local cipher = require('openssl.cipher')
 local rex = require("rex_pcre2")
 local lfs = require("lfs")
 
@@ -293,14 +293,18 @@ function set_basic_auth_header()
     -- For example: ctl8kk5GevYdaA5VZ2S88Q==|yTAzCx0Gd1+MCit4EQl9lA==
     -- The password is encoded using AES-256-CBC with the IV being the right-side data
     -- cf. src/authenticators/ldap_ynhuser.py in YunoHost to see how the cookie is actually created
-    local password_enc_b64, iv_b64 = authPasswordEnc:match("([^|]+)|([^|]+)")
-    local password_enc = ngx.decode_base64(password_enc_b64)
-    local iv = ngx.decode_base64(iv_b64)
-    local password = cipher.new('aes-256-cbc'):decrypt(cookie_secret, iv):final(password_enc)
+
+    -- Tmp, possibly permanent removal of the code that inject the password inside the auth header,
+    -- which should not be needed in the vast majority of cases where the app just trust the $remote_user info/header ...
+
+    -- local password_enc_b64, iv_b64 = authPasswordEnc:match("([^|]+)|([^|]+)")
+    -- local password_enc = ngx.decode_base64(password_enc_b64)
+    -- local iv = ngx.decode_base64(iv_b64)
+    -- local password = cipher.new('aes-256-cbc'):decrypt(cookie_secret, iv):final(password_enc)
 
     -- Set `Authorization` header to enable HTTP authentification
     ngx.req.set_header("Authorization", "Basic "..ngx.encode_base64(
-        authUser..":"..password
+        authUser..":"
     ))
 end
 
