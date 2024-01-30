@@ -122,7 +122,7 @@ function check_authentication()
     -- Check the host the cookie was meant to does match the request
     -- (this should never happen except if somehow a malicious user manually tries
     -- to use a cookie that was delivered from a different domain)
-    if host ~= ngx.var.host and not string.endswith(ngx.var.host, "." .. host) then
+    if host ~= ngx.var.host and not string.ends(ngx.var.host, "." .. host) then
         return false, nil, nil
     end
 
