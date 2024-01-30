@@ -31,7 +31,7 @@ function cached_jwt_verify(data, secret)
     if res == nil then
         logger:debug("Result not found in cache, checking login")
         -- Perform expensive calculation
-        decoded, err = jwt.verify(data, "HS256", cookie_secret)
+        decoded, err = jwt.verify(data, "HS256", COOKIE_SECRET)
         if not decoded then
             logger:error(err)
             return nil, nil, nil, nil, err
@@ -102,11 +102,11 @@ function check_authentication()
     -- cf. src/authenticators/ldap_ynhuser.py in YunoHost to see how the cookie is actually created
 
     local cookie = ngx.var["cookie_" .. conf["cookie_name"]]
-    if cookie == nil or cookie_secret == nil then
+    if cookie == nil or COOKIE_SECRET == nil then
         return false, nil, nil
     end
 
-    session_id, host, user, pwd, err = cached_jwt_verify(cookie, cookie_secret)
+    session_id, host, user, pwd, err = cached_jwt_verify(cookie, COOKIE_SECRET)
 
     if err ~= nil then
         return false, nil, nil
@@ -296,7 +296,7 @@ function set_basic_auth_header()
         local password_enc_b64, iv_b64 = authPasswordEnc:match("([^|]+)|([^|]+)")
         local password_enc = ngx.decode_base64(password_enc_b64)
         local iv = ngx.decode_base64(iv_b64)
-        password = cipher.new('aes-256-cbc'):decrypt(cookie_secret, iv):final(password_enc)
+        password = cipher.new('aes-256-cbc'):decrypt(COOKIE_SECRET, iv):final(password_enc)
     end
 
     -- Set `Authorization` header to enable HTTP authentification

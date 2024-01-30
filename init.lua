@@ -19,7 +19,7 @@ package.path = package.path .. ";"..script_path.."?.lua"
 -- add www-data in the file permissions, which could otherwise lead
 -- to comprised apps running with the www-data group to read the secret file?
 local config = require("config")
-cookie_secret = config.get_cookie_secret()
+COOKIE_SECRET = config.get_cookie_secret()
 
 --
 -- Init logger
