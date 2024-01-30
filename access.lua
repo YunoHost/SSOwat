@@ -343,9 +343,9 @@ else
     end
     if portal_domain == nil then
         ngx.header['Content-Type'] = "text/html"
-        ngx.status = 400
+        ngx.status = ngx.HTTP_BAD_REQUEST
         ngx.say("Unmanaged domain")
-        return ngx.exit(200)
+        return ngx.exit()
     end
 
     portal_url = "https://" .. portal_domain
