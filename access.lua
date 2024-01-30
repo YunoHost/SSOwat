@@ -177,8 +177,8 @@ end
 -- against all the uris rules/regexes from the conf and keep the longest matching one.
 -- ###########################################################################
 
-permission = nil
-longest_match = ""
+local permission = nil
+local longest_match = ""
 
 ngx_full_url = ngx.var.host..ngx.var.uri
 
@@ -211,6 +211,8 @@ end
 --   Either because the permission is set as "public: true",
 --   Or because the logged-in user is listed in the "users" list of the perm
 -- ###########################################################################
+
+local has_access
 
 -- No permission object found = no access
 if permission == nil then
