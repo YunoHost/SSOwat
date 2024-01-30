@@ -256,7 +256,7 @@ end
 -- ###########################################################################
 
 if permission ~= nil and ngx.req.get_headers()["Authorization"] ~= nil then
-    if permission["protect_against_basic_auth_spoofing"] == false then
+    if permission["protect_against_basic_auth_spoofing"] ~= false then
         -- Ignore if not a Basic auth header
         -- otherwise, we interpret this as a Auth header spoofing attempt and clear it
         local auth_header_from_client = ngx.req.get_headers()["Authorization"]
