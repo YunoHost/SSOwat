@@ -288,14 +288,21 @@ function set_basic_auth_header()
     -- Tmp, possibly permanent removal of the code that inject the password inside the auth header,
     -- which should not be needed in the vast majority of cases where the app just trust the $remote_user info/header ...
 
-    -- local password_enc_b64, iv_b64 = authPasswordEnc:match("([^|]+)|([^|]+)")
-    -- local password_enc = ngx.decode_base64(password_enc_b64)
-    -- local iv = ngx.decode_base64(iv_b64)
-    -- local password = cipher.new('aes-256-cbc'):decrypt(cookie_secret, iv):final(password_enc)
+    -- By default, the password is not injected anymore, unless the app has the
+    -- "auth_header" setting defined with value "basic-with-password"
+    if permission["auth_header"] == "basic-with-password" then
+        local password_enc_b64, iv_b64 = authPasswordEnc:match("([^|]+)|([^|]+)")
+        local password_enc = ngx.decode_base64(password_enc_b64)
+        local iv = ngx.decode_base64(iv_b64)
+        local password = cipher.new('aes-256-cbc'):decrypt(cookie_secret, iv):final(password_enc)
+    else
+        -- Gotta have a non-empty password otherwise it doesn't behave as expected
+        local password = "-"
+    end
 
     -- Set `Authorization` header to enable HTTP authentification
     ngx.req.set_header("Authorization", "Basic "..ngx.encode_base64(
-        authUser..":-"
+        authUser..":"..password
     ))
 end
 
