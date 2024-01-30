@@ -246,16 +246,15 @@ end
 --     5. CLEAR USER-PROVIDED AUTH HEADER
 --
 --   Which could be spoofing attempts
---   Unfortunately we can't yolo-clear them on every route because some
---   apps use legit basic auth mechanism ...
 --
---   "Remote user" refers to the fact that Basic Auth headers is coupled to
---   the $remote_user var in nginx, typically used by PHP apps
+--   Apps can opt out of the auth spoofing protection using the setting
+--   'protect_against_basic_auth_spoofing' set to false if they really need to,
+--   but that's a huge security hole and ultimately should never be done...
+--
 -- ###########################################################################
 
 if permission ~= nil and ngx.req.get_headers()["Authorization"] ~= nil then
-    perm_user_remote_user_var_in_nginx_conf = permission["use_remote_user_var_in_nginx_conf"]
-    if perm_user_remote_user_var_in_nginx_conf == nil or perm_user_remote_user_var_in_nginx_conf == true then
+    if permission["protect_against_basic_auth_spoofing"] == false then
         -- Ignore if not a Basic auth header
         -- otherwise, we interpret this as a Auth header spoofing attempt and clear it
         local auth_header_from_client = ngx.req.get_headers()["Authorization"]
