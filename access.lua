@@ -9,7 +9,7 @@ ngx.header["X-SSO-WAT"] = "You've just been SSOed"
 
 -- Misc imports
 local jwt = require("vendor.luajwtjitsi.luajwtjitsi")
--- local cipher = require('openssl.cipher')
+local cipher = require('openssl.cipher')
 local rex = require("rex_pcre2")
 local lfs = require("lfs")
 
@@ -290,14 +290,13 @@ function set_basic_auth_header()
 
     -- By default, the password is not injected anymore, unless the app has the
     -- "auth_header" setting defined with value "basic-with-password"
+    -- (by default we use '-' as a dummy value though, otherwise the header doesn't work as expected..)
+    local password = "-"
     if permission["auth_header"] == "basic-with-password" then
         local password_enc_b64, iv_b64 = authPasswordEnc:match("([^|]+)|([^|]+)")
         local password_enc = ngx.decode_base64(password_enc_b64)
         local iv = ngx.decode_base64(iv_b64)
-        local password = cipher.new('aes-256-cbc'):decrypt(cookie_secret, iv):final(password_enc)
-    else
-        -- Gotta have a non-empty password otherwise it doesn't behave as expected
-        local password = "-"
+        password = cipher.new('aes-256-cbc'):decrypt(cookie_secret, iv):final(password_enc)
     end
 
     -- Set `Authorization` header to enable HTTP authentification
