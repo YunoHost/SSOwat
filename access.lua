@@ -287,9 +287,6 @@ function set_basic_auth_header()
     -- The password is encoded using AES-256-CBC with the IV being the right-side data
     -- cf. src/authenticators/ldap_ynhuser.py in YunoHost to see how the cookie is actually created
 
-    -- Tmp, possibly permanent removal of the code that inject the password inside the auth header,
-    -- which should not be needed in the vast majority of cases where the app just trust the $remote_user info/header ...
-
     -- By default, the password is not injected anymore, unless the app has the
     -- "auth_header" setting defined with value "basic-with-password"
     -- (by default we use '-' as a dummy value though, otherwise the header doesn't work as expected..)
