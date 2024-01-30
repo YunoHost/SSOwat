@@ -296,7 +296,7 @@ function set_basic_auth_header()
 
     -- Set `Authorization` header to enable HTTP authentification
     ngx.req.set_header("Authorization", "Basic "..ngx.encode_base64(
-        authUser..":"
+        authUser..":-"
     ))
 end
 
