@@ -21,7 +21,7 @@
     "logout": "Cerrar sesión",
     "mail_addresses": "Direcciones de correo electrónico",
     "mail_already_used": "Dirección de correo electrónico ya está en uso",
-    "mail_forward": "Direcciones de reenvío de correo electrónico",
+    "mail_forward": "Dirección de reenvío de correo electrónico",
     "missing_required_fields": "Faltan campos obligatorios",
     "new_forward": "nuevoreenvio@midominioexterior.org",
     "new_mail": "nuevomail@midominio.org",
