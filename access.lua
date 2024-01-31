@@ -97,6 +97,10 @@ end
 --  - and/or auth_headers is enabled for this app
 -- ###########################################################################
 
+local is_logged_in = nil
+local authUser = nil
+local authPasswordEnc = nil
+
 function check_authentication()
 
     -- cf. src/authenticators/ldap_ynhuser.py in YunoHost to see how the cookie is actually created
@@ -221,7 +225,7 @@ if permission == nil then
 -- permission is public = everybody has access, no need to check auth
 elseif permission["public"] then
     logger:debug("Someone tries to access "..ngx.var.uri.." (corresponding perm: "..permission["id"]..")")
-     has_access = true
+    has_access = true
 -- Check auth header, assume the route is protected
 else
     is_logged_in, authUser, authPasswordEnc = check_authentication()
