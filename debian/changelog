@@ -1,3 +1,9 @@
+ssowat (12.0.0) unstable; urgency=low
+
+  - Tmp changelog to prepare Bookworm
+
+ -- Alexandre Aubin <alex.aubin@mailoo.org>  Thu, 04 May 2023 20:30:19 +0200
+
 ssowat (11.2) stable; urgency=low
 
   - i18n: Translations updated for Chinese (Simplified), German, Indonesian, Japanese

@@ -7,7 +7,7 @@ Standards-Version: 3.9.1
 
 Package: ssowat
 Architecture: all
-Depends: nginx-extras (>=1.6.2), lua-ldap, lua-json, lua-rex-pcre, lua-filesystem, lua-socket, whois
+Depends: nginx-extras (>=1.6.2), lua-json, lua-rex-pcre2, lua-basexx, lua-luaossl, lua-logging, lua-filesystem, lua-cjson, whois
 Homepage: https://yunohost.org
 Description: user portal with single sign-on designed for Yunohost
  A minimalist user portal with single sign-on, designed to be
