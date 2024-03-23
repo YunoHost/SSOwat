@@ -39,7 +39,7 @@
     "wrong_current_password": "Aktuelles Passwort ist falsch",
     "wrong_username_password": "Falscher Anmeldename oder Passwort",
     "redirection_error_invalid_url": "Weiterleitungsfehler: Ungültige URL",
-    "redirection_error_unmanaged_domain": "Fehler bei Weiterleitung: Nicht-verwaltete Domäne",
+    "redirection_error_unmanaged_domain": "Weiterleitungsfehler: Nicht-verwaltete Domain",
     "good_practices_about_user_password": "Wählen Sie ein Benutzerpasswort mit mindestens 8 Zeichen - es ist jedoch empfehlenswert, ein längeres Passwort (z.B. eine Passphrase) und/oder verschiedene Arten von Zeichen (Groß- und Kleinschreibung, Ziffern und Sonderzeichen) zu verwenden.",
     "password_too_simple_3": "Das Passwort muss mindestens 8 Zeichen lang sein und Grossbuchstaben, Kleinbuchstaben, Zahlen und Sonderzeichen enthalten",
     "password_too_simple_2": "Das Passwort muss mindestens 8 Zeichen lang sein und Gross- und Kleinbuchstaben sowie Zahlen enthalten",
