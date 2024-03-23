@@ -45,5 +45,5 @@
     "password_too_simple_2": "La contrasenya ha de tenir un mínim de 8 caràcters i ha de contenir dígits, majúscules i minúscules",
     "password_too_simple_3": "La contrasenya ha de tenir un mínim de 8 caràcters i tenir dígits, majúscules, minúscules i caràcters especials",
     "password_too_simple_4": "La contrasenya ha de tenir un mínim de 12 caràcters i tenir dígits, majúscules, minúscules i caràcters especials",
-    "good_practices_about_user_password": "Trieu una contrasenya d'un mínim de 8 caràcters ; tot i que és de bona pràctica utilitzar una contrasenya més llarga (és a dir una frase de contrasenya) i/o utilitzar diferents tipus de caràcters (majúscules, minúscules, dígits i caràcters especials)."
+    "good_practices_about_user_password": "Tria una contrasenya d'un mínim de 8 caràcters - tot i que és de bona pràctica utilitzar contrasenyes més llargues (com per exemple una frase) i/o utilitzar diferents tipus de caràcters (majúscules, minúscules, dígits i caràcters especials)."
 }
