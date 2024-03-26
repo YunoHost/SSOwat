@@ -46,8 +46,7 @@ end
 
 logger = Logging.new(appender)
 
--- FIXME : how to set logging level ?
---logger:setLevel(logger.DEBUG)   -- FIXME
+logger:setLevel(Logging.DEBUG)
 
 
 -- You should see that in your Nginx error logs by default
