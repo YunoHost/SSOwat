@@ -46,8 +46,29 @@ end
 
 logger = Logging.new(appender)
 
-logger:setLevel(Logging.DEBUG)
+function isValidLoggingLevel(level)
+  local validLoggingLevel = {
+    Logging.DEBUG,  -- DEBUG
+    Logging.INFO,   -- INFO
+    Logging.WARN,   -- WARN
+    Logging.ERROR,  -- ERROR
+    Logging.FATAL   -- FATAL
+  }
+  for i, l in ipairs(validLoggingLevel)
+  do
+    if l == level then
+      return true
+    end
+  end
+  return false
+end
+conf = config.get_config()
 
+if conf["logging"] and isValidLoggingLevel(conf["logging"]) then
+  logger:setLevel(conf["logging"])
+else
+  logger:setLevel(Logging.INFO) -- INFO by default
+end
 
 -- You should see that in your Nginx error logs by default
 ngx.log(ngx.INFO, "SSOwat ready")
