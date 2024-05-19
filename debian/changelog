@@ -1,3 +1,11 @@
+SSOwat (11.2.1) stable; urgency=low
+
+  - [i18n] Translations updated for Catalan, French, German, Kabyle, Spanish, Swedish
+
+  Thanks to all contributors <3 ! (Alexandre Aubin, Bram, ButterflyOfFire, Carlos Solís, Christian Wehrli, Gregor, xaloc33)
+
+ -- OniriCorpe <oniricorpe@yunohost.org>  Mon, 20 May 2024 00:26:37 +0200
+
 ssowat (11.2) stable; urgency=low
 
   - i18n: Translations updated for Chinese (Simplified), German, Indonesian, Japanese
