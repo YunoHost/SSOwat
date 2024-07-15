@@ -40,9 +40,9 @@
     "footerlink_support": "Dukungan",
     "footerlink_administration": "Administrasi",
     "password_too_simple_2": "Kata sandi harus sekurang-kurangnya 8 karakter dan memiliki angka, huruf kapital dan huruf kecil",
-    "password_too_simple_3": "Kata sandi harus sekurang-kurangnya 8 karakter dan memiliki angka, huruf kapital, huruf kecil, dan karakter spesial",
+    "password_too_simple_3": "Kata sandi harus sekurang-kurangnya 8 karakter dan berisi angka, huruf kapital, huruf kecil dan karakter spesial",
     "password_too_simple_4": "Kata sandi harus sekurang-kurangnya 12 karakter dan memiliki angka, huruf kapital, huruf kecil, dan karakter spesial",
-    "good_practices_about_user_password": "Pilih kata sandi sekurang-kurangnya 8 karakter - meskipun memang adalah hal yang baik jika menggunakan yang lebih panjang (cth. parafrasa) dan/atau menggunakan berbagai macam karakter (kapital, huruf kecil, angka, dan karakter lainnya).",
+    "good_practices_about_user_password": "Pilih kata sandi pengguna yang terdiri dari minimal 8 karakter - meskipun sebaiknya menggunakan kata sandi yang lebih panjang (cth. frasasandi) dan/atau menggunakan berbagai jenis karakter (huruf besar, huruf kecil, angka, dan karakter khusus).",
     "invalid_domain": "Domain tidak valid di",
     "invalid_mailforward": "Alamat surel terusan tidak valid",
     "missing_required_fields": "Isi bidang yang diperlukan"
