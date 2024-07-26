@@ -1,8 +1,11 @@
-ssowat (12.0.0) unstable; urgency=low
+ssowat (12.0.1) testing; urgency=low
 
-  - Tmp changelog to prepare Bookworm
+  - Massive rework to interact with the new independent portal-api and split
+  the portal front-end into a separate repo. SSOwat now only handles purely
+  the SSO middleware logic (letting the request go through for authenticated
+  users or redirecting to the portal)
 
- -- Alexandre Aubin <alex.aubin@mailoo.org>  Thu, 04 May 2023 20:30:19 +0200
+ -- Alexandre Aubin <alex.aubin@mailoo.org>  Fri, 26 Jul 2024 22:21:16 +0200
 
 ssowat (11.2) stable; urgency=low
 
