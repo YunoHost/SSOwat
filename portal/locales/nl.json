@@ -10,7 +10,7 @@
     "footerlink_documentation": "Documentatie",
     "footerlink_edit": "Bewerk mijn profiel",
     "footerlink_support": "Ondersteuning",
-    "fullname": "Voor- en achternaam",
+    "fullname": "Volledige naam",
     "information": "Uw gegevens",
     "information_updated": "Informatie bijgewerkt",
     "invalid_domain": "Ongeldig domein in",
@@ -43,7 +43,7 @@
     "password_listed": "Dit wachtwoord is een van de meest gebruikte wachtwoorden ter wereld. Kies alstublieft iets wat minder voor de hand ligt.",
     "redirection_error_unmanaged_domain": "Omleidingsfout: onbeheerd domein",
     "redirection_error_invalid_url": "Omleidingsfout: ongeldige URL",
-    "good_practices_about_user_password": "Kies een gebruikerswachtwoord van minimaal 8 tekens - hoewel het een goede gewoonte is om langere (bijvoorbeeld een wachtwoordzin) te gebruiken en/of verschillende soorten tekens te gebruiken (hoofdletters, kleine letters, cijfers en speciale tekens).",
+    "good_practices_about_user_password": "Kies een gebruikerswachtwoord van minimaal 8 tekens - hoewel het een goede gewoonte is om een langer wachtwoord te gebruiken (d.w.z. een wachtwoordzin) en/of een variatie van tekens te gebruiken (hoofdletters, kleine letters, cijfers en speciale tekens).",
     "password_too_simple_4": "Het wachtwoord moet minimaal 12 tekens lang zijn en moet cijfers, hoofdletters, kleine letters en speciale tekens bevatten",
     "password_too_simple_3": "Het wachtwoord moet minimaal 8 tekens lang zijn en moet cijfers, hoofdletters, kleine letters en speciale tekens bevatten"
 }
