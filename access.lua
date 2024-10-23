@@ -12,6 +12,7 @@ local jwt = require("vendor.luajwtjitsi.luajwtjitsi")
 local cipher = require('openssl.cipher')
 local rex = require("rex_pcre2")
 local lfs = require("lfs")
+local json = require("json")
 
 -- ###########################################################################
 --     0. Misc helpers because Lua has no sugar ...
@@ -34,18 +35,18 @@ function cached_jwt_verify(data, secret)
         decoded, err = jwt.verify(data, "HS256", COOKIE_SECRET)
         if not decoded then
             logger:error(err)
-            return nil, nil, nil, nil, err
+            return nil, nil, nil, nil, nil, err
         end
-        -- As explained in set_basic_auth_header(), user and hashed password do not contain ':'
-        -- And cache cannot contain tables, so we use "id:user:password" format
-        cached = decoded['id']..":"..decoded['host']..":"..decoded["user"]..":"..decoded["pwd"]
+        -- As the http_headers is a dictionary and can have any char (we have also the user fullname)
+        -- we use the json serializer which is expected to do it correctly
+        cached = json.encode(decoded)
         cache:set(data, cached, 120)
         logger:debug("Result saved in cache")
-        return decoded['id'], decoded['host'], decoded["user"], decoded["pwd"], err
+        return decoded['id'], decoded['host'], decoded["user"], decoded["pwd"], decoded["http_headers"], err
     else
         logger:debug("Result found in cache")
-        session_id, host, user, pwd = res:match("([^:]+):([^:]+):([^:]+):(.*)")
-        return session_id, host, user, pwd, nil
+        data = json.decode(res)
+        return data['id'], data['host'], data["user"], data["pwd"], data["http_headers"], nil
     end
 end
 
@@ -100,6 +101,7 @@ end
 local is_logged_in = nil
 local authUser = nil
 local authPasswordEnc = nil
+local authUserHeaders = nil
 
 function check_authentication()
 
@@ -107,30 +109,30 @@ function check_authentication()
 
     local cookie = ngx.var["cookie_" .. conf["cookie_name"]]
     if cookie == nil or COOKIE_SECRET == nil then
-        return false, nil, nil
+        return false, nil, nil, nil
     end
 
-    session_id, host, user, pwd, err = cached_jwt_verify(cookie, COOKIE_SECRET)
+    session_id, host, user, pwd, headers, err = cached_jwt_verify(cookie, COOKIE_SECRET)
 
     if err ~= nil then
-        return false, nil, nil
+        return false, nil, nil, nil
     end
 
     local session_file = conf["session_folder"] .. '/' .. session_id
     local session_file_attrs = lfs.attributes(session_file, {"modification"})
     if session_file_attrs == nil or math.abs(session_file_attrs["modification"] - os.time()) > 3 * 24 * 3600 then
         -- session expired
-        return false, nil, nil
+        return false, nil, nil, nil
     end
 
     -- Check the host the cookie was meant to does match the request
     -- (this should never happen except if somehow a malicious user manually tries
     -- to use a cookie that was delivered from a different domain)
     if host ~= ngx.var.host and not string.ends(ngx.var.host, "." .. host) then
-        return false, nil, nil
+        return false, nil, nil, nil
     end
 
-    return true, user, pwd
+    return true, user, pwd, headers
 end
 
 -- ###########################################################################
@@ -228,7 +230,7 @@ elseif permission["public"] then
     has_access = true
 -- Check auth header, assume the route is protected
 else
-    is_logged_in, authUser, authPasswordEnc = check_authentication()
+    is_logged_in, authUser, authPasswordEnc, authUserHeaders = check_authentication()
 
     -- Unauthenticated user, deny access
     if authUser == nil then
@@ -269,6 +271,13 @@ if permission ~= nil and ngx.req.get_headers()["Authorization"] ~= nil then
             ngx.req.clear_header("Authorization")
         end
     end
+
+    -- Clean all Yunohost Authentication Headers
+    for k, v in pairs(ngx.req.get_headers()) do
+        if string.starts(k, "YNH_") then
+            ngx.req.clear_header(k)
+        end
+    end
 end
 
 -- ###########################################################################
@@ -282,7 +291,7 @@ end
 --      -> or because user is logged in, but has no access .. in that case just redirect to the portal
 -- ###########################################################################
 
-function set_basic_auth_header()
+function set_auth_headers()
 
     -- cf. https://en.wikipedia.org/wiki/Basic_access_authentication
 
@@ -306,6 +315,12 @@ function set_basic_auth_header()
     ngx.req.set_header("Authorization", "Basic "..ngx.encode_base64(
         authUser..":"..password
     ))
+
+    if authUserHeaders ~= nil then
+        for k, v in pairs(authUserHeaders) do
+            ngx.req.set_header(k, v)
+        end
+    end
 end
 
 -- 1st case : client has access
@@ -316,11 +331,11 @@ if has_access then
         if is_logged_in == nil then
             -- Login check was not performed yet because the app is public
             logger:debug("Checking authentication because the app requires auth_header")
-            is_logged_in, authUser, authPasswordEnc = check_authentication()
+            is_logged_in, authUser, authPasswordEnc, authUserHeaders = check_authentication()
         end
         if is_logged_in then
             -- add it to the response
-            set_basic_auth_header()
+            set_auth_headers()
         end
     end
 
