@@ -37,8 +37,8 @@ function cached_jwt_verify(data, secret)
             logger:error(err)
             return nil, nil, nil, nil, nil, err
         end
-        -- As explained in set_basic_auth_header(), user and hashed password do not contain ':'
-        -- And cache cannot contain tables, so we use "id:user:password" format
+        -- As the http_headers is a dictionary and can have any char (we have also the user fullname)
+        -- we use the json serializer which is expected to do it correctly
         cached = json.encode(decoded)
         cache:set(data, cached, 120)
         logger:debug("Result saved in cache")
