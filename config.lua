@@ -30,7 +30,8 @@ function get_cookie_secret()
     local cookie_secret_path = conf_["cookie_secret_file"] or "/etc/yunohost/.ssowat_cookie_secret"
 
     if file_can_be_opened_for_reading(cookie_secret_path) == false then
-        ngx.log(ngx.STDERR, "Cookie secret file doesn't exist (yet?) or can't be opened for reading. Authentication will be disabled for now.")
+        ngx.log(ngx.STDERR, "Cookie secret file doesn't exist (yet?) or can't be opened for reading. " ..
+            "Authentication will be disabled for now.")
         return nil
     end
 
@@ -40,7 +41,8 @@ function get_cookie_secret()
         cookie_secret_file:close()
         return cookie_secret
     else
-        ngx.log(ngx.STDERR, "Cookie secret file doesn't exist (yet?) or can't be opened for reading. Authentication will be disabled for now.")
+        ngx.log(ngx.STDERR, "Cookie secret file doesn't exist (yet?) or can't be opened for reading. " ..
+            "Authentication will be disabled for now.")
         return nil
     end
 end
@@ -48,10 +50,12 @@ end
 function compare_attributes(file_attributes1, file_attributes2)
     if file_attributes1 == nil and file_attributes2 == nil then
         return true
-    elseif file_attributes1 == nil and file_attributes2 ~= nil or file_attributes1 ~= nil and file_attributes2 == nil then
+    elseif file_attributes1 == nil and file_attributes2 ~= nil or
+            file_attributes1 ~= nil and file_attributes2 == nil then
         return false
     end
-    return file_attributes1["modification"] == file_attributes2["modification"] and file_attributes1["size"] == file_attributes2["size"]
+    return file_attributes1["modification"] == file_attributes2["modification"] and
+            file_attributes1["size"] == file_attributes2["size"]
 end
 
 function get_config()
@@ -60,7 +64,8 @@ function get_config()
     local new_config_attributes = lfs.attributes(conf_path, {"modification", "size"})
     local new_config_persistent_attributes = lfs.attributes(conf_path..".persistent", {"modification", "size"})
 
-    if compare_attributes(new_config_attributes, config_attributes) and compare_attributes(new_config_persistent_attributes, config_persistent_attributes) then
+    if compare_attributes(new_config_attributes, config_attributes) and
+            compare_attributes(new_config_persistent_attributes, config_persistent_attributes) then
         return conf
     -- If the file is being written, its size may be 0 and reloading fails, return the last valid config
     elseif new_config_attributes == nil or new_config_attributes["size"] == 0 then
@@ -70,7 +75,7 @@ function get_config()
     -- If the timestamp of the modification or the size is different, reload the configuration.
     config_attributes = new_config_attributes
     config_persistent_attributes = new_config_persistent_attributes
-    
+
     local conf_file = assert(io.open(conf_path, "r"), "Configuration file is missing")
     conf = json.decode(conf_file:read("*all"))
     conf_file:close()

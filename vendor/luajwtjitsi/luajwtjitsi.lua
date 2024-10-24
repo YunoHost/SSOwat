@@ -68,22 +68,23 @@ end
 -- @param token The JWT token to be parsed.
 -- @return A JSON header and body represented as a table, and a signature.
 local function parse_token(token)
-	local segments=split_token(token)
-  if #segments ~= 3 then
+	local segments = split_token(token)
+	if #segments ~= 3 then
 		return nil, nil, nil, "Invalid token"
 	end
+	local err, header, body, sig
 
-	local header, err = cjson_safe.decode(basexx.from_url64(segments[1]))
+	header, err = cjson_safe.decode(basexx.from_url64(segments[1]))
 	if err then
 		return nil, nil, nil, "Invalid header"
 	end
 
-	local body, err = cjson_safe.decode(basexx.from_url64(segments[2]))
+	body, err = cjson_safe.decode(basexx.from_url64(segments[2]))
 	if err then
 		return nil, nil, nil, "Invalid body"
 	end
 
-	local sig, err = basexx.from_url64(segments[3])
+	sig, err = basexx.from_url64(segments[3])
 	if err then
 		return nil, nil, nil, "Invalid signature"
 	end
@@ -145,12 +146,14 @@ function M.encode(data, key, alg, header)
 	header['typ'] = 'JWT'
 	header['alg'] = alg
 
-	local headerEncoded, err = cjson_safe.encode(header)
+	local err, headerEncoded, dataEncoded
+
+	headerEncoded, err = cjson_safe.encode(header)
 	if headerEncoded == nil then
 		return nil, err
 	end
 
-	local dataEncoded, err = cjson_safe.encode(data)
+	dataEncoded, err = cjson_safe.encode(data)
 	if dataEncoded == nil then
 		return nil, err
 	end

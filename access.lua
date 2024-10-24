@@ -235,7 +235,8 @@ else
         logger:debug("Denied unauthenticated access to "..ngx.var.uri.." (corresponding perm: "..permission["id"]..")")
         has_access = false
     else
-        logger:debug("User "..authUser.." tries to access "..ngx.var.uri.." (corresponding perm: "..permission["id"]..")")
+        logger:debug(
+            "User "..authUser.." tries to access "..ngx.var.uri.." (corresponding perm: "..permission["id"]..")")
 
         -- The user has permission to access the content if s.he is in the list of allowed users
         if element_is_in_table(authUser, permission["users"]) then
@@ -275,11 +276,12 @@ end
 --     6. EFFECTIVELY PASS OR DENY ACCESS
 --
 --  If the user has access (either because app is public OR logged in + authorized)
---      -> pass + possibly inject the Basic Auth header on the fly such that the app can know which user is logged in
+--  -> pass + possibly inject the Basic Auth header on the fly such that the app can know which user is logged in
 --
 --  Otherwise, the user can't access
---      -> either because not logged in at all, in that case, redirect to the portal WITH a callback url to redirect to after logging in
---      -> or because user is logged in, but has no access .. in that case just redirect to the portal
+--  -> either because not logged in at all, in that case, redirect to the portal WITH a callback url to redirect to
+--      after logging in
+--  -> or because user is logged in, but has no access .. in that case just redirect to the portal
 -- ###########################################################################
 
 function set_basic_auth_header()
