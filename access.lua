@@ -280,7 +280,7 @@ end
 
 -- Clean all Yunohost Authentication Headers
 for k, v in pairs(ngx.req.get_headers()) do
-    if string.starts(k, "YNH_") then
+    if string.starts(string.lower(k), "ynh_") or string.starts(string.lower(k), "ynh-") then
         ngx.req.clear_header(k)
     end
 end
