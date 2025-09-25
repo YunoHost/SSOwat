@@ -1,3 +1,9 @@
+ssowat (13.0.0~alpha1) unstable; urgency=low
+
+  - Bump version for Debian 13 Trixie.
+
+ -- Félix Piédallu <felix@piedallu.me>  Thu, 25 Sep 2025 20:41:48 +0200
+
 ssowat (12.1.1) stable; urgency=low
 
   - Also cheanup headers starting ynh- from the client (8e0435f)
