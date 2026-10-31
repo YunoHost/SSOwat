@@ -1,0 +1,32 @@
+on:
+  pull_request:
+  push:
+    branches: [main, dev, bullseye, bookworm, trixie]
+    tags:
+      - "debian/*"
+
+env:
+  DEBEMAIL: yunohost@yunohost.org
+  DEBFULLNAME: YunoHost
+
+jobs:
+  build:
+    name: Build debian package
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          path: ssowat
+
+      - name: Build YunoHost
+        uses: yunohost/yunohost-ci/.github/actions/build_deb@fpu-actions
+        with:
+          path: ssowat
+          outdir: packages
+          unstable: ${{ ! startsWith(github.ref, 'debian/') }}
+
+      - name: Upload built packages
+        uses: actions/upload-artifact@v7
+        with:
+          archive: false
+          path: packages/*
