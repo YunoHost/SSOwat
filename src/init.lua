@@ -11,7 +11,7 @@
 -- Remove prepending '@' & trailing 'init.lua'
 script_path = string.sub(debug.getinfo(1).source, 2, -9)
 -- Include local libs in package.path
-package.path = package.path .. ";"..script_path.."?.lua"
+package.path = package.path .. ";" .. script_path .. "?.lua"
 
 -- Load cookie secret
 -- IMPORTANT (though to be confirmed?)
@@ -28,46 +28,44 @@ COOKIE_SECRET = config.get_cookie_secret()
 local log_file = "/var/log/nginx/ssowat.log"
 
 -- Make sure the log file exists and we can write in it
-io.popen("touch "..log_file)
-io.popen("chown www-data "..log_file)
-io.popen("chmod u+w "..log_file)
+io.popen("touch " .. log_file)
+io.popen("chown www-data " .. log_file)
+io.popen("chmod u+w " .. log_file)
 
 local Logging = require("logging")
 local appender = function(self, level, message)
+    -- Output to log file
+    local fp = io.open(log_file, "a")
+    local str = string.format("[%-6s%s] %s\n", level:upper(), os.date(), message)
+    fp:write(str)
+    fp:close()
 
-  -- Output to log file
-  local fp = io.open(log_file, "a")
-  local str = string.format("[%-6s%s] %s\n", level:upper(), os.date(), message)
-  fp:write(str)
-  fp:close()
-
-  return true
+    return true
 end
 
 logger = Logging.new(appender)
 
 function isValidLoggingLevel(level)
-  local validLoggingLevel = {
-    Logging.DEBUG,  -- DEBUG
-    Logging.INFO,   -- INFO
-    Logging.WARN,   -- WARN
-    Logging.ERROR,  -- ERROR
-    Logging.FATAL   -- FATAL
-  }
-  for i, l in ipairs(validLoggingLevel)
-  do
-    if l == level then
-      return true
+    local validLoggingLevel = {
+        Logging.DEBUG, -- DEBUG
+        Logging.INFO, -- INFO
+        Logging.WARN, -- WARN
+        Logging.ERROR, -- ERROR
+        Logging.FATAL, -- FATAL
+    }
+    for i, l in ipairs(validLoggingLevel) do
+        if l == level then
+            return true
+        end
     end
-  end
-  return false
+    return false
 end
 conf = config.get_config()
 
 if conf["logging"] and isValidLoggingLevel(conf["logging"]) then
-  logger:setLevel(conf["logging"])
+    logger:setLevel(conf["logging"])
 else
-  logger:setLevel(Logging.INFO) -- INFO by default
+    logger:setLevel(Logging.INFO) -- INFO by default
 end
 
 -- You should see that in your Nginx error logs by default
