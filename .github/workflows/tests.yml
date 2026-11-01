@@ -1,0 +1,17 @@
+name: Test code
+
+on:
+  pull_request:
+  push:
+    branches: [main, dev, bullseye, bookworm, trixie]
+
+jobs:
+  lua:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Luacheck linter
+        uses: lunarmodules/luacheck@v1
+        with:
+          args: src
