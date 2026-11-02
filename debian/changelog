@@ -1,3 +1,16 @@
+ssowat (13.0.1) testing; urgency=low
+
+  - Move lua source files to src/ (0083b2f)
+  - Add stylua configuration. Apply lua coding style. (47c19bb)
+  - Add luacheck configuration (ef2cd7a)
+  - workflows: Add format workflow (293629d)
+  - workflows: Add tests workflow (8a64b25)
+  - maintenance: make make_changelog.sh executable (6022f23)
+
+  Thanks to all contributors <3 ! (Alexandre Aubin)
+
+ -- Félix Piédallu <felix@piedallu.me>  Mon, 02 Nov 2026 19:52:35 +0100
+
 ssowat (13.0.0) testing; urgency=low
 
   - Bump version for Debian 13 Trixie.
