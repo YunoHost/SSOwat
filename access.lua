@@ -112,12 +112,39 @@ function check_authentication()
 
     -- cf. src/authenticators/ldap_ynhuser.py in YunoHost to see how the cookie is actually created
 
-    local cookie = ngx.var["cookie_" .. conf["cookie_name"]]
-    if cookie == nil or COOKIE_SECRET == nil then
+    local cookies = ngx.req.get_headers()['Cookie']
+    if COOKIE_SECRET == nil or cookies == nil then
         return false, nil, nil, nil
     end
 
-    session_id, host, user, pwd, headers, err = cached_jwt_verify(cookie, COOKIE_SECRET)
+    -- Note we can't get the cookie from `ngx.var["cookie_" .. conf["cookie_name"]]`
+    -- because this return only the first cookie for a specific name and so if there are multiple yunohost.portal cookie
+    -- we might don't check the good one. By example it could happen if there are 1 Yunohost on a subdomain of an other
+    -- Yunohost. By example we could have have one yunohost on example.com and an other one on hello.example.com.
+    -- In this case, the browser will send 2 cookie for the key yunohost.portal. One for the domain '.example.com' and
+    -- an other one for '.hello.example.com'.
+    -- So we need to parse manually the cookie values
+    local session_id, host, user, pwd, headers, err
+    -- need to check if it's a table
+    -- cf. https://github.com/openresty/lua-nginx-module/issues/710
+    if type(cookies) == "string" then
+        cookies = { cookies }
+    end
+    for _, cookieString in pairs(cookies) do
+        for cookie in string.gmatch(cookieString, "([^;]+)") do
+            cookie = cookie:match("^%s*(.-)%s*$")
+            if cookie:find("^"..conf["cookie_name"].."%s*=" ) ~= nil then
+                local cookieValue = cookie:match("^[^=]*=([^=]+)$"):match("^%s*(.-)%s*$")
+                session_id, host, user, pwd, headers, err = cached_jwt_verify(cookieValue, COOKIE_SECRET)
+                if user ~= nil then
+                    break
+                end
+            end
+        end
+        if user ~= nil then
+            break
+        end
+    end
 
     if err ~= nil then
         return false, nil, nil, nil
