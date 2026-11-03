@@ -28,5 +28,5 @@ jobs:
       - name: Upload built packages
         uses: actions/upload-artifact@v7
         with:
-          archive: false
+          name: debian_build
           path: packages/*
