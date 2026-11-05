@@ -1,3 +1,11 @@
+ssowat (13.0.2) testing; urgency=low
+
+  - Fix github workflows for building debian packages
+
+  Thanks to all contributors <3 !
+
+ -- Félix Piédallu <felix@piedallu.me>  Tue, 05 Nov 2026 13:37:00 +0100
+
 ssowat (13.0.1) testing; urgency=low
 
   - Move lua source files to src/ (0083b2f)
