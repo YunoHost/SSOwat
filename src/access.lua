@@ -9,7 +9,7 @@ ngx.header["X-SSO-WAT"] = "You've just been SSOed"
 
 -- Misc imports
 local jwt = require("vendor.luajwtjitsi.luajwtjitsi")
-local cipher = require('openssl.cipher')
+local cipher = require("openssl.cipher")
 local rex = require("rex_pcre2")
 local lfs = require("lfs")
 local json = require("json")
@@ -43,15 +43,21 @@ function cached_jwt_verify(data, secret)
         cached = json.encode(decoded)
         cache:set(data, cached, 120)
         logger:debug("Result saved in cache")
-        local headers = { YNH_USER = decoded["user"], YNH_USER_EMAIL = decoded["email"],
-            YNH_USER_FULLNAME = decoded["fullname"]}
-        return decoded['id'], decoded['host'], decoded["user"], decoded["pwd"], headers, err
+        local headers = {
+            YNH_USER = decoded["user"],
+            YNH_USER_EMAIL = decoded["email"],
+            YNH_USER_FULLNAME = decoded["fullname"],
+        }
+        return decoded["id"], decoded["host"], decoded["user"], decoded["pwd"], headers, err
     else
         logger:debug("Result found in cache")
         local decoded = json.decode(res)
-        local headers = { YNH_USER = decoded["user"], YNH_USER_EMAIL = decoded["email"],
-            YNH_USER_FULLNAME = decoded["fullname"]}
-        return decoded['id'], decoded['host'], decoded["user"], decoded["pwd"], headers, nil
+        local headers = {
+            YNH_USER = decoded["user"],
+            YNH_USER_EMAIL = decoded["email"],
+            YNH_USER_FULLNAME = decoded["fullname"],
+        }
+        return decoded["id"], decoded["host"], decoded["user"], decoded["pwd"], headers, nil
     end
 end
 
@@ -76,8 +82,8 @@ function uri_args_string(args)
         args = ngx.req.get_uri_args()
     end
     String = "?"
-    for k,v in pairs(args) do
-        String = String..tostring(k).."="..tostring(v).."&"
+    for k, v in pairs(args) do
+        String = String .. tostring(k) .. "=" .. tostring(v) .. "&"
     end
     return string.sub(String, 1, string.len(String) - 1)
 end
@@ -94,7 +100,6 @@ function element_is_in_table(element, table)
     return false
 end
 
-
 -- ###########################################################################
 --     1. AUTHENTICATION
 --  Check wether or not this is a logged-in user
@@ -109,7 +114,6 @@ local authPasswordEnc = nil
 local authUserHeaders = nil
 
 function check_authentication()
-
     -- cf. src/authenticators/ldap_ynhuser.py in YunoHost to see how the cookie is actually created
 
     local cookie = ngx.var["cookie_" .. conf["cookie_name"]]
@@ -123,8 +127,8 @@ function check_authentication()
         return false, nil, nil, nil
     end
 
-    local session_file = conf["session_folder"] .. '/' .. session_id
-    local session_file_attrs = lfs.attributes(session_file, {"modification"})
+    local session_file = conf["session_folder"] .. "/" .. session_id
+    local session_file_attrs = lfs.attributes(session_file, { "modification" })
     if session_file_attrs == nil or math.abs(session_file_attrs["modification"] - os.time()) > 3 * 24 * 3600 then
         -- session expired
         return false, nil, nil, nil
@@ -147,22 +151,23 @@ end
 -- ###########################################################################
 
 function convert_to_absolute_url(redirect_url)
-    if string.starts(redirect_url, "http://")
-    or string.starts(redirect_url, "https://") then
+    if string.starts(redirect_url, "http://") or string.starts(redirect_url, "https://") then
         return redirect_url
     elseif string.starts(redirect_url, "/") then
-        return ngx.var.scheme.."://"..ngx.var.host..redirect_url
+        return ngx.var.scheme .. "://" .. ngx.var.host .. redirect_url
     else
-        return ngx.var.scheme.."://"..redirect_url
+        return ngx.var.scheme .. "://" .. redirect_url
     end
 end
 
 if conf["redirected_urls"] then
     for url, redirect_url in pairs(conf["redirected_urls"]) do
-        if url == ngx.var.host..ngx.var.uri..uri_args_string()
-        or url == ngx.var.scheme.."://"..ngx.var.host..ngx.var.uri..uri_args_string()
-        or url == ngx.var.uri..uri_args_string() then
-            logger:debug("Found in redirected_urls, redirecting to "..url)
+        if
+            url == ngx.var.host .. ngx.var.uri .. uri_args_string()
+            or url == ngx.var.scheme .. "://" .. ngx.var.host .. ngx.var.uri .. uri_args_string()
+            or url == ngx.var.uri .. uri_args_string()
+        then
+            logger:debug("Found in redirected_urls, redirecting to " .. url)
             ngx.redirect(convert_to_absolute_url(redirect_url))
         end
     end
@@ -191,17 +196,17 @@ end
 local permission = nil
 local longest_match = ""
 
-ngx_full_url = ngx.var.host..ngx.var.uri
+ngx_full_url = ngx.var.host .. ngx.var.uri
 
 for permission_name, permission_infos in pairs(conf["permissions"]) do
-    if next(permission_infos['uris']) ~= nil then
-        for _, prefix in pairs(permission_infos['uris']) do
+    if next(permission_infos["uris"]) ~= nil then
+        for _, prefix in pairs(permission_infos["uris"]) do
             local match = nil
             if string.starts(prefix, "re:") then
                 prefix = string.sub(prefix, 4, string.len(prefix))
                 -- Make sure we match the prefix from the beginning of the url
                 if not string.starts(prefix, "^") then
-                    prefix = "^"..prefix
+                    prefix = "^" .. prefix
                 end
                 match = rex.match(ngx_full_url, prefix)
             elseif string.starts(ngx_full_url, prefix) then
@@ -227,11 +232,11 @@ local has_access
 
 -- No permission object found = no access
 if permission == nil then
-    logger:debug("No permission matching request for "..ngx.var.uri.." ... Assuming access is denied")
+    logger:debug("No permission matching request for " .. ngx.var.uri .. " ... Assuming access is denied")
     has_access = false
 -- permission is public = everybody has access, no need to check auth
 elseif permission["public"] then
-    logger:debug("Someone tries to access "..ngx.var.uri.." (corresponding perm: "..permission["id"]..")")
+    logger:debug("Someone tries to access " .. ngx.var.uri .. " (corresponding perm: " .. permission["id"] .. ")")
     has_access = true
 -- Check auth header, assume the route is protected
 else
@@ -239,17 +244,27 @@ else
 
     -- Unauthenticated user, deny access
     if authUser == nil then
-        logger:debug("Denied unauthenticated access to "..ngx.var.uri.." (corresponding perm: "..permission["id"]..")")
+        logger:debug(
+            "Denied unauthenticated access to " .. ngx.var.uri .. " (corresponding perm: " .. permission["id"] .. ")"
+        )
         has_access = false
     else
-        logger:debug("User "..authUser.." tries to access "..ngx.var.uri.." (corresponding perm: "..permission["id"]..")")
+        logger:debug(
+            "User "
+                .. authUser
+                .. " tries to access "
+                .. ngx.var.uri
+                .. " (corresponding perm: "
+                .. permission["id"]
+                .. ")"
+        )
 
         -- The user has permission to access the content if s.he is in the list of allowed users
         if element_is_in_table(authUser, permission["users"]) then
-            logger:debug("User "..authUser.." can access "..ngx.var.host..ngx.var.uri..uri_args_string())
+            logger:debug("User " .. authUser .. " can access " .. ngx.var.host .. ngx.var.uri .. uri_args_string())
             has_access = true
         else
-            logger:debug("User "..authUser.." cannot access "..ngx.var.uri)
+            logger:debug("User " .. authUser .. " cannot access " .. ngx.var.uri)
             has_access = false
         end
     end
@@ -297,7 +312,6 @@ end
 -- ###########################################################################
 
 function set_auth_headers()
-
     -- cf. https://en.wikipedia.org/wiki/Basic_access_authentication
 
     -- authPasswordEnc is actually a string formatted as <password_enc_b64>|<iv_b64>
@@ -313,13 +327,11 @@ function set_auth_headers()
         local password_enc_b64, iv_b64 = authPasswordEnc:match("([^|]+)|([^|]+)")
         local password_enc = ngx.decode_base64(password_enc_b64)
         local iv = ngx.decode_base64(iv_b64)
-        password = cipher.new('aes-256-cbc'):decrypt(COOKIE_SECRET, iv):final(password_enc)
+        password = cipher.new("aes-256-cbc"):decrypt(COOKIE_SECRET, iv):final(password_enc)
     end
 
     -- Set `Authorization` header to enable HTTP authentification
-    ngx.req.set_header("Authorization", "Basic "..ngx.encode_base64(
-        authUser..":"..password
-    ))
+    ngx.req.set_header("Authorization", "Basic " .. ngx.encode_base64(authUser .. ":" .. password))
 
     if authUserHeaders ~= nil then
         for k, v in pairs(authUserHeaders) do
@@ -345,25 +357,24 @@ if has_access then
     end
 
     -- Pass
-    logger:debug("Allowing to pass through "..ngx.var.uri)
+    logger:debug("Allowing to pass through " .. ngx.var.uri)
     return
 
 -- 2nd case : no access ... redirect to portal / login form
 else
-
     portal_domain = conf["domain_portal_urls"][ngx.var.host]
     if portal_domain == nil then
         logger:debug("Domain " .. ngx.var.host .. " is not configured for SSOWat, falling back to default")
         portal_domain = conf["domain_portal_urls"]["default"]
         if portal_domain ~= nil then
-            if string.starts(portal_domain, '/') then
+            if string.starts(portal_domain, "/") then
                 portal_domain = ngx.var.host .. portal_domain
             end
             return ngx.redirect("https://" .. portal_domain)
         end
     end
     if portal_domain == nil then
-        ngx.header['Content-Type'] = "text/html"
+        ngx.header["Content-Type"] = "text/html"
         ngx.status = ngx.HTTP_BAD_REQUEST
         ngx.say("Unmanaged domain")
         return ngx.exit()
@@ -373,7 +384,7 @@ else
     logger:debug("Redirecting to portal : " .. portal_url)
 
     if is_logged_in then
-        return ngx.redirect(portal_url.."?msg=access_denied")
+        return ngx.redirect(portal_url .. "?msg=access_denied")
     else
         local back_url = "https://" .. ngx.var.host .. ngx.var.uri .. uri_args_string()
 
@@ -385,6 +396,6 @@ else
         -- than the portal. Otherwise, a malicious actor could create a deceptive link
         -- that would in fact redirect to a different domain, tricking the user that may
         -- not realize this.
-        return ngx.redirect(portal_url.."?r="..ngx.encode_base64(back_url))
+        return ngx.redirect(portal_url .. "?r=" .. ngx.encode_base64(back_url))
     end
 end

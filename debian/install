@@ -1,5 +1,3 @@
-init.lua /usr/share/ssowat
-access.lua /usr/share/ssowat
-config.lua /usr/share/ssowat
+src/*.lua /usr/share/ssowat
 vendor /usr/share/ssowat
 conf.json.example /etc/ssowat
